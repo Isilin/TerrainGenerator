@@ -1,0 +1,29 @@
+{
+    "name": "TerrainGenerator",
+    "version": "Dev 0.1.0",
+    "description": "",
+    "license": "GPL-3.0",
+    "author": {
+        "name": "Pierre Casati",
+        "email": "casa2pir@hotmail.fr",
+        "url": "https://github.com/Isilin"
+    },
+    "contributors": [
+        
+    ],
+    "bin": "",
+    "scripts": {
+    },
+    "main": "",
+    "repository": {
+        
+    },
+    
+    "dependencies": {
+        
+    },
+    "devDependencies": {
+        "grunt": "^1.0.1"
+    },
+    "private": true
+}
