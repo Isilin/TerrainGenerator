@@ -1,9 +1,10 @@
 {
-    "name": "TerrainGenerator",
+    "name": "terraingenerator",
     "version": "0.1.0",
     "description": "",
     "license": "GPL-3.0",
     "readme": "README.md",
+    "private": true,
     "author": {
         "name": "Pierre Casati",
         "email": "casa2pir@hotmail.fr",
@@ -12,10 +13,7 @@
     "contributors": [
         
     ],
-    "bin": "",
-    "scripts": {
-    },
-    "main": "",
+
     "repository": {
         "type": "git",
         "url": "https://github.com/Isilin/TerrainGenerator.git"
@@ -24,15 +22,34 @@
         "email": "casa2pir@hotmail.fr",
         "url": "https://github.com/Isilin/TerrainGenerator/issues"
     },
-    "dependencies": {
-        
-    },
-    "devDependencies": {
-        "grunt": "^1.0.1"
-    },
-    "private": true,
+    
+    "bin": "",
     "engines": {
         "node": "~7.10.0",
         "npm": "~4.5.0"
+    },
+
+    "devDependencies": {
+        "bower": "^1.8.0",
+        "grunt": "^1.0.1",
+        "body-parser": "~1.17.1",
+        "cookie-parser": "~1.4.3",
+        "debug": "~2.6.6",
+        "ejs": "~2.5.6",
+        "express": "~4.15.2",
+        "morgan": "~1.8.1",
+        "serve-favicon": "~2.4.2"
+    },
+
+    "scripts": {
+        "postinstall": "bower install",
+
+        "prestart": "npm install",
+        "start": "node ./bin/www",
+        
+        "pretest": "npm install",
+
+        "preupdate-webdriver": "npm install",
+        "update-webdriver": "webdriver-manager update"
     }
 }
