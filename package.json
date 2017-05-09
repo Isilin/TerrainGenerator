@@ -1,8 +1,9 @@
 {
     "name": "TerrainGenerator",
-    "version": "Dev 0.1.0",
+    "version": "0.1.0",
     "description": "",
     "license": "GPL-3.0",
+    "readme": "README.md",
     "author": {
         "name": "Pierre Casati",
         "email": "casa2pir@hotmail.fr",
@@ -16,14 +17,22 @@
     },
     "main": "",
     "repository": {
-        
+        "type": "git",
+        "url": "https://github.com/Isilin/TerrainGenerator.git"
     },
-    
+    "bugs": {
+        "email": "casa2pir@hotmail.fr",
+        "url": "https://github.com/Isilin/TerrainGenerator/issues"
+    },
     "dependencies": {
         
     },
     "devDependencies": {
         "grunt": "^1.0.1"
     },
-    "private": true
+    "private": true,
+    "engines": {
+        "node": "~7.10.0",
+        "npm": "~4.5.0"
+    }
 }
