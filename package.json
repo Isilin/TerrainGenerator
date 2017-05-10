@@ -51,5 +51,6 @@
 
         "preupdate-webdriver": "npm install",
         "update-webdriver": "webdriver-manager update"
-    }
+    },
+    "main": "./bin/www"
 }
