@@ -29,7 +29,7 @@
         "npm": "~4.5.0"
     },
 
-    "devDependencies": {
+    "dependencies": {
         "bower": "^1.8.0",
         "grunt": "^1.0.1",
         "body-parser": "~1.17.1",
