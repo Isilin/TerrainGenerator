@@ -1,4 +1,5 @@
 var app = angular.module('terrainGenerator',[]);
-app.controller('controller', ($scope, $http) => {
+
+app.controller('analytics', ($scope, $http) => {
     
 });

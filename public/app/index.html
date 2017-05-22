@@ -1,0 +1,20 @@
+<canvas id="heightmap"></canvas>
+<div id="show-analytics" class="visible">Analyze</div>
+<div ng-include="'/app/analytics.html'"></div>
+<div id="fpscontrols">W = Forward, S = Back, A = Left, D = Right, R = Up, F = Down, Q = Freeze, Mouse = Look</div>
+
+<script src="/bower_components/angular/angular.min.js"
+<script src="/demo/libs/stats.min.js"></script>
+<script src="/demo/libs/dat.gui.min.js"></script>
+<script src="/demo/libs/three.min.js"></script>
+<script src="/demo/libs/CanvasRenderer.js"></script>
+<script src="/demo/libs/Projector.js"></script>
+<script src="/demo/libs/FirstPersonControls.js"></script>
+<script src="/bower_components/THREE.Terrain/build/THREE.Terrain.min.js"></script>
+<script src="/bower_components/THREE.Terrain/src/worley.js"></script>
+<script src="/bower_components/THREE.Terrain/src/brownian.js"></script>
+<script src="/bower_components/THREE.Terrain/src/gaussian.js"></script>
+<script src="/bower_components/THREE.Terrain/src/weightedBoxBlurGaussian.js"></script>
+<script src="/bower_components/THREE.Terrain/src/analysis.js"></script>
+<script src="/demo/index.js"></script>
+<script>setup();</script>

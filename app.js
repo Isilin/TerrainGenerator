@@ -1,4 +1,5 @@
 var express = require('express');
+var engine = require('ejs-mate');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -11,7 +12,9 @@ var terraingenerator = require('./routes/terraingenerator');
 
 var app = express();
 
-app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
+app.engine('ejs', engine);
+
+app.use(favicon(path.join(__dirname, 'public', 'assets','images', 'favicon.ico')));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, '/public')));
@@ -36,6 +39,7 @@ if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
+      title: err.title,
       message: err.message,
       error: err
     });
@@ -45,6 +49,7 @@ if (app.get('env') === 'development') {
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
+    title: err.title,
     message: err.message,
     error: {}
   });
