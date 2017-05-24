@@ -1,4 +1,4 @@
-<div ng-app="terrainGenerator" ng-controller="terrainCtrl" class="clipboard">
+<div ng-app="terrainGenerator" ng-controller="guiCtrl" class="clipboard">
 
     <canvas id="heightmap"></canvas>
     <button type="button" class="btn btn-info" id="show-analytics" ng-click="open()">Analyze</button>
@@ -27,15 +27,20 @@
     <script src="/bower_components/angular-touch/angular-touch.js"></script>
     <script src="/bower_components/angular-bootstrap/ui-bootstrap.js"></script>
     <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-
+    
     <script src="/app/scripts/app.routes.js"></script>
+
+    <script src="/app/scripts/components/analyticsModal.cmpt.js"></script>
+
+    <script src="/app/scripts/controllers/gui.ctrl.js"></script>
     <script src="/app/scripts/controllers/terrain.ctrl.js"></script>
     <script src="/app/scripts/controllers/analyticsModal.ctrl.js"></script>
-    <script src="/app/scripts/components/analyticsModal.cmpt.js"></script>
-    <script src="/app/scripts/directives/paireEntryTable.drtv.js"></script>
-    <script src="/app/scripts/controllers/modal.ctrl.js"></script>
     <script src="/app/scripts/controllers/heightmap.ctrl.js"></script>
+
+    <script src="/app/scripts/directives/paireEntryTable.drtv.js"></script>
+
     <script src="/app/scripts/factories/stats.fcty.js"></script>
-    <!--<script src="/demo/index.js"></script>
-    <script>setup();</script>-->
+
+    <script src="/assets/js/index.js"></script>
+    <script>setup();</script>
 </div>

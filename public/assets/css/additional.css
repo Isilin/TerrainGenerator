@@ -1,3 +1,13 @@
 .collapser:hover {
     cursor: pointer
 }
+
+.modal-dialog{
+    overflow-y: initial !important
+}
+
+.body-analytics-modal {
+    height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}

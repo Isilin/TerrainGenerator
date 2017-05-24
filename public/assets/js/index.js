@@ -105,7 +105,7 @@ function setupControls() {
 }
 
 function setupWorld() {
-  THREE.ImageUtils.loadTexture('/bower_components/THREE.Terrain/demo/img/sky1.jpg', undefined, function(t1) {
+  THREE.ImageUtils.loadTexture('/assets/images/sky1.jpg', undefined, function(t1) {
     t1.minFilter = THREE.LinearFilter; // Texture is not a power-of-two size; use smoother interpolation.
     skyDome = new THREE.Mesh(
       new THREE.SphereGeometry(8192, 16, 16, 0, Math.PI*2, 0, Math.PI*0.5),
@@ -133,7 +133,7 @@ function setupWorld() {
 
 function setupDatGui() {
   var heightmapImage = new Image();
-  heightmapImage.src = '/bower_components/THREE.Terrain/demo/img/heightmap.png';
+  heightmapImage.src = '/assets/images/heightmap.png';
   function Settings() {
     var that = this;
     var mat = new THREE.MeshBasicMaterial({color: 0x5566aa, wireframe: true});
@@ -142,7 +142,7 @@ function setupDatGui() {
     var elevationGraph = document.getElementById('elevation-graph'),
         slopeGraph = document.getElementById('slope-graph'),
         analyticsValues = document.getElementsByClassName('value');
-    THREE.ImageUtils.loadTexture('/bower_components/THREE.Terrain/demo/img/sand1.jpg', undefined, function(t1) {
+    THREE.ImageUtils.loadTexture('/assets/images/sand1.jpg', undefined, function(t1) {
       t1.wrapS = t1.wrapT = THREE.RepeatWrapping;
       sand = new THREE.Mesh(
         new THREE.PlaneBufferGeometry(16384+1024, 16384+1024, 64, 64),
@@ -151,11 +151,11 @@ function setupDatGui() {
       sand.position.y = -101;
       sand.rotation.x = -0.5 * Math.PI;
       scene.add(sand);
-      THREE.ImageUtils.loadTexture('/bower_components/THREE.Terrain/demo/img/grass1.jpg', undefined, function(t2) {
+      THREE.ImageUtils.loadTexture('/assets/images/grass1.jpg', undefined, function(t2) {
         t2.wrapS = t2.wrapT = THREE.RepeatWrapping;
-        THREE.ImageUtils.loadTexture('/bower_components/THREE.Terrain/demo/img/stone1.jpg', undefined, function(t3) {
+        THREE.ImageUtils.loadTexture('/assets/images/stone1.jpg', undefined, function(t3) {
           t3.wrapS = t3.wrapT = THREE.RepeatWrapping;
-          THREE.ImageUtils.loadTexture('/bower_components/THREE.Terrain/demo/img/snow1.jpg', undefined, function(t4) {
+          THREE.ImageUtils.loadTexture('/assets/images/snow1.jpg', undefined, function(t4) {
             t4.wrapS = t4.wrapT = THREE.RepeatWrapping;
             // t2.repeat.x = t2.repeat.y = 2;
             blend = THREE.Terrain.generateBlendedMaterial([
@@ -433,7 +433,7 @@ function watchFocus() {
     controls.freeze = true;
   });
 }
-
+/*
 document.querySelector('#analytics .close').addEventListener('click', function(event) {
   event.preventDefault();
   document.getElementById('analytics').classList.remove('visible');
@@ -447,7 +447,7 @@ document.querySelector('#show-analytics').addEventListener('click', function(eve
   analytics.scrollTop = 0;
   analytics.classList.add('visible');
 }, false);
-
+*/
 function __printCameraData() {
   var s = '';
   s += 'camera.position.x = ' + Math.round(fpsCamera.position.x) + ';\n';
