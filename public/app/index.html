@@ -1,6 +1,6 @@
 <div ng-app="terrainGenerator" ng-controller="guiCtrl" class="clipboard">
     <div ng-controller="terrainCtrl"></div>
-    <canvas id="heightmap"></canvas>
+    <canvas id="heightmap" ng-controller="heightmapCtrl"></canvas>
     <button type="button" class="btn btn-info" id="show-analytics" ng-click="open()">Analyze</button>
     <div id="fpscontrols">W = Forward, S = Back, A = Left, D = Right, R = Up, F = Down, Q = Freeze, Mouse = Look</div>
 
