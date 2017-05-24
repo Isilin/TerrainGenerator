@@ -1,5 +1,5 @@
 <div ng-app="terrainGenerator" ng-controller="guiCtrl" class="clipboard">
-
+    <div ng-controller="terrainCtrl"></div>
     <canvas id="heightmap"></canvas>
     <button type="button" class="btn btn-info" id="show-analytics" ng-click="open()">Analyze</button>
     <div id="fpscontrols">W = Forward, S = Back, A = Left, D = Right, R = Up, F = Down, Q = Freeze, Mouse = Look</div>
@@ -40,7 +40,4 @@
     <script src="/app/scripts/directives/paireEntryTable.drtv.js"></script>
 
     <script src="/app/scripts/factories/stats.fcty.js"></script>
-
-    <script src="/assets/js/index.js"></script>
-    <script>setup();</script>
 </div>
