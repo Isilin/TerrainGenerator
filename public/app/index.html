@@ -1,24 +1,43 @@
-<div ng-app="terrainGenerator">
-
+<div ng-app="terrainGenerator" ng-controller="guiCtrl" class="clipboard">
+    <div ng-controller="terrainCtrl"></div>
     <canvas id="heightmap"></canvas>
-    <div id="show-analytics" class="visible">Analyze</div>
-    <div ng-view=""></div>
+    <button type="button" class="btn btn-info" id="show-analytics" ng-click="open()">Analyze</button>
     <div id="fpscontrols">W = Forward, S = Back, A = Left, D = Right, R = Up, F = Down, Q = Freeze, Mouse = Look</div>
-</div>
 
-<script src="/bower_components/angular/angular.min.js"></script>
-<script src="/demo/libs/stats.min.js"></script>
-<script src="/demo/libs/dat.gui.min.js"></script>
-<script src="/demo/libs/three.min.js"></script>
-<script src="/demo/libs/CanvasRenderer.js"></script>
-<script src="/demo/libs/Projector.js"></script>
-<script src="/demo/libs/FirstPersonControls.js"></script>
-<script src="/bower_components/THREE.Terrain/build/THREE.Terrain.min.js"></script>
-<script src="/bower_components/THREE.Terrain/src/worley.js"></script>
-<script src="/bower_components/THREE.Terrain/src/brownian.js"></script>
-<script src="/bower_components/THREE.Terrain/src/gaussian.js"></script>
-<script src="/bower_components/THREE.Terrain/src/weightedBoxBlurGaussian.js"></script>
-<script src="/bower_components/THREE.Terrain/src/analysis.js"></script>
-<script src="/app/app.js"></script>
-<script src="/demo/index.js"></script>
-<script>setup();</script>
+
+    <script src="/assets/libs/stats.min.js"></script>
+    <script src="/assets/libs/dat.gui.min.js"></script>
+    <script src="/assets/libs/three.min.js"></script>
+    <script src="/assets/libs/CanvasRenderer.js"></script>
+    <script src="/assets/libs/Projector.js"></script>
+    <script src="/assets/libs/FirstPersonControls.js"></script>
+    <script src="/bower_components/THREE.Terrain/build/THREE.Terrain.min.js"></script>
+    <script src="/bower_components/THREE.Terrain/src/worley.js"></script>
+    <script src="/bower_components/THREE.Terrain/src/brownian.js"></script>
+    <script src="/bower_components/THREE.Terrain/src/gaussian.js"></script>
+    <script src="/bower_components/THREE.Terrain/src/weightedBoxBlurGaussian.js"></script>
+    <script src="/bower_components/THREE.Terrain/src/analysis.js"></script>
+
+
+    <script src="/bower_components/jquery/dist/jquery.js"></script>
+    <script src="/bower_components/angular/angular.js"></script>
+    <script src="/bower_components/boostrap/dist/js/bootstrap.js"></script>
+    <script src="/bower_components/angular-route/angular-route.js"></script>
+    <script src="/bower_components/angular-animate/angular-animate.js"></script>
+    <script src="/bower_components/angular-touch/angular-touch.js"></script>
+    <script src="/bower_components/angular-bootstrap/ui-bootstrap.js"></script>
+    <script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    
+    <script src="/app/scripts/app.routes.js"></script>
+
+    <script src="/app/scripts/components/analyticsModal.cmpt.js"></script>
+
+    <script src="/app/scripts/controllers/gui.ctrl.js"></script>
+    <script src="/app/scripts/controllers/terrain.ctrl.js"></script>
+    <script src="/app/scripts/controllers/analyticsModal.ctrl.js"></script>
+    <script src="/app/scripts/controllers/heightmap.ctrl.js"></script>
+
+    <script src="/app/scripts/directives/paireEntryTable.drtv.js"></script>
+
+    <script src="/app/scripts/factories/stats.fcty.js"></script>
+</div>
