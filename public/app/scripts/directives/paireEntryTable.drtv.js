@@ -10,10 +10,10 @@ angular.module('terrainGenerator')
                 name: "@name",
                 value: "@value"
             },
-            controller: ['$scope','$attrs', 'stats', function ($scope, $attrs, stats) {
+            controller: ['$scope','$attrs', 'analytics', function ($scope, $attrs, analytics) {
                 $scope.name = $attrs.name;
                 $scope.value = $attrs.value;
-                $scope.stats = stats;
+                $scope.analytics = analytics;
             }]
         }
     }

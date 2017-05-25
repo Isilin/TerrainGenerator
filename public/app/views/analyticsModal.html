@@ -4,15 +4,15 @@
     </div>
 
     <div class="modal-body row">
-        <div class="container col-md-12 body-analytics-modal">
+        <div class="container-fluid col-md-12 body-analytics-modal">
             <div class="row">
                 <div class="table-responsive col-md-6">
                     <table class="table table-stripped table-hover table-condensed">
                         <caption>Summary</caption>
                         <tbody>
-                            <tr paire-entry-table name="Elevation dispersion" value="{{stats.elevation.stdev}}"></tr>
-                            <tr paire-entry-table name="Elevation skew" value="{{stats.elevation.pearsonSkew}}"></tr>
-                            <tr paire-entry-table name="Jaggedness" value="{{stats.roughness.jaggedness}}"></tr>
+                            <tr paire-entry-table name="Elevation dispersion" value="{{analytics.elevation.stdev}}"></tr>
+                            <tr paire-entry-table name="Elevation skew" value="{{analytics.elevation.pearsonSkew}}"></tr>
+                            <tr paire-entry-table name="Jaggedness" value="{{analytics.roughness.jaggedness}}"></tr>
                         </tbody>
                     </table>
                 </div>
@@ -20,9 +20,9 @@
                     <table class="table table-stripped table-hover table-condensed">
                         <caption>&nbsp;</caption>
                         <tbody>
-                            <tr paire-entry-table name="Slope dispersion" value="{{stats.slope.stdev}}"></tr>
-                            <tr paire-entry-table name="Slope skew" value="{{stats.slope.groeneveldMeedenSkew}}"></tr>
-                            <tr paire-entry-table name="Ruggedness" value="{{stats.roughness.terrainRuggednessIndex}}"></tr>
+                            <tr paire-entry-table name="Slope dispersion" value="{{analytics.slope.stdev}}"></tr>
+                            <tr paire-entry-table name="Slope skew" value="{{analytics.slope.groeneveldMeedenSkew}}"></tr>
+                            <tr paire-entry-table name="Ruggedness" value="{{analytics.roughness.terrainRuggednessIndex}}"></tr>
                         </tbody>
                     </table>
                 </div>
@@ -33,20 +33,20 @@
                         <table class="table table-stripped table-hover table-condensed">
                             <caption>Elevation <span class="glyphicon glyphicon-triangle-bottom collapser" ng-click="toggleElevation()"></span></caption>
                             <tbody uib-collapse="isElevationCollapsed">
-                                <tr paire-entry-table name="Sample size" value="{{stats.elevation.sampleSize}}"></tr>
-                                <tr paire-entry-table name="Min" value="{{stats.elevation.min}}"></tr>
-                                <tr paire-entry-table name="Max" value="{{stats.elevation.max}}"></tr>
-                                <tr paire-entry-table name="Range" value="{{stats.elevation.range}}"></tr>
-                                <tr paire-entry-table name="Midrange" value="{{stats.elevation.midrange}}"></tr>
-                                <tr paire-entry-table name="Median" value="{{stats.elevation.median}}"></tr>
-                                <tr paire-entry-table name="IQR" value="{{stats.elevation.iqr}}"></tr>
-                                <tr paire-entry-table name="Mean" value="{{stats.elevation.mean}}"></tr>
-                                <tr paire-entry-table name="Std dev" value="{{stats.elevation.stdev}}"></tr>
-                                <tr paire-entry-table name="MAD" value="{{stats.elevation.mad}}"></tr>
-                                <tr paire-entry-table name="Mode" value="{{stats.elevation.modes}}"></tr>
-                                <tr paire-entry-table name="Pearson skew" value="{{stats.elevation.pearsonSkew}}"></tr>
-                                <tr paire-entry-table name="G&amp;M skew" value="{{stats.elevation.groeneveldMeedenSkew}}"></tr>
-                                <tr paire-entry-table name="Kurtosis" value="{{stats.elevation.kurtosis}}"></tr>
+                                <tr paire-entry-table name="Sample size" value="{{analytics.elevation.sampleSize}}"></tr>
+                                <tr paire-entry-table name="Min" value="{{analytics.elevation.min}}"></tr>
+                                <tr paire-entry-table name="Max" value="{{analytics.elevation.max}}"></tr>
+                                <tr paire-entry-table name="Range" value="{{analytics.elevation.range}}"></tr>
+                                <tr paire-entry-table name="Midrange" value="{{analytics.elevation.midrange}}"></tr>
+                                <tr paire-entry-table name="Median" value="{{analytics.elevation.median}}"></tr>
+                                <tr paire-entry-table name="IQR" value="{{analytics.elevation.iqr}}"></tr>
+                                <tr paire-entry-table name="Mean" value="{{analytics.elevation.mean}}"></tr>
+                                <tr paire-entry-table name="Std dev" value="{{analytics.elevation.stdev}}"></tr>
+                                <tr paire-entry-table name="MAD" value="{{analytics.elevation.mad}}"></tr>
+                                <tr paire-entry-table name="Mode" value="{{analytics.elevation.modes}}"></tr>
+                                <tr paire-entry-table name="Pearson skew" value="{{analytics.elevation.pearsonSkew}}"></tr>
+                                <tr paire-entry-table name="G&amp;M skew" value="{{analytics.elevation.groeneveldMeedenSkew}}"></tr>
+                                <tr paire-entry-table name="Kurtosis" value="{{analytics.elevation.kurtosis}}"></tr>
                             </tbody>
                         </table>
                     </div>
@@ -60,20 +60,20 @@
                         <table class="table table-stripped table-hover table-condensed">
                             <caption>Slope <span class="glyphicon glyphicon-triangle-bottom collapser" ng-click="toggleSlope()"></span></caption>
                             <tbody uib-collapse="isSlopeCollapsed">
-                                <tr paire-entry-table name="Sample size" value="{{stats.slope.sampleSize}}"></tr>
-                                <tr paire-entry-table name="Min" value="{{stats.slope.min}}"></tr>
-                                <tr paire-entry-table name="Max" value="{{stats.slope.max}}"></tr>
-                                <tr paire-entry-table name="Range" value="{{stats.slope.range}}"></tr>
-                                <tr paire-entry-table name="Midrange" value="{{stats.slope.midrange}}"></tr>
-                                <tr paire-entry-table name="Median" value="{{stats.slope.median}}"></tr>
-                                <tr paire-entry-table name="IQR" value="{{stats.slope.iqr}}"></tr>
-                                <tr paire-entry-table name="Mean" value="{{stats.slope.mean}}"></tr>
-                                <tr paire-entry-table name="Std dev" value="{{stats.slope.stdev}}"></tr>
-                                <tr paire-entry-table name="MAD" value="{{stats.slope.mad}}"></tr>
-                                <tr paire-entry-table name="Mode" value="{{stats.slope.modes}}"></tr>
-                                <tr paire-entry-table name="Pearson skew" value="{{stats.slope.pearsonSkew}}"></tr>
-                                <tr paire-entry-table name="G&amp;M skew" value="{{stats.slope.groeneveldMeedenSkew}}"></tr>
-                                <tr paire-entry-table name="Kurtosis" value="{{stats.slope.kurtosis}}"></tr>
+                                <tr paire-entry-table name="Sample size" value="{{analytics.slope.sampleSize}}"></tr>
+                                <tr paire-entry-table name="Min" value="{{analytics.slope.min}}"></tr>
+                                <tr paire-entry-table name="Max" value="{{analytics.slope.max}}"></tr>
+                                <tr paire-entry-table name="Range" value="{{analytics.slope.range}}"></tr>
+                                <tr paire-entry-table name="Midrange" value="{{analytics.slope.midrange}}"></tr>
+                                <tr paire-entry-table name="Median" value="{{analytics.slope.median}}"></tr>
+                                <tr paire-entry-table name="IQR" value="{{analytics.slope.iqr}}"></tr>
+                                <tr paire-entry-table name="Mean" value="{{analytics.slope.mean}}"></tr>
+                                <tr paire-entry-table name="Std dev" value="{{analytics.slope.stdev}}"></tr>
+                                <tr paire-entry-table name="MAD" value="{{analytics.slope.mad}}"></tr>
+                                <tr paire-entry-table name="Mode" value="{{analytics.slope.modes}}"></tr>
+                                <tr paire-entry-table name="Pearson skew" value="{{analytics.slope.pearsonSkew}}"></tr>
+                                <tr paire-entry-table name="G&amp;M skew" value="{{analytics.slope.groeneveldMeedenSkew}}"></tr>
+                                <tr paire-entry-table name="Kurtosis" value="{{analytics.slope.kurtosis}}"></tr>
                             </tbody>
                         </table>
                     </div>
@@ -88,9 +88,9 @@
                     <table class="table table-stripped table-hover table-condensed">
                         <caption>Roughness metrics</caption>
                         <tbody>
-                            <tr paire-entry-table name="2D to 3D area ratio" value="{{stats.roughness.planimetricAreaRatio}}"></tr>
-                            <tr paire-entry-table name="Ruggedness Index" value="{{stats.roughness.terrainRuggednessIndex}}"></tr>
-                            <tr paire-entry-table name="Jaggedness" value="{{stats.roughness.jaggedness}}"></tr>
+                            <tr paire-entry-table name="2D to 3D area ratio" value="{{analytics.roughness.planimetricAreaRatio}}"></tr>
+                            <tr paire-entry-table name="Ruggedness Index" value="{{analytics.roughness.terrainRuggednessIndex}}"></tr>
+                            <tr paire-entry-table name="Jaggedness" value="{{analytics.roughness.jaggedness}}"></tr>
                         </tbody>
                     </table>
                 </div>
@@ -98,8 +98,8 @@
                     <table class="table table-stripped table-hover table-condensed">
                         <caption>Fitted Plane</caption>
                         <tbody>
-                            <tr paire-entry-table name="Slope" value="{{stats.fittedPlane.slope}}"></tr>
-                            <tr paire-entry-table name="Var. explained" value="{{stats.fittedPlane.pctExplained}}"></tr>
+                            <tr paire-entry-table name="Slope" value="{{analytics.fittedPlane.slope}}"></tr>
+                            <tr paire-entry-table name="Var. explained" value="{{analytics.fittedPlane.pctExplained}}"></tr>
                         </tbody>
                     </table>
                 </div>
@@ -108,6 +108,6 @@
     </div>
 
     <div class="modal-footer">
-        <button class="btn btn-warning" type="button" ng-click="close()">Close</button>
+        <button class="btn btn-default" type="button" ng-click="close()">Close</button>
     </div>
 </div>

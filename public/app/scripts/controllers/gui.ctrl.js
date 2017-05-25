@@ -4,9 +4,9 @@ angular.module('terrainGenerator')
     .controller('guiCtrl', [
         '$scope', 
         '$uibModal',
-        'stats',
-        ($scope, $uibModal, stats) => {
-            $scope.stats = stats;
+        'analytics',
+        ($scope, $uibModal, analytics) => {
+            $scope.analytics = analytics;
 
             $scope.open = function () {
                 $uibModal.open({
