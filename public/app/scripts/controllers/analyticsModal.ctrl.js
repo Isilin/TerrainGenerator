@@ -4,9 +4,9 @@ angular.module('terrainGenerator')
     .controller('analyticsModalCtrl', [
         '$scope',
         '$uibModal',
-        'stats',
-        ($scope, $uibModal, stats) => {
-            $scope.stats = stats;
+        'analytics',
+        ($scope, $uibModal, analytics) => {
+            $scope.analytics = analytics;
 
             $scope.isElevationCollapsed = true;
             $scope.isSlopeCollapsed = true;
