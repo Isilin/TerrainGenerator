@@ -1,0 +1,73 @@
+<div class="controlPanel">
+        <div uib-collapse="!status.menu">
+                <uib-accordion close-others="true">
+                        <div uib-accordion-group class="panel-default" is-open="status.heightmap.open">
+                                <uib-accordion-heading>
+                                        <button type="button" class="btn btn-default btn-accordeon">Heightmap<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.heightmap.open, 'glyphicon-chevron-right': !status.heightmap.open}"></i></button>
+                                </uib-accordion-heading>
+                                <table class="table table-stripped table-hover table-condensed">
+                                        <tbody>
+                                                <tr><td>Heightmap</td></tr>
+                                                <tr><td>Easing</td></tr>
+                                                <tr><td>Smoothing</td></tr>
+                                                <tr><td>Segments</td></tr>
+                                                <tr><td>Steps</td></tr>
+                                                <tr><td>Turbulent</td></tr>
+                                        </tbody>
+                                </table>
+                        </div>
+                </uib-accordion>
+                <uib-accordion close-others="true">
+                        <div uib-accordion-group class="panel-default" is-open="status.decoration.open">
+                                <uib-accordion-heading>
+                                        <button type="button" class="btn btn-default btn-accordeon">Decoration<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.decoration.open, 'glyphicon-chevron-right': !status.decoration.open}"></i></button>
+                                </uib-accordion-heading>
+                                <table class="table table-stripped table-hover table-condensed">
+                                        <tbody>
+                                                <tr><td>Texture</td></tr>
+                                                <tr><td>Scattering</td></tr>
+                                                <tr><td>Spread</td></tr>
+                                                <tr><td>Light color</td></tr>
+                                        </tbody>
+                                </table>
+                        </div>
+                </uib-accordion>
+                <uib-accordion close-others="true">
+                        <div uib-accordion-group class="panel-default" is-open="status.size.open">
+                                <uib-accordion-heading>
+                                        <button type="button" class="btn btn-default btn-accordeon">Size<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.size.open, 'glyphicon-chevron-right': !status.size.open}"></i></button>
+                                </uib-accordion-heading>
+                                <table class="table table-stripped table-hover table-condensed">
+                                        <tbody>
+                                                <tr><td>Size</td></tr>
+                                                <tr><td>Max height</td></tr>
+                                                <tr><td>Width:Length ratio</td></tr>
+                                        </tbody>
+                                </table>
+                        </div>
+                </uib-accordion>
+                <uib-accordion close-others="true">
+                        <div uib-accordion-group class="panel-default" is-open="status.edges.open">
+                                <uib-accordion-heading>
+                                        <button type="button" class="btn btn-default btn-accordeon">Edges<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.edges.open, 'glyphicon-chevron-right': !status.edges.open}"></i></button>
+                                </uib-accordion-heading>
+                                <table class="table table-stripped table-hover table-condensed">
+                                        <tbody>
+                                                <tr><td>Type</td></tr>
+                                                <tr><td>Direction</td></tr>
+                                                <tr><td>Curve</td></tr>
+                                                <tr><td>Distance</td></tr>
+                                        </tbody>
+                                </table>
+                        </div>
+                </uib-accordion>
+                <table class="table table-stripped table-hover table-condensed">
+                        <tbody>
+                                <tr><td>Flight mode</td></tr>
+                                <tr><td>Scatter meshes</td></tr>
+                                <tr><td>Regenerate</td></tr>
+                        </tbody>
+                </table>
+        </div>
+        <button type="button" class="btn btn-default btn-accordeon" ng-click="toggle()">{{getText()}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': !status.menu, 'glyphicon-chevron-up': status.menu}"></i></button>
+</div>

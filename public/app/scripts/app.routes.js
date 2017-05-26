@@ -2,6 +2,8 @@
 
 angular.module('terrainGenerator', [
     'ngRoute',
+    'ngAnimate',
+    'ngSanitize', 
     'ui.bootstrap'
   ])
   .config(($routeProvider) => {
