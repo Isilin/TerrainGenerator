@@ -1,7 +1,11 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .service('app', ['WebGL', function (WebGL) {
+    .service('app', [
+        'WebGL',
+        'Scene',
+        'Settings',
+        function (WebGL, Scene, Settings) {
         var app = {};
 
         WebGL.initGL();
@@ -13,7 +17,20 @@ angular.module('terrainGenerator')
             window.innerHeight = parent.innerHeight;
         }
 
-        var camera, scene, renderer, clock, player, terrainScene, decoScene, lastOptions, controls = {}, fpsCamera, skyDome, skyLight, sand, water; // jscs:ignore requireLineBreakAfterVariableAssignment
+        var camera, 
+            scene, 
+            renderer, 
+            clock, 
+            player, 
+            terrainScene, 
+            decoScene, 
+            lastOptions, 
+            controls = {}, 
+            fpsCamera, 
+            skyDome, 
+            skyLight, 
+            sand,
+            water; // jscs:ignore requireLineBreakAfterVariableAssignment
         var INV_MAX_FPS = 1 / 100,
             frameDelta = 0,
             paused = true,
@@ -120,7 +137,7 @@ angular.module('terrainGenerator')
 
         function setupDatGui() {
             var heightmapImage = new Image();
-            heightmapImage.src = '/bower_components/THREE.Terrain/demo/img/heightmap.png';
+            heightmapImage.src = '/assets/images/heightmap.png';
 
             function Settings() {
                 var that = this;
@@ -130,7 +147,7 @@ angular.module('terrainGenerator')
                 var elevationGraph = document.getElementById('elevation-graph'),
                     slopeGraph = document.getElementById('slope-graph'),
                     analyticsValues = document.getElementsByClassName('value');
-                THREE.ImageUtils.loadTexture('/bower_components/THREE.Terrain/demo/img/sand1.jpg', undefined, function (t1) {
+                THREE.ImageUtils.loadTexture('/assets/images/sand1.jpg', undefined, function (t1) {
                     t1.wrapS = t1.wrapT = THREE.RepeatWrapping;
                     sand = new THREE.Mesh(
                         new THREE.PlaneBufferGeometry(16384 + 1024, 16384 + 1024, 64, 64),
@@ -139,11 +156,11 @@ angular.module('terrainGenerator')
                     sand.position.y = -101;
                     sand.rotation.x = -0.5 * Math.PI;
                     scene.add(sand);
-                    THREE.ImageUtils.loadTexture('/bower_components/THREE.Terrain/demo/img/grass1.jpg', undefined, function (t2) {
+                    THREE.ImageUtils.loadTexture('/assets/images/grass1.jpg', undefined, function (t2) {
                         t2.wrapS = t2.wrapT = THREE.RepeatWrapping;
-                        THREE.ImageUtils.loadTexture('/bower_components/THREE.Terrain/demo/img/stone1.jpg', undefined, function (t3) {
+                        THREE.ImageUtils.loadTexture('/assets/images/stone1.jpg', undefined, function (t3) {
                             t3.wrapS = t3.wrapT = THREE.RepeatWrapping;
-                            THREE.ImageUtils.loadTexture('/bower_components/THREE.Terrain/demo/img/snow1.jpg', undefined, function (t4) {
+                            THREE.ImageUtils.loadTexture('/assets/images/snow1.jpg', undefined, function (t4) {
                                 t4.wrapS = t4.wrapT = THREE.RepeatWrapping;
                                 // t2.repeat.x = t2.repeat.y = 2;
                                 blend = THREE.Terrain.generateBlendedMaterial([
@@ -312,9 +329,9 @@ angular.module('terrainGenerator')
                     }
                 };
             }
-            var gui = new dat.GUI();
+            //var gui = new dat.GUI();
             var settings = new Settings();
-            var heightmapFolder = gui.addFolder('Heightmap');
+            /*var heightmapFolder = gui.addFolder('Heightmap');
             heightmapFolder.add(settings, 'heightmap', ['Brownian', 'Cosine', 'CosineLayers', 'DiamondSquare', 'Fault', 'heightmap.png', 'Hill', 'HillIsland', 'influences', 'Particles', 'Perlin', 'PerlinDiamond', 'PerlinLayers', 'Simplex', 'SimplexLayers', 'Value', 'Weierstrass', 'Worley']).onFinishChange(settings.Regenerate);
             heightmapFolder.add(settings, 'easing', ['Linear', 'EaseIn', 'EaseInWeak', 'EaseOut', 'EaseInOut', 'InEaseOut']).onFinishChange(settings.Regenerate);
             heightmapFolder.add(settings, 'smoothing', ['Conservative (0.5)', 'Conservative (1)', 'Conservative (10)', 'Gaussian (0.5, 7)', 'Gaussian (1.0, 7)', 'Gaussian (1.5, 7)', 'Gaussian (1.0, 5)', 'Gaussian (1.0, 11)', 'GaussianBox', 'Mean (0)', 'Mean (1)', 'Mean (8)', 'Median', 'None']).onChange(function (val) {
@@ -364,7 +381,7 @@ angular.module('terrainGenerator')
                 }
             });
             gui.add(settings, 'Scatter meshes');
-            gui.add(settings, 'Regenerate');
+            gui.add(settings, 'Regenerate');*/
 
             if (typeof window.Stats !== 'undefined' && /[?&]stats=1\b/g.test(location.search)) {
                 Stats = new Stats();

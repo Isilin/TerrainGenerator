@@ -1,5 +1,5 @@
 <div ng-app="terrainGenerator" ng-controller="guiCtrl" class="clipboard">
-    <div ng-controller="terrainCtrl"></div>
+    <div ng-controller="generatorCtrl"></div>
     <canvas id="heightmap" ng-controller="heightmapCtrl"></canvas>
     <button type="button" class="btn btn-info" id="show-analytics" ng-click="open()">Analyze</button>
     <div id="fpscontrols">W = Forward, S = Back, A = Left, D = Right, R = Up, F = Down, Q = Freeze, Mouse = Look</div>
@@ -36,7 +36,7 @@
     <script src="/app/scripts/components/controlPanel.cmpt.js"></script>
 
     <script src="/app/scripts/controllers/gui.ctrl.js"></script>
-    <script src="/app/scripts/controllers/terrain.ctrl.js"></script>
+    <script src="/app/scripts/controllers/generator.ctrl.js"></script>
     <script src="/app/scripts/controllers/analyticsModal.ctrl.js"></script>
     <script src="/app/scripts/controllers/heightmap.ctrl.js"></script>
     <script src="/app/scripts/controllers/controlPanel.ctrl.js"></script>
@@ -44,6 +44,8 @@
     <script src="/app/scripts/directives/paireEntryTable.drtv.js"></script>
 
     <script src="/app/scripts/factories/analytics.fcty.js"></script>
+    <script src="/app/scripts/factories/Scene.fcty.js"></script>
+    <script src="/app/scripts/factories/Settings.fcty.js"></script>
 
     <script src="/app/scripts/services/WebGL.svc.js"></script>
     <script src="/app/scripts/services/app.svc.js"></script>

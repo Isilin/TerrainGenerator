@@ -7,12 +7,27 @@
                                 </uib-accordion-heading>
                                 <table class="table table-stripped table-hover table-condensed">
                                         <tbody>
-                                                <tr><td>Heightmap</td></tr>
-                                                <tr><td>Easing</td></tr>
-                                                <tr><td>Smoothing</td></tr>
-                                                <tr><td>Segments</td></tr>
-                                                <tr><td>Steps</td></tr>
-                                                <tr><td>Turbulent</td></tr>
+                                                <tr>
+                                                        <td>
+                                                                Heightmap
+                                                                <select class="form-control form-select" ng-model="heightmap.selected" ng-options="o as o for o in heightmap.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <td>
+                                                                Easing
+                                                                <select class="form-control form-select" ng-model="easing.selected" ng-options="o as o for o in easing.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <td>
+                                                                Smoothing
+                                                                <select class="form-control form-select" ng-model="smoothing.selected" ng-options="o as o for o in smoothing.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr><td>Segments<input type="number" class="form-control form-number" min="7" max="127" value="63"></td></tr>
+                                                <tr><td>Steps<input type="number" class="form-control form-number" min="1" max="8" value="1"></td></tr>
+                                                <tr><td>Turbulent<input type="checkbox" class="form-check-input checkbox-control"></td></tr>
                                         </tbody>
                                 </table>
                         </div>
@@ -24,10 +39,20 @@
                                 </uib-accordion-heading>
                                 <table class="table table-stripped table-hover table-condensed">
                                         <tbody>
-                                                <tr><td>Texture</td></tr>
-                                                <tr><td>Scattering</td></tr>
-                                                <tr><td>Spread</td></tr>
-                                                <tr><td>Light color</td></tr>
+                                                <tr>
+                                                        <td>
+                                                                Texture
+                                                                <select class="form-control form-select" ng-model="texture.selected" ng-options="o as o for o in texture.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <td>
+                                                                Scattering
+                                                                <select class="form-control form-select" ng-model="scattering.selected" ng-options="o as o for o in scattering.options"></select>
+                                                                </td>
+                                                        </tr>
+                                                <tr><td>Spread<input type="number" class="form-control form-number" min="0" max="100" value="60"></td></tr>
+                                                <tr><td>Light color<input type="color" class="form-control form-color" value="#e8bdb0"></td></tr>
                                         </tbody>
                                 </table>
                         </div>
@@ -39,9 +64,9 @@
                                 </uib-accordion-heading>
                                 <table class="table table-stripped table-hover table-condensed">
                                         <tbody>
-                                                <tr><td>Size</td></tr>
-                                                <tr><td>Max height</td></tr>
-                                                <tr><td>Width:Length ratio</td></tr>
+                                                <tr><td>Size<input type="number" class="form-control form-number" min="1024" max="3072" step="256" value="1024"></td></tr>
+                                                <tr><td>Max height<input type="number" class="form-control form-number" min="2" max="300" step="2" value="200"></td></tr>
+                                                <tr><td>Width:Length ratio<input type="number" class="form-control form-number" min="0.2" max="2" value="1" step="0.05"></td></tr>
                                         </tbody>
                                 </table>
                         </div>
@@ -53,17 +78,32 @@
                                 </uib-accordion-heading>
                                 <table class="table table-stripped table-hover table-condensed">
                                         <tbody>
-                                                <tr><td>Type</td></tr>
-                                                <tr><td>Direction</td></tr>
-                                                <tr><td>Curve</td></tr>
-                                                <tr><td>Distance</td></tr>
+                                                <tr>
+                                                        <td>
+                                                                Type
+                                                                <select class="form-control form-select" ng-model="edgetype.selected" ng-options="o as o for o in edgetype.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <td>
+                                                                Direction
+                                                                <select class="form-control form-select" ng-model="direction.selected" ng-options="o as o for o in direction.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <td>
+                                                                Curve
+                                                                <select class="form-control form-select" ng-model="curve.selected" ng-options="o as o for o in curve.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr><td>Distance<input type="number" class="form-control form-number" min="0" max="512" step="32" value="256"></td></tr>
                                         </tbody>
                                 </table>
                         </div>
                 </uib-accordion>
                 <table class="table table-stripped table-hover table-condensed">
                         <tbody>
-                                <tr><td>Flight mode</td></tr>
+                                <tr><td>Flight mode<input type="checkbox" class="form-check-input checkbox-control"></td></tr>
                                 <tr><td>Scatter meshes</td></tr>
                                 <tr><td>Regenerate</td></tr>
                         </tbody>
