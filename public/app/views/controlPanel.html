@@ -1,0 +1,113 @@
+<div class="controlPanel">
+        <div uib-collapse="!status.menu">
+                <uib-accordion close-others="true">
+                        <div uib-accordion-group class="panel-default" is-open="status.heightmap.open">
+                                <uib-accordion-heading>
+                                        <button type="button" class="btn btn-default btn-accordeon">Heightmap<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.heightmap.open, 'glyphicon-chevron-right': !status.heightmap.open}"></i></button>
+                                </uib-accordion-heading>
+                                <table class="table table-stripped table-hover table-condensed">
+                                        <tbody>
+                                                <tr>
+                                                        <td>
+                                                                Heightmap
+                                                                <select class="form-control form-select" ng-model="heightmap.selected" ng-options="o as o for o in heightmap.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <td>
+                                                                Easing
+                                                                <select class="form-control form-select" ng-model="easing.selected" ng-options="o as o for o in easing.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <td>
+                                                                Smoothing
+                                                                <select class="form-control form-select" ng-model="smoothing.selected" ng-options="o as o for o in smoothing.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr><td>Segments<input type="number" class="form-control form-number" min="7" max="127" value="63"></td></tr>
+                                                <tr><td>Steps<input type="number" class="form-control form-number" min="1" max="8" value="1"></td></tr>
+                                                <tr><td>Turbulent<input type="checkbox" class="form-check-input checkbox-control"></td></tr>
+                                        </tbody>
+                                </table>
+                        </div>
+                </uib-accordion>
+                <uib-accordion close-others="true">
+                        <div uib-accordion-group class="panel-default" is-open="status.decoration.open">
+                                <uib-accordion-heading>
+                                        <button type="button" class="btn btn-default btn-accordeon">Decoration<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.decoration.open, 'glyphicon-chevron-right': !status.decoration.open}"></i></button>
+                                </uib-accordion-heading>
+                                <table class="table table-stripped table-hover table-condensed">
+                                        <tbody>
+                                                <tr>
+                                                        <td>
+                                                                Texture
+                                                                <select class="form-control form-select" ng-model="texture.selected" ng-options="o as o for o in texture.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <td>
+                                                                Scattering
+                                                                <select class="form-control form-select" ng-model="scattering.selected" ng-options="o as o for o in scattering.options"></select>
+                                                                </td>
+                                                        </tr>
+                                                <tr><td>Spread<input type="number" class="form-control form-number" min="0" max="100" value="60"></td></tr>
+                                                <tr><td>Light color<input type="color" class="form-control form-color" value="#e8bdb0"></td></tr>
+                                        </tbody>
+                                </table>
+                        </div>
+                </uib-accordion>
+                <uib-accordion close-others="true">
+                        <div uib-accordion-group class="panel-default" is-open="status.size.open">
+                                <uib-accordion-heading>
+                                        <button type="button" class="btn btn-default btn-accordeon">Size<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.size.open, 'glyphicon-chevron-right': !status.size.open}"></i></button>
+                                </uib-accordion-heading>
+                                <table class="table table-stripped table-hover table-condensed">
+                                        <tbody>
+                                                <tr><td>Size<input type="number" class="form-control form-number" min="1024" max="3072" step="256" value="1024"></td></tr>
+                                                <tr><td>Max height<input type="number" class="form-control form-number" min="2" max="300" step="2" value="200"></td></tr>
+                                                <tr><td>Width:Length ratio<input type="number" class="form-control form-number" min="0.2" max="2" value="1" step="0.05"></td></tr>
+                                        </tbody>
+                                </table>
+                        </div>
+                </uib-accordion>
+                <uib-accordion close-others="true">
+                        <div uib-accordion-group class="panel-default" is-open="status.edges.open">
+                                <uib-accordion-heading>
+                                        <button type="button" class="btn btn-default btn-accordeon">Edges<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.edges.open, 'glyphicon-chevron-right': !status.edges.open}"></i></button>
+                                </uib-accordion-heading>
+                                <table class="table table-stripped table-hover table-condensed">
+                                        <tbody>
+                                                <tr>
+                                                        <td>
+                                                                Type
+                                                                <select class="form-control form-select" ng-model="edgetype.selected" ng-options="o as o for o in edgetype.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <td>
+                                                                Direction
+                                                                <select class="form-control form-select" ng-model="direction.selected" ng-options="o as o for o in direction.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr>
+                                                        <td>
+                                                                Curve
+                                                                <select class="form-control form-select" ng-model="curve.selected" ng-options="o as o for o in curve.options"></select>
+                                                        </td>
+                                                </tr>
+                                                <tr><td>Distance<input type="number" class="form-control form-number" min="0" max="512" step="32" value="256"></td></tr>
+                                        </tbody>
+                                </table>
+                        </div>
+                </uib-accordion>
+                <table class="table table-stripped table-hover table-condensed">
+                        <tbody>
+                                <tr><td>Flight mode<input type="checkbox" class="form-check-input checkbox-control"></td></tr>
+                                <tr><td>Scatter meshes</td></tr>
+                                <tr><td>Regenerate</td></tr>
+                        </tbody>
+                </table>
+        </div>
+        <button type="button" class="btn btn-default btn-accordeon" ng-click="toggle()">{{getText()}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': !status.menu, 'glyphicon-chevron-up': status.menu}"></i></button>
+</div>

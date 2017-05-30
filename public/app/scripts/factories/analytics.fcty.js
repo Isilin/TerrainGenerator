@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .factory('analytics', () => {
+    .factory('analytics', function () {
         var stats = {
             "elevation": {
                 "stdev": 0,
