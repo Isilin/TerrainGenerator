@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .controller('controlPanelCtrl', ['$scope', function ($scope) {
+    .controller('controlPanelCtrl', ['$scope', 'Settings', function ($scope, Settings) {
+        $scope.settings = Settings;
+
         $scope.getText = function () {
             return $scope.status.menu ? "Close Controls" : "Open Controls";
         };

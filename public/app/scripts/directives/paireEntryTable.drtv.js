@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .directive('paireEntryTable', () => {
+    .directive('paireEntryTable', function () {
         return {
             templateUrl: '/app/views/paireEntryTable.html',
             restrict: 'A',

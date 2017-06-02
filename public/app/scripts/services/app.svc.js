@@ -3,19 +3,12 @@
 angular.module('terrainGenerator')
     .service('app', [
         'WebGL',
-        'Scene',
+        //'Scene',
         'Settings',
-        function (WebGL, Scene, Settings) {
+        function (WebGL, /*Scene, */Settings) {
         var app = {};
 
         WebGL.initGL();
-
-        // Workaround: in Chrome, if a page is opened with window.open(),
-        // window.innerWidth and window.innerHeight will be zero.
-        if (window.innerWidth === 0) {
-            window.innerWidth = parent.innerWidth;
-            window.innerHeight = parent.innerHeight;
-        }
 
         var camera, 
             scene, 
@@ -40,99 +33,39 @@ angular.module('terrainGenerator')
 
         function animate() {
             Stats.begin();
-            draw();
+/*            draw();
 
             frameDelta += clock.getDelta();
             while (frameDelta >= INV_MAX_FPS) {
                 update(INV_MAX_FPS);
                 frameDelta -= INV_MAX_FPS;
-            }
+            }*/
 
             Stats.end();
-            if (!paused) {
+/*            if (!paused) {
                 requestAnimationFrame(animate);
-            }
+            }*/
         }
 
         function startAnimating() {
-            if (paused) {
+/*            if (paused) {
                 paused = false;
                 controls.freeze = false;
                 clock.start();
                 requestAnimationFrame(animate);
-            }
+            }*/
         }
 
         function stopAnimating() {
-            paused = true;
+/*            paused = true;
             controls.freeze = true;
-            clock.stop();
+            clock.stop();*/
         }
 
         app.setup = function () {
-            setupThreeJS();
-            setupControls();
-            setupWorld();
             watchFocus();
             setupDatGui();
             startAnimating();
-        }
-
-        function setupThreeJS() {
-            scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x868293, 0.0007);
-
-            renderer = WebGL.existingContext ? new THREE.WebGLRenderer({ antialias: true }) : new THREE.CanvasRenderer();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-            renderer.domElement.setAttribute('tabindex', -1);
-
-            camera = new THREE.PerspectiveCamera(60, renderer.domElement.width / renderer.domElement.height, 1, 10000);
-            scene.add(camera);
-            camera.position.x = 449;
-            camera.position.y = 311;
-            camera.position.z = 376;
-            camera.rotation.x = -52 * Math.PI / 180;
-            camera.rotation.y = 35 * Math.PI / 180;
-            camera.rotation.z = 37 * Math.PI / 180;
-
-            clock = new THREE.Clock(false);
-        }
-
-        function setupControls() {
-            fpsCamera = new THREE.PerspectiveCamera(60, renderer.domElement.width / renderer.domElement.height, 1, 10000);
-            scene.add(fpsCamera);
-            controls = new THREE.FirstPersonControls(fpsCamera, renderer.domElement);
-            controls.freeze = true;
-            controls.movementSpeed = 100;
-            controls.lookSpeed = 0.075;
-        }
-
-        function setupWorld() {
-            THREE.ImageUtils.loadTexture('/bower_components/THREE.Terrain/demo/img/sky1.jpg', undefined, function (t1) {
-                t1.minFilter = THREE.LinearFilter; // Texture is not a power-of-two size; use smoother interpolation.
-                skyDome = new THREE.Mesh(
-                    new THREE.SphereGeometry(8192, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.5),
-                    new THREE.MeshBasicMaterial({ map: t1, side: THREE.BackSide, fog: false })
-                );
-                skyDome.position.y = -99;
-                scene.add(skyDome);
-            });
-
-            water = new THREE.Mesh(
-                new THREE.PlaneBufferGeometry(16384 + 1024, 16384 + 1024, 16, 16),
-                new THREE.MeshLambertMaterial({ color: 0x006ba0, transparent: true, opacity: 0.6 })
-            );
-            water.position.y = -99;
-            water.rotation.x = -0.5 * Math.PI;
-            scene.add(water);
-
-            skyLight = new THREE.DirectionalLight(0xe8bdb0, 1.5);
-            skyLight.position.set(2950, 2625, -160); // Sun on the sky texture
-            scene.add(skyLight);
-            var light = new THREE.DirectionalLight(0xc3eaff, 0.75);
-            light.position.set(-1, -0.5, -1);
-            scene.add(light);
         }
 
         function setupDatGui() {
@@ -397,46 +330,22 @@ angular.module('terrainGenerator')
             }
         }
 
-        window.addEventListener('resize', function () {
+        /*window.addEventListener('resize', function () {
             renderer.setSize(window.innerWidth, window.innerHeight);
             camera.aspect = renderer.domElement.width / renderer.domElement.height;
             camera.updateProjectionMatrix();
             fpsCamera.aspect = renderer.domElement.width / renderer.domElement.height;
             fpsCamera.updateProjectionMatrix();
             draw();
-        }, false);
+        }, false);*/
 
         function draw() {
-            renderer.render(scene, useFPS ? fpsCamera : camera);
+//            renderer.render(scene, useFPS ? fpsCamera : camera);
         }
 
         function update(delta) {
             if (terrainScene) terrainScene.rotation.z = Date.now() * 0.00001;
             if (controls.update) controls.update(delta);
-        }
-
-        document.addEventListener('mousemove', function (event) {
-            if (!paused) {
-                mouseX = event.pageX;
-                mouseY = event.pageY;
-            }
-        }, false);
-
-        // Stop animating if the window is out of focus
-        function watchFocus() {
-            var _blurred = false;
-            window.addEventListener('focus', function () {
-                if (_blurred) {
-                    _blurred = false;
-                    // startAnimating();
-                    // controls.freeze = false;
-                }
-            });
-            window.addEventListener('blur', function () {
-                // stopAnimating();
-                _blurred = true;
-                controls.freeze = true;
-            });
         }
 
         function __printCameraData() {
@@ -701,4 +610,4 @@ angular.module('terrainGenerator')
 
         return app;
     }]
-    );
+);

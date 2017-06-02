@@ -5,8 +5,8 @@ angular.module('terrainGenerator')
         '$scope', 
         '$uibModal',
         'analytics',
-        'app',
-        ($scope, $uibModal, analytics, app) => {
+        'Generator',
+        function ($scope, $uibModal, analytics, Generator) {
             $scope.analytics = analytics;
 
             $scope.open = function () {
@@ -20,7 +20,10 @@ angular.module('terrainGenerator')
                 );
             };
 
-            app.setup();
+            //app.setup();
+
+            Generator.init();
+            Generator.start();
         }
     ]
 );

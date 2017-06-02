@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .service('WebGL', function () {
+    .service('WebGL', ['$window', function ($window) {
         var webGL = {}
 
         var isExistingContext = function () { 
@@ -33,8 +33,15 @@ angular.module('terrainGenerator')
         webGL.initGL = function() {
             alertNoGL();
             checkDisablingGL();
+
+            // Workaround: in Chrome, if a page is opened with window.open(),
+            // window.innerWidth and window.innerHeight will be zero.
+            if ($window.innerWidth === 0) {
+                $window.innerWidth = $window.parent.innerWidth;
+                $window.innerHeight = $window.parent.innerHeight;
+            }
         };
 
         return webGL;
-    }
+    }]
 );

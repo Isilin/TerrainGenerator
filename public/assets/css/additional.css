@@ -62,3 +62,9 @@ uib-accordion > .panel-group {
     width: 50% !important;
     height: 32px !important;
 }
+
+#commands-info {
+    position: absolute;
+    bottom: 0px;
+    left: 20px;
+}
