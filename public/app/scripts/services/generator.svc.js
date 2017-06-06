@@ -7,7 +7,7 @@ angular.module('terrainGenerator')
         'Renderer', 
         'Camera', 
         'Settings',
-        function (WebGL, Scene, Renderer, Camera) {
+        function (WebGL, Scene, Renderer, Camera, Settings) {
         const INV_MAX_FPS = 1 / 100;
 
         var generator = {

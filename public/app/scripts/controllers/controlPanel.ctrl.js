@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .controller('controlPanelCtrl', ['$scope', 'Settings', function ($scope, Settings) {
+    .controller('controlPanelCtrl', ['$scope', 'Settings', 'Scene', function ($scope, Settings, Scene) {
         $scope.settings = Settings;
 
         $scope.getText = function () {
@@ -20,114 +20,24 @@ angular.module('terrainGenerator')
             'edges': {}
         };
 
-        $scope.heightmap = {
-            options: [
-                'Brownian',
-                'Cosine',
-                'CosineLayers',
-                'DiamondSquare',
-                'Fault',
-                'Heightmap.png',
-                'Hill',
-                'Hillsland',
-                'Influences',
-                'Particles',
-                'Perlin',
-                'PerlinDiamond',
-                'PerlinLayers',
-                'Simplex',
-                'SimplexLayers',
-                'Value',
-                'Weierstrass',
-                'Worley'
-            ],
-            selected: 'Brownian'
-        };
+        $scope.refresh = function () {
+            Scene.refreshTerrain();
+        }
 
-        $scope.easing = {
-            options: [
-                'Linear',
-                'Easeln',
-                'EalsenWeak',
-                'EaseOut',
-                'EaseInOut',
-                'InEaseOut'
-            ],
-            selected: 'Linear'
-        };
+        $scope.updateSmoothing = function () {
+            Scene.updateSmoothing($scope.settings.smoothing.selected, $scope.settings.lastSetup);
+            Scene.updateScattering();
+            if ($scope.settings.lastSetup.heightmap) {
+                THREE.Terrain.toHeightmap(Scene.terrain.children[0].geometry.vertices, $scope.settings.lastSetup);
+            }
+        },
 
-        $scope.smoothing = {
-            options: [
-                'Conservative (0.5)',
-                'Conservative (1)',
-                'Conservative (10)',
-                'Gaussian (0.5, 7)',
-                'Gaussian (1.0, 7)',
-                'Gaussian (1.5, 7)',
-                'Gaussian (1.0, 5)',
-                'Gaussian (1.0, 11)',
-                'GaussianBox',
-                'Mean (0)',
-                'Mean (1)',
-                'Mean (8)',
-                'Median',
-                'None'
-            ],
-            selected: 'None'
-        };
+        $scope.updateScattering = function () {
+            Scene.updateScattering();
+        },
 
-        $scope.texture = {
-            options: [
-                'Blended',
-                'Grayscale',
-                'Wireframe'
-            ],
-            selected: 'Blended'
-        };
-
-        $scope.scattering = {
-            options: [
-                'Altitude',
-                'Linear',
-                'Cosine',
-                'CosineLayers',
-                'DiamondSquare',
-                'Particles',
-                'Perlin',
-                'PerlinAltitude',
-                'Simplex',
-                'Value',
-                'Weierstrass',
-                'Worley'
-            ],
-            selected: 'Altitude'
-        };
-
-        $scope.edgetype = {
-            options: [
-                'Box',
-                'Radial'
-            ],
-            selected: 'Box'
-        };
-
-        $scope.direction = {
-            options: [
-                'Normal',
-                'Up',
-                'Down'
-            ],
-            selected: 'Normal'
-        };
-
-        $scope.curve = {
-            options: [
-                'Linear',
-                'EaseIn',
-                'EaseOut',
-                'EaseInOut'
-            ],
-            selected: 'Linear'
+        $scope.updateLightColor = function () {
+            Scene.skylight.color.set($scope.settings.lightColor);
         }
     }]
 );

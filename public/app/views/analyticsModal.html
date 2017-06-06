@@ -28,7 +28,7 @@
                 </div>
             </div>
             <div class="row">
-                <div id="elevation" class="col-md-6">
+                <div class="col-md-6">
                     <div class="table-responsive">
                         <table class="table table-stripped table-hover table-condensed">
                             <caption>Elevation <span class="glyphicon glyphicon-triangle-bottom collapser" ng-click="toggleElevation()"></span></caption>
@@ -50,12 +50,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="histogram-container" uib-collapse="isElevationCollapsed">
-                        <canvas id="elevation-graph" class="histogram"></canvas>
-                        <div class="graph-label">Elevation Histogram</div>
-                    </div>
                 </div>
-                <div id="elevation" class="col-md-6">
+                <div class="col-md-6">
                     <div class="table-responsive">
                         <table class="table table-stripped table-hover table-condensed">
                             <caption>Slope <span class="glyphicon glyphicon-triangle-bottom collapser" ng-click="toggleSlope()"></span></caption>
@@ -76,10 +72,6 @@
                                 <tr paire-entry-table name="Kurtosis" value="{{analytics.slope.kurtosis}}"></tr>
                             </tbody>
                         </table>
-                    </div>
-                    <div class="histogram-container" uib-collapse="isSlopeCollapsed">
-                        <canvas id="slope-graph" class="histogram"></canvas>
-                        <div class="graph-label">Slope Histogram</div>
                     </div>
                 </div>
             </div>

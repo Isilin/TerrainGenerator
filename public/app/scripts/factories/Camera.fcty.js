@@ -153,6 +153,19 @@ angular.module('terrainGenerator')
                         this.moveDown = true;
                         break;
                 }
+            },
+
+            toString: function () {
+                var s = '';
+                s += 'camera.position.x = ' + Math.round(camera.that.position.x) + ';\n';
+                s += 'camera.position.y = ' + Math.round(camera.that.position.y) + ';\n';
+                s += 'camera.position.z = ' + Math.round(camera.that.position.z) + ';\n';
+                s += 'camera.rotation.x = ' + Math.round(camera.that.rotation.x * 180 / Math.PI) + ' * Math.PI / 180;\n';
+                s += 'camera.rotation.y = ' + Math.round(camera.that.rotation.y * 180 / Math.PI) + ' * Math.PI / 180;\n';
+                s += 'camera.rotation.z = ' + Math.round(camera.that.rotation.z * 180 / Math.PI) + ' * Math.PI / 180;\n';
+                s += 'controls.lat = ' + Math.round(camera.that.latitude) + ';\n';
+                s += 'controls.lon = ' + Math.round(camera.that.longitude) + ';\n';
+                console.log(s);
             }
         };
 
