@@ -20,8 +20,6 @@ angular.module('terrainGenerator')
                 );
             };
 
-            //app.setup();
-
             Generator.init();
             Generator.start();
         }

@@ -1,5 +1,5 @@
 <div id="body" ng-app="terrainGenerator" ng-controller="guiCtrl" class="clipboard">
-    <canvas id="heightmap" ng-controller="heightmapCtrl"></canvas>
+    <canvas id="heightmap"></canvas>
     <button type="button" class="btn btn-info" id="show-analytics" ng-click="open()">Analyze</button>
     <pre id="commands-info" class="alert alert-info">W = Forward, S = Back, A = Left, D = Right, R = Up, F = Down, Q = Freeze, Mouse = Look</pre>
     <control-panel></control-panel>
@@ -32,7 +32,6 @@
 
 <script src="/app/scripts/controllers/gui.ctrl.js"></script>
 <script src="/app/scripts/controllers/analyticsModal.ctrl.js"></script>
-<script src="/app/scripts/controllers/heightmap.ctrl.js"></script>
 <script src="/app/scripts/controllers/controlPanel.ctrl.js"></script>
 
 <script src="/app/scripts/directives/paireEntryTable.drtv.js"></script>

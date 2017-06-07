@@ -30,9 +30,6 @@ angular.module('terrainGenerator')
                 this.skylight = new THREE.DirectionalLight(0xe8bdb0, 1.5);
                 this.skylight.position.set(2950, 2625, -160); // Sun on the sky texture
                 this.that.add(this.skylight);
-                this.light = new THREE.DirectionalLight(0xc3eaff, 0.75);
-                this.light.position.set(-1, -0.5, -1);
-                this.that.add(this.light);
 
                 scene.addCamera();
 
