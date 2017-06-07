@@ -8,60 +8,59 @@ angular.module('terrainGenerator')
         'Camera', 
         'Settings',
         function (WebGL, Scene, Renderer, Camera, Settings) {
-        const INV_MAX_FPS = 1 / 100;
+            const INV_MAX_FPS = 1 / 100;
 
-        var generator = {
-            renderer: null,
-            scene: null,
-            clock: null,
-            frameDelta: 0,
-            paused: true,
+            this.renderer = null;
+            this.scene = null;
+            this.clock = null;
+            this.frameDelta = 0;
+            this.paused = true;
 
-            init: function () {
+            var that = this;
+
+            this.init = function () {
                 WebGL.initGL();
 
-                generator.renderer = Renderer;
-                generator.scene = Scene;
-                generator.clock = new THREE.Clock(false);
-            },
+                that.renderer = Renderer;
+                that.scene = Scene;
+                that.clock = new THREE.Clock(false);
+            };
 
-            draw: function () {
-                generator.renderer.render(generator.scene);
-            },
+            this.draw = function () {
+                that.renderer.render(that.scene);
+            };
 
-            animate: function () {
-                generator.draw();
+            this.animate = function () {
+                that.draw();
 
-                generator.frameDelta += generator.clock.getDelta();
-                while (generator.frameDelta >= INV_MAX_FPS) {
-                    generator.update(INV_MAX_FPS);
-                    generator.frameDelta -= INV_MAX_FPS;
+                that.frameDelta += that.clock.getDelta();
+                while (that.frameDelta >= INV_MAX_FPS) {
+                    that.update(INV_MAX_FPS);
+                    that.frameDelta -= INV_MAX_FPS;
                 }
 
-                if (!generator.paused) {
-                    requestAnimationFrame(generator.animate);
+                if (!that.paused) {
+                    requestAnimationFrame(that.animate);
                 }
-            },
+            };
 
-            update: function (delta) {
-                generator.scene.update(delta);
-            },
+            this.update = function (delta) {
+                that.scene.update(delta);
+            };
 
-            start: function () {
-                if (generator.paused) {
-                    generator.paused = false;
-                    generator.clock.start();
-                    requestAnimationFrame(generator.animate);
+            this.start = function () {
+                if (that.paused) {
+                    that.paused = false;
+                    that.clock.start();
+                    requestAnimationFrame(that.animate);
                 }
-            },
+            };
 
-            stop: function () {
-                generator.paused = true;
-                generator.camera.disableControls();
-                generator.clock.stop();
-            }
-        };
-
-        return generator;
-    }]
+            this.stop = function () {
+                that.paused = true;
+                that.camera.disableControls();
+                that.clock.stop();
+            };
+        }
+    ]
 )

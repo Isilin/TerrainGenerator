@@ -77,6 +77,7 @@ angular.module('terrainGenerator')
                 };
                 scene.that.remove(scene.terrain);
                 scene.terrain = THREE.Terrain(o);
+                console.log(scene.terrain);
                 scene.updateSmoothing(Settings.smoothing, o);
                 scene.that.add(scene.terrain);
                 scene.skybox.visible = Materials.sand.visible = Materials.water.visible = Settings.texture.selected != 'Wireframe';
