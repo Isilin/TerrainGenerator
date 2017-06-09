@@ -3,21 +3,23 @@
 angular.module('terrainGenerator')
     .service('Renderer', ['$document', '$window', 'WebGL', function ($document, $window, WebGL) {
         var renderer = {
-            that: null,
+            _parent: null,
+            _ratio: 0,
 
             init: function () {
                 var container = $document[0].getElementById('terrain');
-                this.that = WebGL.existingContext ? new THREE.WebGLRenderer({ antialias: true, canvas: container }) : new THREE.CanvasRenderer();
-                this.that.setSize($window.innerWidth, $window.innerHeight);
-                this.that.domElement.setAttribute('tabindex', -1);
+                this._parent = WebGL.existingContext ? new THREE.WebGLRenderer({ antialias: true, canvas: container }) : new THREE.CanvasRenderer();
+                this.resize($window.innerWidth, $window.innerHeight);
+                this._parent.domElement.setAttribute('tabindex', -1);
             },
 
             resize: function (width, height) {
-                this.that.setSize(width, height);
+                this._parent.setSize(width, height);
+                this._ratio = width / height;
             },
 
             render: function(scene) {
-                this.that.render(scene.that, scene.camera.that);
+                this._parent.render(scene._parent, scene._camera._parent);
             }
         };
 

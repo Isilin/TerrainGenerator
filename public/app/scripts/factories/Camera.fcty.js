@@ -1,176 +1,189 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .factory('Camera', ['Renderer', function (Renderer) {
-        const SPEED = 500;
-        const LOOKSPEED = 0.075;
+    .factory('Camera', [
+        'Renderer', 
+        function (Renderer) {
+            const SPEED = 500;
+            const LOOKSPEED = 0.075;
 
-        var camera = {
-            that: null,
+            var camera = {
+                _parent: null,
 
-            freeze: true,
+                _freeze: true,
 
-            moveForward: false,
-            moveBack: false,
-            moveLeft: false,
-            moveRight: false,
-            moveUp: false,
-            moveDown: false,
+                _moveForward: false,
+                _moveBack: false,
+                _moveLeft: false,
+                _moveRight: false,
+                _moveUp: false,
+                _moveDown: false,
 
-            middleX: 0,
-            middleY: 0,
-            mouseX: 0,
-            mouseY: 0,
+                _middleX: 0,
+                _middleY: 0,
+                _mouseX: 0,
+                _mouseY: 0,
 
-	        target: new THREE.Vector3( 0, 10, 100 ),
-	        latitude: 0,
-	        longitude: 0,
-	        phi: THREE.Math.degToRad(90),
-	        theta: THREE.Math.degToRad( 0 ),
+                _target: new THREE.Vector3( 0, 10, 100 ),
+                _latitude: 0,
+                _longitude: 0,
+                _phi: THREE.Math.degToRad(90),
+                _theta: THREE.Math.degToRad( 0 ),
 
-            init: function () {
-                this.that = new THREE.PerspectiveCamera(60, Renderer.that.domElement.width / Renderer.that.domElement.height, 1, 10000);
-                this.that.position.set(0, 10, 0);
-                this.that.lookAt(this.target);
-            },
+                init: function () {
+                    this._parent = new THREE.PerspectiveCamera(60, Renderer.ratio, 1, 10000);
+                    this._parent.position.set(-600, 550, 440);
+                    this._parent.lookAt(this._target);
+                },
 
-            update: function (delta) {
-                var moveX = 0, moveY = 0, moveZ = 0;
-                var targetPosition = this.target;
-                if ( !this.freeze || this.moveForward || this.moveBack || this.moveLeft || this.moveRight
-                                || this.moveUp || this.moveDown) {
-                    var actualMoveSpeed = delta * SPEED;
+                turnOffControls: function () {
+                    this._freeze = true;
+                    this._moveForward = false;
+                    this._moveBack = false;
+                    this._moveLeft = false;
+                    this._moveRight = false;
+                    this._moveUp = false;
+                    this._moveDown = false;
+                },
 
-                    moveX = (this.moveRight - this.moveLeft)  *  actualMoveSpeed;
-                    moveY = (this.moveUp - this.moveDown)  *  actualMoveSpeed;
-                    moveZ = (this.moveBack - this.moveForward)  *  actualMoveSpeed;
-                    this.that.translateX(moveX);
-                    this.that.translateY(moveY);
-                    this.that.translateZ(moveZ);
+                update: function (delta) {
+                    var moveX = 0, moveY = 0, moveZ = 0;
+                    var targetPosition = this._target;
+                    if ( !this._freeze || this._moveForward || this._moveBack || this._moveLeft 
+                            || this._moveRight || this._moveUp || this._moveDown) {
+                        var actualMoveSpeed = delta * SPEED;
 
-                    var actualLookSpeed = delta * LOOKSPEED;
+                        moveX = (this._moveRight - this._moveLeft)  *  actualMoveSpeed;
+                        moveY = (this._moveUp - this._moveDown)  *  actualMoveSpeed;
+                        moveZ = (this._moveBack - this._moveForward)  *  actualMoveSpeed;
+                        this._parent.translateX(moveX);
+                        this._parent.translateY(moveY);
+                        this._parent.translateZ(moveZ);
 
-                    if(!this.freeze) {
-                        this.longitude += this.mouseX * actualLookSpeed;
-                        this.latitude -= this.mouseY * actualLookSpeed;
+                        var actualLookSpeed = delta * LOOKSPEED;
+
+                        if(!this._freeze) {
+                            this._longitude += this._mouseX * actualLookSpeed;
+                            this._latitude -= this._mouseY * actualLookSpeed;
+                        }
+
+                        this._latitude = Math.max( - 85, Math.min( 85, this._latitude ) );
+                        this._phi = THREE.Math.degToRad( 90 - this._latitude );
+
+                        this._theta = THREE.Math.degToRad( this._longitude );
+
+                        var position = this._parent.position;
+
+                        targetPosition.x = position.x + 100 * Math.sin( this._phi ) * Math.cos( this._theta );
+                        targetPosition.y = position.y + 100 * Math.cos( this._phi );
+                        targetPosition.z = position.z + 100 * Math.sin( this._phi ) * Math.sin( this._theta );
                     }
 
-                    this.latitude = Math.max( - 85, Math.min( 85, this.latitude ) );
-                    this.phi = THREE.Math.degToRad( 90 - this.latitude );
+                    this._parent.lookAt( targetPosition );
+                    return {x: moveX, y: moveY, z: moveZ};
+                },
 
-                    this.theta = THREE.Math.degToRad( this.longitude );
+                onResize: function (newWidth, newHeight) {
+                    this._middleX = newWidth / 2;
+                    this._middleY = newHeight / 2;
+                },
 
-                    var position = this.that.position;
+                onMouseUp: function (event) {
+                    switch (event.button) {
+                        case 0:
+                            this._freeze = true;
+                            break;
+                    }
+                },
 
-                    targetPosition.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
-                    targetPosition.y = position.y + 100 * Math.cos( this.phi );
-                    targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
+                onMouseDown: function (event) {
+                    switch (event.button) {
+                        case 0:
+                            this._freeze = false;
+                            break;
+                    }
+                },
+
+                onMouseMove: function (event) {
+                    this._mouseX = event.xPos - this._middleX;
+                    this._mouseY = event.yPos - this._middleY;
+                },
+
+                onMouseWheel: function (event) {
+                    var fov = this._parent.fov;
+                    fov -= event.wheelDeltaY * 0.05;
+                    if(fov > 120) {
+                        fov = 120;
+                    } else if (fov < 15) {
+                        fov = 15;
+                    }
+                    this._parent.fov = fov;
+                    this._parent.updateProjectionMatrix();
+                },
+
+                onKeyUp: function (event) {
+                    switch (event.key) {
+                        case 90: // 'Z'
+                            this._moveForward = false;
+                            break;
+                        case 83: // 'S'
+                            this._moveBack = false;
+                            break;
+                        case 81: // 'Q'
+                            this._moveLeft = false;
+                            break;
+                        case 68: // 'D'
+                            this._moveRight = false;
+                            break;
+                        case 32: // 'Space'
+                            this._moveUp = false;
+                            break;
+                        case 16: // 'Left Shift'
+                            this._moveDown = false;
+                            break;
+                    }
+                },
+
+                onKeyDown: function (event) {
+                    switch (event.key) {
+                        case 90: // 'Z'
+                            this._moveForward = true;
+                            break;
+                        case 83: // 'S'
+                            this._moveBack = true;
+                            break;
+                        case 81: // 'Q'
+                            this._moveLeft = true;
+                            break;
+                        case 68: // 'D'
+                            this._moveRight = true;
+                            break;
+                        case 32: // 'Space'
+                            this._moveUp = true;
+                            break;
+                        case 16: // 'Left Shift'
+                            this._moveDown = true;
+                            break;
+                    }
+                },
+
+                toString: function () {
+                    var s = '';
+                    s += 'camera.position.x = ' + Math.round(camera._parent.position.x) + ';\n';
+                    s += 'camera.position.y = ' + Math.round(camera._parent.position.y) + ';\n';
+                    s += 'camera.position.z = ' + Math.round(camera._parent.position.z) + ';\n';
+                    s += 'camera.rotation.x = ' + Math.round(camera._parent.rotation.x * 180 / Math.PI) + ' * Math.PI / 180;\n';
+                    s += 'camera.rotation.y = ' + Math.round(camera._parent.rotation.y * 180 / Math.PI) + ' * Math.PI / 180;\n';
+                    s += 'camera.rotation.z = ' + Math.round(camera._parent.rotation.z * 180 / Math.PI) + ' * Math.PI / 180;\n';
+                    s += 'controls.latitude = ' + Math.round(camera._latitude) + ';\n';
+                    s += 'controls.longitude = ' + Math.round(camera._longitude) + ';\n';
+                    console.log(s);
                 }
+            };
 
-                this.that.lookAt( targetPosition );
-                return {x: moveX, y: moveY, z: moveZ};
-            },
+            camera.init();
 
-            onResize: function (newWidth, newHeight) {
-                this.middleX = newWidth / 2;
-                this.middleY = newHeight / 2;
-            },
-
-            onMouseUp: function (event) {
-                switch (event.button) {
-                    case 0:
-                        this.freeze = true;
-                        break;
-                }
-            },
-
-            onMouseDown: function (event) {
-                switch (event.button) {
-                    case 0:
-                        this.freeze = false;
-                        break;
-                }
-            },
-
-            onMouseMove: function (event) {
-                this.mouseX = event.xPos - this.middleX;
-                this.mouseY = event.yPos - this.middleY;
-            },
-
-            onMouseWheel: function (event) {
-                var fov = this.that.fov;
-                fov -= event.wheelDeltaY * 0.05;
-                if(fov > 120) {
-                    fov = 120;
-                } else if (fov < 15) {
-                    fov = 15;
-                }
-                this.that.fov = fov;
-                this.that.updateProjectionMatrix();
-            },
-
-            onKeyUp: function (event) {
-                switch (event.key) {
-                    case 90: // 'Z'
-                        this.moveForward = false;
-                        break;
-                    case 83: // 'S'
-                        this.moveBack = false;
-                        break;
-                    case 81: // 'Q'
-                        this.moveLeft = false;
-                        break;
-                    case 68: // 'D'
-                        this.moveRight = false;
-                        break;
-                    case 32: // 'Space'
-                        this.moveUp = false;
-                        break;
-                    case 16: // 'Left Shift'
-                        this.moveDown = false;
-                        break;
-                }
-            },
-
-            onKeyDown: function (event) {
-                switch (event.key) {
-                    case 90: // 'Z'
-                        this.moveForward = true;
-                        break;
-                    case 83: // 'S'
-                        this.moveBack = true;
-                        break;
-                    case 81: // 'Q'
-                        this.moveLeft = true;
-                        break;
-                    case 68: // 'D'
-                        this.moveRight = true;
-                        break;
-                    case 32: // 'Space'
-                        this.moveUp = true;
-                        break;
-                    case 16: // 'Left Shift'
-                        this.moveDown = true;
-                        break;
-                }
-            },
-
-            toString: function () {
-                var s = '';
-                s += 'camera.position.x = ' + Math.round(camera.that.position.x) + ';\n';
-                s += 'camera.position.y = ' + Math.round(camera.that.position.y) + ';\n';
-                s += 'camera.position.z = ' + Math.round(camera.that.position.z) + ';\n';
-                s += 'camera.rotation.x = ' + Math.round(camera.that.rotation.x * 180 / Math.PI) + ' * Math.PI / 180;\n';
-                s += 'camera.rotation.y = ' + Math.round(camera.that.rotation.y * 180 / Math.PI) + ' * Math.PI / 180;\n';
-                s += 'camera.rotation.z = ' + Math.round(camera.that.rotation.z * 180 / Math.PI) + ' * Math.PI / 180;\n';
-                s += 'controls.lat = ' + Math.round(camera.that.latitude) + ';\n';
-                s += 'controls.lon = ' + Math.round(camera.that.longitude) + ';\n';
-                console.log(s);
-            }
-        };
-
-        camera.init();
-
-        return camera;
-    }]
+            return camera;
+        }
+    ]
 )

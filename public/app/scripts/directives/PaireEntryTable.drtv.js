@@ -15,6 +15,6 @@ angular.module('terrainGenerator')
                 $scope.value = $attrs.value;
                 $scope.analytics = analytics;
             }]
-        }
+        };
     }
 );

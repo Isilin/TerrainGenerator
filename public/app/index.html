@@ -1,4 +1,4 @@
-<div id="body" ng-app="terrainGenerator" ng-controller="guiCtrl" class="clipboard">
+<div id="body" ng-app="terrainGenerator" ng-controller="GUICtrl" class="clipboard">
     <canvas id="heightmap"></canvas>
     <button type="button" class="btn btn-info" id="show-analytics" ng-click="open()">Analyze</button>
     <pre id="commands-info" class="alert alert-info">W = Forward, S = Back, A = Left, D = Right, R = Up, F = Down, Q = Freeze, Mouse = Look</pre>
@@ -27,23 +27,23 @@
 
 <script src="/app/scripts/app.routes.js"></script>
 
-<script src="/app/scripts/components/analyticsModal.cmpt.js"></script>
-<script src="/app/scripts/components/controlPanel.cmpt.js"></script>
+<script src="/app/scripts/components/AnalyticsModal.cmpt.js"></script>
+<script src="/app/scripts/components/ControlPanel.cmpt.js"></script>
 
-<script src="/app/scripts/controllers/gui.ctrl.js"></script>
-<script src="/app/scripts/controllers/analyticsModal.ctrl.js"></script>
-<script src="/app/scripts/controllers/controlPanel.ctrl.js"></script>
+<script src="/app/scripts/controllers/AnalyticsModal.ctrl.js"></script>
+<script src="/app/scripts/controllers/ControlPanel.ctrl.js"></script>
+<script src="/app/scripts/controllers/GUI.ctrl.js"></script>
 
-<script src="/app/scripts/directives/paireEntryTable.drtv.js"></script>
-<script src="/app/scripts/directives/controls.drtv.js"></script>
+<script src="/app/scripts/directives/Controls.drtv.js"></script>
+<script src="/app/scripts/directives/PaireEntryTable.drtv.js"></script>
 
-<script src="/app/scripts/factories/analytics.fcty.js"></script>
+<script src="/app/scripts/factories/Analytics.fcty.js"></script>
+<script src="/app/scripts/factories/Camera.fcty.js"></script>
+<script src="/app/scripts/factories/Generator.fcty.js"></script>
 <script src="/app/scripts/factories/Scene.fcty.js"></script>
 <script src="/app/scripts/factories/Settings.fcty.js"></script>
-<script src="/app/scripts/factories/Camera.fcty.js"></script>
 
 <script src="/app/scripts/services/WebGL.svc.js"></script>
 <script src="/app/scripts/services/Renderer.svc.js"></script>
-<script src="/app/scripts/services/generator.svc.js"></script>
 <script src="/app/scripts/services/MathHelper.svc.js"></script>
 <script src="/app/scripts/services/Materials.svc.js"></script>

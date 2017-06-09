@@ -2,54 +2,54 @@
 
 angular.module('terrainGenerator')
     .factory('analytics', function () {
-        var stats = {
-            "elevation": {
-                "stdev": 0,
-                "pearsonSkew": 0,
-                "sampleSize": 0,
-                "min": 0,
-                "max": 0,
-                "range": 0,
-                "midrange": 0,
-                "median": 0,
-                "iqr": 0,
-                "mean": 0,
-                "mad": 0,
-                "modes": 0,
-                "groeneveldMeedenSkew": 0,
-                "kurtosis": 0
+        return {
+            elevation: {
+                stdev: 0,
+                pearsonSkew: 0,
+                sampleSize: 0,
+                min: 0,
+                max: 0,
+                range: 0,
+                midrange: 0,
+                median: 0,
+                iqr: 0,
+                mean: 0,
+                mad: 0,
+                modes: 0,
+                groeneveldMeedenSkew: 0,
+                kurtosis: 0
             },
-            "roughness": {
-                "jaggedness": 0,
-                "terrainRuggednessIndex": 0,
-                "planimetricAreaRatio": 0
+            roughness: {
+                jaggedness: 0,
+                terrainRuggednessIndex: 0,
+                planimetricAreaRatio: 0
             },
-            "slope": {
-                "stdev": 0,
-                "groeneveldMeedenSkew": 0,
-                "sampleSize": 0,
-                "min": 0,
-                "max": 0,
-                "range": 0,
-                "midrange": 0,
-                "median": 0,
-                "iqr": 0,
-                "mean": 0,
-                "mad": 0,
-                "modes": 0,
-                "pearsonSkew": 0,
-                "kurtosis": 0
+            slope: {
+                stdev: 0,
+                groeneveldMeedenSkew: 0,
+                sampleSize: 0,
+                min: 0,
+                max: 0,
+                range: 0,
+                midrange: 0,
+                median: 0,
+                iqr: 0,
+                mean: 0,
+                mad: 0,
+                modes: 0,
+                pearsonSkew: 0,
+                kurtosis: 0
             },
-            "fittedPlane": {
-                "slope": 0,
-                "pctExplained": 0
+            fittedPlane: {
+                slope: 0,
+                pctExplained: 0
             },
-            "moments": {
-                'elevation.stdev': {
+            moments: {
+                "elevation.stdev": {
                     mean: 42.063,
                     stdev: 6.353,
                 },
-                'elevation.pearsonSkew': {
+                "elevation.pearsonSkew": {
                     // mean: 0.100,
                     // stdev: 0.566,
                     levels: {
@@ -83,7 +83,5 @@ angular.module('terrainGenerator')
                 },
             }
         };
-
-        return stats;
     }
 );

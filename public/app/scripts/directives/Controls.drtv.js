@@ -5,27 +5,26 @@ angular.module('terrainGenerator')
         '$window', 
         'Renderer', 
         'Camera', 
-        'Generator', 
-        function ($window, Renderer, Camera, Generator) {
+        function ($window, Renderer, Camera) {
             return {
-                link: function (scope, element, attr) {
-                    var lastValue = Camera.freeze;
+                link: function (scope, element) {
+                    var lastValue = Camera._freeze;
 
                     scope.onResize = function () {
                         Renderer.resize($window.innerWidth, $window.innerHeight);
-                        Camera.that.aspect = Renderer.that.domElement.width / Renderer.that.domElement.height;
-                        Camera.that.updateProjectionMatrix();
+                        Camera._parent.aspect = Renderer._ratio;
+                        Camera._parent.updateProjectionMatrix();
 
                         Camera.onResize($window.innerWidth, $window.innerHeight);
                     };
 
                     scope.onFocus = function () {
-                        Camera.freeze = lastValue;
+                        Camera._freeze = lastValue;
                     };
 
                     scope.onBlur = function () {
-                        lastValue = Camera.freeze;
-                        Camera.freeze = true;
+                        lastValue = Camera._freeze;
+                        Camera.turnOffControls();
                     };
 
                     angular.element($window).bind('resize', function () {

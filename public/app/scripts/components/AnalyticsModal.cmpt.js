@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .component('analyticsModalCmpt', {
+    .component('analyticsModal', {
         templateUrl: '/app/views/analyticsModal.html',
-        controller: "analyticsModalCtrl",
+        controller: "AnalyticsModalCtrl",
     }
 );

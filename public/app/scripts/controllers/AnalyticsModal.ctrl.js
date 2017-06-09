@@ -1,11 +1,10 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .controller('analyticsModalCtrl', [
+    .controller('AnalyticsModalCtrl', [
         '$scope',
-        '$uibModal',
         'analytics',
-        ($scope, $uibModal, analytics) => {
+        function ($scope, analytics) {
             $scope.analytics = analytics;
 
             $scope.isElevationCollapsed = true;

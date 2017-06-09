@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .controller('guiCtrl', [
+    .controller('GUICtrl', [
         '$scope', 
         '$uibModal',
         'analytics',
@@ -12,7 +12,7 @@ angular.module('terrainGenerator')
             $scope.open = function () {
                 $uibModal.open({
                     animation: true,
-                    component: 'analyticsModalCmpt',
+                    component: 'analyticsModal',
                 })
                 .result.then(function (selectedItem) {
                         $scope.selected = selectedItem;
@@ -20,8 +20,10 @@ angular.module('terrainGenerator')
                 );
             };
 
-            Generator.init();
-            Generator.start();
+            var generator = Generator;
+
+            generator.init();
+            generator.start();
         }
     ]
 );
