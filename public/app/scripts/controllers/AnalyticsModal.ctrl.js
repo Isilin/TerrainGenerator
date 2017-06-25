@@ -1,26 +1,30 @@
 'use strict';
 
-angular.module('terrainGenerator')
-    .controller('AnalyticsModalCtrl', [
-        '$scope',
-        'analytics',
-        function ($scope, analytics) {
-            $scope.analytics = analytics;
+class AnalyticsModalCtrl
+{
+    constructor (scope, analytics) {
+        this.$scope = scope;
 
-            $scope.isElevationCollapsed = true;
-            $scope.isSlopeCollapsed = true;
+        this.$scope.analytics = analytics;
 
-            $scope.toggleElevation = function () {
-                $scope.isElevationCollapsed = !$scope.isElevationCollapsed;
-            };
+        this.$scope.isElevationCollapsed = true;
+        this.$scope.isSlopeCollapsed = true;
 
-            $scope.toggleSlope = function () {
-                $scope.isSlopeCollapsed = !$scope.isSlopeCollapsed;
-            };
+        var that = this;
 
-            $scope.close = function () {
-                $scope.$parent.$close();
-            };
-        }
-    ]
-);
+        this.$scope.toggleElevation = function () {
+            that.$scope.isElevationCollapsed = !that.$scope.isElevationCollapsed;
+        };
+
+        this.$scope.toggleSlope = function () {
+            that.$scope.isSlopeCollapsed = !that.$scope.isSlopeCollapsed;
+        };
+
+        this.$scope.close = function () {
+            that.$scope.$parent.$close();
+        };
+    }
+}
+
+AnalyticsModalCtrl.$inject = ['$scope', 'analytics'];
+angular.module('terrainGenerator').controller('AnalyticsModalCtrl', AnalyticsModalCtrl);

@@ -10,10 +10,7 @@
         "email": "casa2pir@hotmail.fr",
         "url": "https://github.com/Isilin"
     },
-    "contributors": [
-        
-    ],
-
+    "contributors": [],
     "repository": {
         "type": "git",
         "url": "https://github.com/Isilin/TerrainGenerator.git"
@@ -22,13 +19,11 @@
         "email": "casa2pir@hotmail.fr",
         "url": "https://github.com/Isilin/TerrainGenerator/issues"
     },
-    
     "bin": "",
     "engines": {
         "node": "~7.10.0",
         "npm": "~4.5.0"
     },
-
     "devDependencies": {
         "bower": "^1.8.0",
         "grunt": "^1.0.1",
@@ -42,15 +37,11 @@
         "serve-favicon": "~2.4.2",
         "i18n": "~0.8.3"
     },
-
     "scripts": {
         "postinstall": "bower install",
-
         "prestart": "npm install",
         "start": "node ./bin/www",
-        
         "pretest": "npm install",
-
         "preupdate-webdriver": "npm install",
         "update-webdriver": "webdriver-manager update"
     },

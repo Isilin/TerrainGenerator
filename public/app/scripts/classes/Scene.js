@@ -1,13 +1,68 @@
 'use strict';
 
+class Scene extends THREE.Scene
+{
+    constructor (Camera, Terrain, Settings, Materials) {
+        super();
+        this.fog = new THREE.FogExp2(0x868293, 0.0002);
+
+        this.$settings = Settings;
+        this.$materials = Materials;
+
+        this._camera = Camera;
+
+        /* ##### TERRAIN ##### */
+        this._terrain = Terrain;
+        this.add(this._terrain.object);
+        /* ################### */
+
+        /* ##### SKYDOME ##### */
+        var sdGeometry = new THREE.SphereGeometry(8192, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.5);
+        var loader = new THREE.TextureLoader();
+        var sdMaterial = new THREE.MeshPhongMaterial({
+            map: loader.load('/assets/images/sky1.jpg'),
+            fog: false,
+            side: THREE.BackSide
+        });
+        var skydome = new THREE.Mesh(sdGeometry, sdMaterial);
+        skydome.position.y = -99;
+        this.add(skydome);
+        /* ################### */
+        
+        /* ##### AMBIENT LIGHT ##### */
+        this.add(new THREE.AmbientLight(0xe0e0e0));
+        /* ######################### */
+        
+        /* ##### SUN ##### */
+        var sun = new THREE.DirectionalLight(0xffff66, 1.5);
+        sun.position.set(2950, 2625, -160);
+        this.add(sun);
+        /* ############### */
+    }
+
+    get camera () { return this._camera; }
+
+    update(delta) { this._camera.update(delta); }
+
+    refreshTerrain() {
+        delete this._terrain;
+        this._terrain = Terrain;
+    }
+}
+
+Scene.$inject = ['Camera', 'Terrain', 'Settings', 'Materials'];
+angular.module('terrainGenerator').service('Scene', Scene);
+
+/*
 angular.module('terrainGenerator')
     .factory('Scene', [
         'Camera', 
         'Settings', 
         'MathHelper', 
         'Materials', 
-        function (Camera, Settings, MathHelper, Materials) {
-            var scene = {
+        'Renderer',
+        function (Settings, MathHelper, Materials, Renderer) {*/
+            /*var scene = {
                 _parent: null,
                 _camera: null,
 
@@ -148,11 +203,12 @@ angular.module('terrainGenerator')
                     else if (smoothing === 'Median') THREE.Terrain.SmoothMedian(g, o);
                     THREE.Terrain.Normalize(m, o);
                 }
-            };
+            };*/
 
-            scene.init();
+            /*scene.init();
 
-            return scene;
+            return scene;*/
+/*            return new Scene(Camera, Terrain, Settings, Materials);
         }
     ]
-);
+);*/

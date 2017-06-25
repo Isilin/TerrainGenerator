@@ -1,48 +1,52 @@
 'use strict';
 
-angular.module('terrainGenerator')
-    .controller('ControlPanelCtrl', [
-        '$scope', 
-        'Settings', 
-        'Scene', 
-        function ($scope, Settings, Scene) {
-            $scope.settings = Settings;
+class ControlPanelCtrl
+{
+    constructor (scope, settings, scene) {
+        this.$scope = scope;
+        this.scene = scene;
 
-            $scope.getText = function () {
-                return $scope.status.menu ? "Close Controls" : "Open Controls";
-            };
+        this.$scope.settings = settings;
+        
+        var that = this;
 
-            $scope.toggle = function () {
-                $scope.status.menu = !$scope.status.menu;
-            };
+        this.$scope.getText = function () {
+            return that.$scope.status.menu ? "Close Controls" : "Open Controls";
+        };
 
-            $scope.status = {
-                'menu': true,
-                'heightmap': {},
-                'decoration': {},
-                'size': {},
-                'edges': {}
-            };
+        this.$scope.toggle = function () {
+            that.$scope.status.menu = !that.$scope.status.menu;
+        };
 
-            $scope.refresh = function () {
-                Scene.refreshTerrain();
-            };
+        this.$scope.status = {
+            'menu': true,
+            'heightmap': {},
+            'decoration': {},
+            'size': {},
+            'edges': {}
+        };
 
-            $scope.updateSmoothing = function () {
-                Scene.updateSmoothing($scope.settings.smoothing.selected, $scope.settings.lastSetup);
-                Scene.updateScattering();
-                if ($scope.settings.lastSetup.heightmap) {
-                    THREE.Terrain.toHeightmap(Scene.terrain.children[0].geometry.vertices, $scope.settings.lastSetup);
-                }
-            };
+        this.$scope.refresh = function () {
+            that.scene.refreshTerrain();
+        };
 
-            $scope.updateScattering = function () {
-                Scene.updateScattering();
-            };
+        this.$scope.updateSmoothing = function () {
+            that.scene.updateSmoothing(that.$scope.settings.smoothing.selected, that.$scope.settings.lastSetup);
+            that.scene.updateScattering();
+            if (that.$scope.settings.lastSetup.heightmap) {
+                THREE.Terrain.toHeightmap(that.scene.terrain.children[0].geometry.vertices, that.$scope.settings.lastSetup);
+            }
+        };
 
-            $scope.updateLightColor = function () {
-                Scene.skylight.color.set($scope.settings.lightColor);
-            };
-        }
-    ]
-);
+        this.$scope.updateScattering = function () {
+            that.scene.updateScattering();
+        };
+
+        that.$scope.updateLightColor = function () {
+            that.scene.skylight.color.set(that.$scope.settings.lightColor);
+        };
+    }
+}
+
+ControlPanelCtrl.$inject = ['$scope', 'Settings', 'Scene'];
+angular.module('terrainGenerator').controller('ControlPanelCtrl', ControlPanelCtrl);

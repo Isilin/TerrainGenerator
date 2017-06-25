@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('terrainGenerator')
-    .factory('Settings', [ 'WebGL', function (WebGL) {
+    .service('Settings', [ 'WebGL', function (WebGL) {
 
         var settings = {
             easing: {

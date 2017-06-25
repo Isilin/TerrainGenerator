@@ -8,23 +8,22 @@ angular.module('terrainGenerator')
         function ($window, Renderer, Camera) {
             return {
                 link: function (scope, element) {
-                    var lastValue = Camera._freeze;
+                    var lastValue = Camera.freeze;
 
                     scope.onResize = function () {
                         Renderer.resize($window.innerWidth, $window.innerHeight);
-                        Camera._parent.aspect = Renderer._ratio;
-                        Camera._parent.updateProjectionMatrix();
-
-                        Camera.onResize($window.innerWidth, $window.innerHeight);
+                        Camera.aspect = Renderer._ratio;
+                        Camera.middleView = {x: $window.innerWidth, y: $window.innerHeight};
+                        Camera.updateProjectionMatrix();
                     };
 
                     scope.onFocus = function () {
-                        Camera._freeze = lastValue;
+                        Camera.freeze = lastValue;
                     };
 
                     scope.onBlur = function () {
-                        lastValue = Camera._freeze;
-                        Camera.turnOffControls();
+                        lastValue = Camera.freeze;
+                        Camera.controlsEnabled = false;
                     };
 
                     angular.element($window).bind('resize', function () {
@@ -53,10 +52,10 @@ angular.module('terrainGenerator')
                         Camera.onMouseWheel(event.originalEvent);
                     })
                     .bind('keyup', function (event) {
-                        Camera.onKeyUp({event: "keyup", key: event.originalEvent.which});
+                        Camera.onKeyUp({event: "keyup", keycode: event.originalEvent.which});
                     })
                     .bind('keydown', function (event) {
-                        Camera.onKeyDown({event: "keydown", key: event.originalEvent.which});
+                        Camera.onKeyDown({event: "keydown", keycode: event.originalEvent.which});
                     });
 
                     scope.onResize();

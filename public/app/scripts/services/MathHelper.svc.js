@@ -40,5 +40,9 @@ angular.module('terrainGenerator')
         this.degrees = function(radians) {
             return radians * 180 / Math.PI;
         };
+
+        this.isNumber = function (n) {
+            return !isNaN(parseFloat(n)) && isFinite(n);
+        }
     }
 );

@@ -19,7 +19,7 @@ angular.module('terrainGenerator')
             },
 
             render: function(scene) {
-                this._parent.render(scene._parent, scene._camera._parent);
+                this._parent.render(scene, scene._camera);
             }
         };
 

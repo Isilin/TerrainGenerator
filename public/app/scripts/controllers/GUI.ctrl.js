@@ -1,29 +1,30 @@
 'use strict';
 
-angular.module('terrainGenerator')
-    .controller('GUICtrl', [
-        '$scope', 
-        '$uibModal',
-        'analytics',
-        'Generator',
-        function ($scope, $uibModal, analytics, Generator) {
-            $scope.analytics = analytics;
+class GUICtrl
+{
+    constructor (scope, uibModal, analytics, generator) {
+        this.$scope = scope;
+        this.$uibModal = uibModal;
+        this.generator = generator;
+        this.$scope.analytics = analytics;
 
-            $scope.open = function () {
-                $uibModal.open({
-                    animation: true,
-                    component: 'analyticsModal',
-                })
-                .result.then(function (selectedItem) {
-                        $scope.selected = selectedItem;
-                    }
-                );
-            };
+        var that = this;
 
-            var generator = Generator;
+        this.$scope.open = function () {
+            that.$uibModal.open({
+                animation: true,
+                component: 'analyticsModal',
+            })
+            .result.then(function (selectedItem) {
+                    that.$scope.selected = selectedItem;
+                }
+            );
+        };
 
-            generator.init();
-            generator.start();
-        }
-    ]
-);
+        this.generator.init();
+        this.generator.start();
+    }
+}
+
+GUICtrl.$inject = ['$scope', '$uibModal', 'analytics', 'Generator'];
+angular.module('terrainGenerator').controller('GUICtrl', GUICtrl);
