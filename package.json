@@ -43,7 +43,8 @@
         "gulp-babel": "^6.1.2",
         "gulp-nodemon": "^2.2.1",
         "gulp-minimize": "^1.0.0",
-        "gulp-uglify": "^3.0.0"
+        "gulp-uglify": "^3.0.0",
+        "gulp-browserify": "^0.5.1"
     },
     "scripts": {
         "postinstall": "bower install",
