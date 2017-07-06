@@ -212,22 +212,22 @@ class Camera extends THREE.PerspectiveCamera
             return;
         }
         switch (event.keycode) {
-            case 90: // 'Z'
+            case 90: /* 'Z' */
                 this._moveForward = false;
                 break;
-            case 83: // 'S'
+            case 83: /* 'S' */
                 this._moveBack = false;
                 break;
-            case 81: // 'Q'
+            case 81: /* 'Q' */
                 this._moveLeft = false;
                 break;
-            case 68: // 'D'
+            case 68: /* 'D' */
                 this._moveRight = false;
                 break;
-            case 32: // 'Space'
+            case 32: /* 'Space' */
                 this._moveUp = false;
                 break;
-            case 16: // 'Left Shift'
+            case 16: /* 'Left Shift' */
                 this._moveDown = false;
                 break;
         }
@@ -243,22 +243,22 @@ class Camera extends THREE.PerspectiveCamera
             return;
         }
         switch (event.keycode) {
-            case 90: // 'Z'
+            case 90: /* 'Z' */
                 this._moveForward = true;
                 break;
-            case 83: // 'S'
+            case 83: /* 'S' */
                 this._moveBack = true;
                 break;
-            case 81: // 'Q'
+            case 81: /* 'Q' */
                 this._moveLeft = true;
                 break;
-            case 68: // 'D'
+            case 68: /* 'D' */
                 this._moveRight = true;
                 break;
-            case 32: // 'Space'
+            case 32: /* 'Space' */
                 this._moveUp = true;
                 break;
-            case 16: // 'Left Shift'
+            case 16: /* 'Left Shift' */
                 this._moveDown = true;
                 break;
         }

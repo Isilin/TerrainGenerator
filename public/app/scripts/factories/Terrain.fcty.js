@@ -11,7 +11,7 @@ class Terrain
             easing: THREE.Terrain[this.$settings.easing.selected],
             heightmap: h ? heightmapImage : THREE.Terrain[this.$settings.heightmap.selected],
             material: Materials.mat,
-            //material: this.$settings.texture.selected == 'Wireframe' ? Materials.mat : (this.$settings.texture.selected == 'Blended' ? Materials.blend : Material.gray),
+            /*material: this.$settings.texture.selected == 'Wireframe' ? Materials.mat : (this.$settings.texture.selected == 'Blended' ? Materials.blend : Material.gray),*/
             maxHeight: this.$settings.maxHeight - 100,
             minHeight: -100,
             steps: this.$settings.steps,
@@ -22,7 +22,7 @@ class Terrain
             ySize: Math.round(this.$settings.size * this.$settings.widthLengthRatio),
             xSegments: s,
             ySegments: Math.round(s * this.$settings.widthLengthRatio),
-            _mesh: !this._object3D  ? null : this._object3D.children[0], // internal only
+            _mesh: !this._object3D  ? null : this._object3D.children[0], /* internal only */
         };
         delete this._object3D;
         this._object3D = new THREE.Terrain(this.options);

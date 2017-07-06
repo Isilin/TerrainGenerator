@@ -49,3 +49,6 @@ jspm_packages
 /test/sample
 !/test/sample/bower.json
 /npm-shrinkwrap.json
+
+# Gulp files
+/dist/

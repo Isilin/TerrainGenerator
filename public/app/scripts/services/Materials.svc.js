@@ -31,13 +31,13 @@ angular.module('terrainGenerator')
                             t3.wrapS = t3.wrapT = THREE.RepeatWrapping;
                             loader.load('/assets/images/snow1.jpg', function (t4) {
                                 t4.wrapS = t4.wrapT = THREE.RepeatWrapping;
-                                // t2.repeat.x = t2.repeat.y = 2;
+                                /* t2.repeat.x = t2.repeat.y = 2;*/
                                 materials.blend = THREE.Terrain.generateBlendedMaterial([
                                     { texture: t1 },
                                     { texture: t2, levels: [-80, -35, 20, 50] },
                                     { texture: t3, levels: [20, 50, 60, 85] },
                                     { texture: t4, glsl: '1.0 - smoothstep(65.0 + smoothstep(-256.0, 256.0, vPosition.x) * 10.0, 80.0, vPosition.z)' },
-                                    { texture: t3, glsl: 'slope > 0.7853981633974483 ? 0.2 : 1.0 - smoothstep(0.47123889803846897, 0.7853981633974483, slope) + 0.2' }, // between 27 and 45 degrees
+                                    { texture: t3, glsl: 'slope > 0.7853981633974483 ? 0.2 : 1.0 - smoothstep(0.47123889803846897, 0.7853981633974483, slope) + 0.2' }, /* between 27 and 45 degrees */
                                 ]);
                                 callback();
                             });
