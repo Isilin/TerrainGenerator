@@ -1,70 +1,109 @@
 'use strict';
 
+/* ========== GULP PLUGINS ========== */
 import gulp from 'gulp';
-import nodemon from 'gulp-nodemon';
-import babel from 'gulp-babel';
-import minimize from 'gulp-minimize';
-import uglify from 'gulp-uglify';
+var plugins = require('gulp-load-plugins')({
+	pattern: ['gulp-*', 'gulp.*', 'main-bower-files'],
+	replaceString: /\bgulp[\-.]/
+    }
+);
+
+var vendor = {
+    js: ['bower_components/**/*.js'],
+    css: ['bower_components/**/*.css'],
+    bower: ["bower.json"],
+    dist: "dist/public/vendor/"
+}
+
+/* ========== LIBRARIES ========== */
+gulp.task('bower_js', function () {
+    gulp.src(plugins.mainBowerFiles("**/*.js"), { base: 'bower_components' })
+        .pipe(plugins.concat("vendor.js"))
+        .pipe(plugins.uglify())
+        .pipe(plugins.rename("dist.min.js"))
+        .pipe(gulp.dest(vendor.dist));
+});
+
+gulp.task('bower_css', function () {
+    gulp.src(plugins.mainBowerFiles("**/*.css"), { base: 'bower_components' })
+        .pipe(plugins.concat("vendor.css"))
+        //.pipe(uglify())
+        .pipe(plugins.rename("dist.min.css"))
+        .pipe(gulp.dest(vendor.dist));
+});
+
+gulp.task('bower', ['bower_js', 'bower_css']);
+
+gulp.task('watch_bower', ['bower'], function () {
+    gulp.watch(vendor.js, ['bower_js']);
+    gulp.watch(vendor.css, ['bower_css']);
+    gulp.watch(vendor.bower, ['bower']);
+});
+
+gulp.task('default_bower', ['watch_bower']);
 
 /* ========== CLIENT TASKS ========== */
 
-gulp.task('build', function () {
-    gulp.src('public/**/*.js')
-        .pipe(babel({
-            presets: ['es2015']
-        }))
-        //.pipe(uglify())
-        .pipe(gulp.dest('dist/public'));
+var client = {
+    js: ['public/app/scripts/**/*.js'],
+    css: ['public/assets/css/*.css'],
+    assets: ['public/assets/**/*', !'public/assets/css'],
+    dist: "dist/public/"
+};
 
+gulp.task('build_js', function () {
+    gulp.src(client.js)
+        .pipe(plugins.babel())
+        .pipe(plugins.concat("client.js"))
+        .pipe(plugins.uglify())
+        .pipe(plugins.rename("client.min.js"))
+        .pipe(gulp.dest(client.dist));
+});
+
+gulp.task('build', function () {
     gulp.src('public/assets/**/')
         .pipe(gulp.dest('dist/public/assets'));
 
     gulp.src(['public/app/**/*.html'])
-        .pipe(minimize())
+        .pipe(plugins.minimize())
         .pipe(gulp.dest('dist/public/app/'));
-
-    gulp.src(['bower_components/**/'])
-        .pipe(gulp.dest('dist/bower_components/'));
 });
 
-gulp.task('watch', function () {
-  gulp.watch(['public/**/*', 'bower_components'], ['build']);
+gulp.task('watch_client', ['build'], function () {
+    gulp.watch(client.js, ['build_js']);
 });
 
-gulp.task('dev', ['build', 'watch']);
+gulp.task('default_client', ['watch_client']);
+
+gulp.task('dev', ['default_bower', 'default_client']);
 
 /* ========== SERVER TASKS ========== */
 
-gulp.task('babel-server', function () {
-    gulp.src('bin/www')
-        .pipe(babel({
-            presets: ['es2015']
-        }))
-        .pipe(gulp.dest('dist/bin/'));
+var server = {
+    js: ["bin/www", "bin/**/*.js"],
+    dist: "dist/bin/",
+    node: ["node_modules/", "gulpfile.babel.js", "package.json"]
+}
 
-    gulp.src('app.js')
-        .pipe(babel({
-            presets: ['es2015']
-        }))
-        .pipe(uglify())
-        .pipe(gulp.dest('dist/'));
+gulp.task("server_js", function () {
+    gulp.src(server.js)
+        .pipe(plugins.babel())
+        .pipe(plugins.uglify())
+        .pipe(gulp.dest(server.dist));
+});
 
-    gulp.src('routes/**/*.js')
-        .pipe(babel({
-            presets: ['es2015']
-        }))
-        .pipe(uglify())
-        .pipe(gulp.dest('dist/routes/'));
-
-    gulp.src('views/**/*.ejs')
-        .pipe(gulp.dest('dist/views/'));
-})
+gulp.task('babel-server', ["server_js"], function () {
+    gulp.src(['bin/views/**/*.ejs'])
+        .pipe(gulp.dest('dist/bin/views'));
+    gulp.src(['bin/assets/**/*'])
+        .pipe(gulp.dest("dist/bin/assets"));
+});
 
 gulp.task('server', ['babel-server'], function () {
-    nodemon({
+    plugins.nodemon({
         script: 'dist/bin/www',
         env: { 'NODE_ENV': 'development' },
         tasks: ['babel-server'],
-        watch: ['node_modules', 'bin/www', 'routes/**/*.js', 'views/**/', 'app.js']
+        watch: [server.node, 'bin/views/**/', server.js]
     });
 });
