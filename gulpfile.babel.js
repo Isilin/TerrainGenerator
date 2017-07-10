@@ -73,7 +73,7 @@ gulp.task('dev', ['default_bower', 'build', 'watch']);
 /* ========== SERVER TASKS ========== */
 
 gulp.task('babel-server', function () {
-    gulp.src(['bin/www', 'bin/app.js'])
+    gulp.src(['bin/www', 'bin/Server.js'])
         .pipe(plugins.babel())
         .pipe(gulp.dest('dist/bin/'));
 
@@ -90,6 +90,6 @@ gulp.task('server', ['babel-server'], function () {
         script: 'dist/bin/www',
         env: { 'NODE_ENV': 'development' },
         tasks: ['babel-server'],
-        watch: ['node_modules', 'bin/www', 'bin/routes/**/*.js', 'bin/views/**/', 'bin/app.js']
+        watch: ['node_modules', 'bin/www', 'bin/routes/**/*.js', 'bin/views/**/', 'bin/Server.js']
     });
 });
