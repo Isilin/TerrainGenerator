@@ -6,6 +6,7 @@ import babel from 'gulp-babel';
 import minimize from 'gulp-minimize';
 import uglify from 'gulp-uglify';
 import browserify from 'gulp-browserify';
+import babelify from 'babelify';
 
 /* ========== CLIENT TASKS ========== */
 
@@ -14,9 +15,9 @@ gulp.task('build-client', function () {
         .pipe(babel({
             presets: ['es2015']
         }))
-        .pipe(browserify())
         //.pipe(uglify())
-        .pipe(gulp.dest('dist/public'));
+        .pipe(gulp.dest('dist/public'))
+        .pipe(browserify({ transform: ['babelify'] }));
 
     gulp.src('public/assets/**/')
         .pipe(gulp.dest('dist/public/assets'));
@@ -27,7 +28,7 @@ gulp.task('build-client', function () {
 });
 
 gulp.task('watch-client', function () {
-  gulp.watch(['public', 'bower_components'], ['build-client']);
+  gulp.watch(['public/**/*', 'bower_components/**/*'], ['build-client']);
 });
 
 gulp.task('dev', ['build-client', 'watch-client']);

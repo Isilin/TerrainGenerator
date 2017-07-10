@@ -1,5 +1,3 @@
-'use strict';
-
 class AnalyticsModalCtrl
 {
     constructor (scope, analytics) {
@@ -24,7 +22,7 @@ class AnalyticsModalCtrl
             that.$scope.$parent.$close();
         };
     }
-}
+};
 
 AnalyticsModalCtrl.$inject = ['$scope', 'analytics'];
-angular.module('terrainGenerator').controller('AnalyticsModalCtrl', AnalyticsModalCtrl);
+export default AnalyticsModalCtrl;

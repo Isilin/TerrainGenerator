@@ -1,7 +1,4 @@
-'use strict';
-
-class GUICtrl
-{
+class GUI {
     constructor (scope, uibModal, analytics, generator) {
         this.$scope = scope;
         this.$uibModal = uibModal;
@@ -24,7 +21,7 @@ class GUICtrl
         this.generator.init();
         this.generator.start();
     }
-}
+};
 
-GUICtrl.$inject = ['$scope', '$uibModal', 'analytics', 'Generator'];
-angular.module('terrainGenerator').controller('GUICtrl', GUICtrl);
+GUI.$inject = ['$scope', '$uibModal', 'analytics', 'Generator'];
+export default GUI;

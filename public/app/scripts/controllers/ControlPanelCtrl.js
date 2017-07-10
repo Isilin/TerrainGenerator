@@ -1,5 +1,3 @@
-'use strict';
-
 class ControlPanelCtrl
 {
     constructor (scope, settings, scene) {
@@ -46,7 +44,7 @@ class ControlPanelCtrl
             that.scene.skylight.color.set(that.$scope.settings.lightColor);
         };
     }
-}
+};
 
 ControlPanelCtrl.$inject = ['$scope', 'Settings', 'Scene'];
-angular.module('terrainGenerator').controller('ControlPanelCtrl', ControlPanelCtrl);
+export default ControlPanelCtrl;
