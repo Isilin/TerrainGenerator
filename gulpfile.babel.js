@@ -47,15 +47,20 @@ gulp.task('default_bower', ['watch_bower']);
 var client = {
     js: ['public/app/scripts/**/*.js'],
     css: ['public/assets/css/*.css'],
-    assets: ['public/assets/**/*', !'public/assets/css']
+    assets: ['public/assets/**/*', !'public/assets/css'],
+    dist: "dist/public/"
 };
 
-gulp.task('build', function () {
-    gulp.src('public/**/*.js')
+gulp.task('build_js', function () {
+    gulp.src(client.js)
         .pipe(plugins.babel())
-        //.pipe(uglify())
-        .pipe(gulp.dest('dist/public'));
+        .pipe(plugins.concat("client.js"))
+        .pipe(plugins.uglify())
+        .pipe(plugins.rename("client.min.js"))
+        .pipe(gulp.dest(client.dist));
+});
 
+gulp.task('build', function () {
     gulp.src('public/assets/**/')
         .pipe(gulp.dest('dist/public/assets'));
 
@@ -64,32 +69,41 @@ gulp.task('build', function () {
         .pipe(gulp.dest('dist/public/app/'));
 });
 
-gulp.task('watch', function () {
-  gulp.watch(['public/**/*'], ['build']);
+gulp.task('watch_client', ['build'], function () {
+    gulp.watch(client.js, ['build_js']);
 });
 
-gulp.task('dev', ['default_bower', 'build', 'watch']);
+gulp.task('default_client', ['watch_client']);
+
+gulp.task('dev', ['default_bower', 'default_client']);
 
 /* ========== SERVER TASKS ========== */
 
-gulp.task('babel-server', function () {
-    gulp.src(['bin/www', 'bin/Server.js'])
-        .pipe(plugins.babel())
-        .pipe(gulp.dest('dist/bin/'));
+var server = {
+    js: ["bin/www", "bin/**/*.js"],
+    dist: "dist/bin/",
+    node: ["node_modules/", "gulpfile.babel.js", "package.json"]
+}
 
-    gulp.src(['bin/routes/**/*.js'])
+gulp.task("server_js", function () {
+    gulp.src(server.js)
         .pipe(plugins.babel())
-        .pipe(gulp.dest('dist/bin/routes/**/'));
+        .pipe(plugins.uglify())
+        .pipe(gulp.dest(server.dist));
+});
 
-    gulp.src(['bin/views/**/*.ejs', 'bin/assets/**'])
-        .pipe(gulp.dest('dist/bin/**/'));
-})
+gulp.task('babel-server', ["server_js"], function () {
+    gulp.src(['bin/views/**/*.ejs'])
+        .pipe(gulp.dest('dist/bin/views'));
+    gulp.src(['bin/assets/**/*'])
+        .pipe(gulp.dest("dist/bin/assets"));
+});
 
 gulp.task('server', ['babel-server'], function () {
     plugins.nodemon({
         script: 'dist/bin/www',
         env: { 'NODE_ENV': 'development' },
         tasks: ['babel-server'],
-        watch: ['node_modules', 'bin/www', 'bin/routes/**/*.js', 'bin/views/**/', 'bin/Server.js']
+        watch: [server.node, 'bin/views/**/', server.js]
     });
 });

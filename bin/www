@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-import Server from './Server';
+import Server from './Server.js';
 var debug = require('debug')('todo-api:server');
 var http = require('http');
 
