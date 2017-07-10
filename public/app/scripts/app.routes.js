@@ -19,8 +19,8 @@ angular.module('terrainGenerator', [
   .config(($routeProvider) => {
     $routeProvider
         .when('terrain', {
-        templateUrl: 'views/terrain.html',
-        controller: 'terrainCtrl'
+            templateUrl: 'views/terrain.html',
+            controller: 'terrainCtrl'
         })
         .otherwise({
             redirectTo: 'terrain'
