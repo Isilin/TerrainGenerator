@@ -8,13 +8,6 @@ var plugins = require('gulp-load-plugins')({
     }
 );
 
-var path = {
-    src_root: "public/",
-    dest_root: "dist/",
-    bowerfiles: "bower_components/",
-    bower_dest: "public/vendor/",
-};
-
 var vendor = {
     js: ['bower_components/**/*.js'],
     css: ['bower_components/**/*.css'],
@@ -51,11 +44,15 @@ gulp.task('default_bower', ['watch_bower']);
 
 /* ========== CLIENT TASKS ========== */
 
+var client = {
+    js: ['public/app/scripts/**/*.js'],
+    css: ['public/assets/css/*.css'],
+    assets: ['public/assets/**/*', !'public/assets/css']
+};
+
 gulp.task('build', function () {
     gulp.src('public/**/*.js')
-        .pipe(plugins.babel({
-            presets: ['env']
-        }))
+        .pipe(plugins.babel())
         //.pipe(uglify())
         .pipe(gulp.dest('dist/public'));
 
@@ -65,9 +62,6 @@ gulp.task('build', function () {
     gulp.src(['public/app/**/*.html'])
         .pipe(plugins.minimize())
         .pipe(gulp.dest('dist/public/app/'));
-
-    //gulp.src(['bower_components/**/'])
-    //    .pipe(gulp.dest('dist/bower_components/'));
 });
 
 gulp.task('watch', function () {
@@ -79,28 +73,16 @@ gulp.task('dev', ['default_bower', 'build', 'watch']);
 /* ========== SERVER TASKS ========== */
 
 gulp.task('babel-server', function () {
-    gulp.src('bin/www')
-        .pipe(plugins.babel({
-            presets: ['env']
-        }))
+    gulp.src(['bin/www', 'bin/app.js'])
+        .pipe(plugins.babel())
         .pipe(gulp.dest('dist/bin/'));
 
-    gulp.src('app.js')
-        .pipe(plugins.babel({
-            presets: ['env']
-        }))
-        .pipe(plugins.uglify())
-        .pipe(gulp.dest('dist/'));
+    gulp.src(['bin/routes/**/*.js'])
+        .pipe(plugins.babel())
+        .pipe(gulp.dest('dist/bin/routes/**/'));
 
-    gulp.src('routes/**/*.js')
-        .pipe(plugins.babel({
-            presets: ['env']
-        }))
-        .pipe(plugins.uglify())
-        .pipe(gulp.dest('dist/routes/'));
-
-    gulp.src('views/**/*.ejs')
-        .pipe(gulp.dest('dist/views/'));
+    gulp.src(['bin/views/**/*.ejs', 'bin/assets/**'])
+        .pipe(gulp.dest('dist/bin/**/'));
 })
 
 gulp.task('server', ['babel-server'], function () {
@@ -108,6 +90,6 @@ gulp.task('server', ['babel-server'], function () {
         script: 'dist/bin/www',
         env: { 'NODE_ENV': 'development' },
         tasks: ['babel-server'],
-        watch: ['node_modules', 'bin/www', 'routes/**/*.js', 'views/**/', 'app.js']
+        watch: ['node_modules', 'bin/www', 'bin/routes/**/*.js', 'bin/views/**/', 'bin/app.js']
     });
 });

@@ -6,16 +6,16 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
-var terraingenerator = require('./routes/terraingenerator');
+var index = require('routes/index');
+var users = require('routes/users');
+var terraingenerator = require('routes/terraingenerator');
 
 var app = express();
 
 app.engine('ejs', engine);
 
-app.use(favicon(path.join(__dirname, 'public', 'assets','images', 'favicon.ico')));
-app.set('views', path.join(__dirname, 'views'));
+app.use(favicon(path.join('assets','images', 'favicon.ico')));
+app.set('views', 'views');
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, '/public')));
 app.use('/bower_components',  express.static( path.join(__dirname, '/bower_components')));
