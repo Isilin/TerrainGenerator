@@ -18,13 +18,13 @@ export default class extends express {
     this.use(favicon(path.join(__dirname, 'assets','images', 'favicon.ico')));
     this.set('views', path.join(__dirname, 'views'));
     this.set('view engine', 'ejs');
-    this.use(express.static(path.join(__dirname, '../public')));
+    this.use(express.static(path.join(__dirname, '/../public/')));
     this.use('/bower_components',  express.static( path.join(__dirname, '../../bower_components')));
     this.use(logger('dev'));
     this.use(bodyParser.json());
     this.use(bodyParser.urlencoded({ extended: false }));
     this.use(cookieParser());
-    this.use(express.static(path.join(__dirname, '../public')));
+    this.use(express.static(path.join(__dirname, '/../public/')));
 
     this.use('/', index);
     this.use('/users', users);
