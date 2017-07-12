@@ -1,11 +1,11 @@
-import {default as controllerName} from "./controllers/controllers";
+import moduleName from './controllers/controllers';
 
 angular.module('terrainGenerator', [
     'ngRoute',
     'ngAnimate',
     'ngSanitize', 
     'ui.bootstrap',
-    controllerName
+    moduleName
   ])
   .config(($routeProvider) => {
     $routeProvider

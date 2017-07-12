@@ -3,7 +3,7 @@
 /* ========== GULP PLUGINS ========== */
 import gulp from 'gulp';
 var plugins = require('gulp-load-plugins')({
-	pattern: ['gulp-*', 'gulp.*', 'main-bower-files'],
+	pattern: ['gulp-*', 'gulp.*', 'main-bower-files', 'webpack', 'webpack-stream'],
 	replaceString: /\bgulp[\-.]/
     }
 );
@@ -53,10 +53,8 @@ var client = {
 
 gulp.task('build_js', function () {
     gulp.src(client.js)
-        .pipe(plugins.babel())
-        //.pipe(plugins.concat("client.js"))
-        .pipe(plugins.uglify())
-        //.pipe(plugins.rename("client.min.js"))
+        .pipe(plugins.webpackStream(require('./webpack.config.js'), plugins.webpack))
+        .pipe(plugins.rename("bundle.min.js"))
         .pipe(gulp.dest(client.dist + "app/scripts/"));
 });
 
@@ -88,8 +86,10 @@ gulp.task('dev', ['default_bower', 'default_client']);
 var server = {
     js: ["bin/www", "bin/Server.js"],
     js_routes: ["bin/routes/*.js"],
+    assets: ['bin/assets/**/*'],
     dist: "dist/bin/",
-    node: ["node_modules/", "gulpfile.babel.js", "package.json"]
+    node: ["node_modules/", "gulpfile.babel.js", "package.json"],
+    script: "dist/bin/www"
 }
 
 gulp.task("server_js", function () {
@@ -106,14 +106,14 @@ gulp.task("server_js", function () {
 
 gulp.task('babel-server', ["server_js"], function () {
     gulp.src(['bin/views/**/*.ejs'])
-        .pipe(gulp.dest('dist/bin/views'));
-    gulp.src(['bin/assets/**/*'])
-        .pipe(gulp.dest("dist/bin/assets"));
+        .pipe(gulp.dest(server.dist + 'views'));
+    gulp.src(server.assets)
+        .pipe(gulp.dest(server.dist + "assets"));
 });
 
 gulp.task('server', ['babel-server'], function () {
     plugins.nodemon({
-        script: 'dist/bin/www',
+        script: server.script,
         env: { 'NODE_ENV': 'development' },
         tasks: ['babel-server'],
         watch: ["node_modules/", "gulpfile.babel.js", "package.json", 'bin/views/**/', "bin/www", "bin/**/*.js"]

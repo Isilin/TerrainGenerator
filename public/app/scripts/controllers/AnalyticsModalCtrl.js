@@ -25,4 +25,5 @@ class AnalyticsModalCtrl
 };
 
 AnalyticsModalCtrl.$inject = ['$scope', 'analytics'];
+
 export default AnalyticsModalCtrl;

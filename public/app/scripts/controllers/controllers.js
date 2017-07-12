@@ -1,6 +1,6 @@
-import {default as AnalyticsModalCtrl} from "./AnalyticsModalCtrl";
-import {default as ControlPanelCtrl} from "./ControlPanelCtrl";
-import {default as GUI} from "./GUI";
+import AnalyticsModalCtrl from "./AnalyticsModalCtrl";
+import ControlPanelCtrl from "./ControlPanelCtrl";
+import GUI from "./GUI";
 
 var moduleName = "terrainGenerator.controllers";
 
