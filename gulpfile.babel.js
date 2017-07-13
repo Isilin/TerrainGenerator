@@ -52,20 +52,20 @@ var client = {
 };
 
 gulp.task('build_js', function () {
-    gulp.src(client.js)
+    return gulp.src(client.js)
         .pipe(plugins.webpackStream(require('./webpack.config.js'), plugins.webpack))
         .pipe(plugins.rename("bundle.min.js"))
         .pipe(gulp.dest(client.dist + "app/scripts/"));
 });
 
 gulp.task('build_html', function () {
-    gulp.src(client.html)
+    return gulp.src(client.html)
         .pipe(plugins.minimize())
         .pipe(gulp.dest(client.dist + "app/"));
 });
 
 gulp.task('build_assets', function () {
-    gulp.src(client.assets)
+    return gulp.src(client.assets)
         .pipe(gulp.dest(client.dist + "assets/"));
 });
 
@@ -84,35 +84,42 @@ gulp.task('dev', ['default_bower', 'default_client']);
 /* ========== SERVER TASKS ========== */
 
 var server = {
-    js: ["bin/www", "bin/Server.js"],
+    js: ["bin/Server.js", "bin/www"],
     js_routes: ["bin/routes/*.js"],
     assets: ['bin/assets/**/*'],
-    dist: "dist/bin/",
+    dist: "./dist/bin/",
     node: ["node_modules/", "gulpfile.babel.js", "package.json"],
-    script: "dist/bin/www"
+    script: __dirname + "/dist/bin/www"
 }
 
 gulp.task("server_js", function () {
-    gulp.src(server.js)
+    return gulp.src(server.js)
         .pipe(plugins.babel())
         .pipe(plugins.uglify())
         .pipe(gulp.dest(server.dist));
+});
 
-    gulp.src(server.js_routes)
+gulp.task("routes_js", function () {
+    return gulp.src(server.js_routes)
         .pipe(plugins.babel())
         .pipe(plugins.uglify())
         .pipe(gulp.dest(server.dist + "routes/"));
 });
 
-gulp.task('babel-server', ["server_js"], function () {
-    gulp.src(['bin/views/**/*.ejs'])
+gulp.task("server_views", function () {
+    return gulp.src(['bin/views/**/*.ejs'])
         .pipe(gulp.dest(server.dist + 'views'));
-    gulp.src(server.assets)
+});
+
+gulp.task("server_assets", function () {
+    return gulp.src(server.assets)
         .pipe(gulp.dest(server.dist + "assets"));
 });
 
+gulp.task('babel-server', ["server_js", "routes_js", 'server_views', 'server_assets']);
+
 gulp.task('server', ['babel-server'], function () {
-    plugins.nodemon({
+    return plugins.nodemon({
         script: server.script,
         env: { 'NODE_ENV': 'development', 'PORT': 5000 },
         tasks: ['babel-server'],
