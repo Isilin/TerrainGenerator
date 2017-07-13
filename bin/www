@@ -1,18 +1,16 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
+import Server from './Server';
+import debug from 'debug';
+import http from 'http';
 
-import Server from './Server.js';
-var debug = require('debug')('todo-api:server');
-var http = require('http');
+debug('todo-api:server');
 
 const port = (process.env.PORT || 5000);
 
 var server = http.createServer(new Server());
 
-server.listen(port, () => {
+server.listen(port, function () {
   console.log(`Server started on port ${port}`);
 });
 server.on('error', onError);
@@ -21,15 +19,12 @@ server.on('listening', onListening);
 /**
  * Event listener for HTTP server "error" event.
  */
-
 function onError(error) {
   if (error.syscall !== 'listen') {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = (typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port);
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -52,8 +47,6 @@ function onError(error) {
 
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
+  var bind = (typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port);
   debug('Listening on ' + bind);
 }

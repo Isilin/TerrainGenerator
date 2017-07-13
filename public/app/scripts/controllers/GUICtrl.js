@@ -1,12 +1,10 @@
-'use strict';
-
-class GUICtrl
-{
-    constructor (scope, uibModal, analytics, generator) {
-        this.$scope = scope;
-        this.$uibModal = uibModal;
-        this.generator = generator;
-        this.$scope.analytics = analytics;
+export default class GUICtrl {
+    /*@ngInject*/
+    constructor ($scope, $uibModal, Analytics, Generator) {
+        this.$scope = $scope;
+        this.$uibModal = $uibModal;
+        this.generator = Generator;
+        this.$scope.analytics = Analytics;
 
         var that = this;
 
@@ -24,7 +22,4 @@ class GUICtrl
         this.generator.init();
         this.generator.start();
     }
-}
-
-GUICtrl.$inject = ['$scope', '$uibModal', 'analytics', 'Generator'];
-angular.module('terrainGenerator').controller('GUICtrl', GUICtrl);
+};

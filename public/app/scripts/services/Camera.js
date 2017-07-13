@@ -1,8 +1,9 @@
 const SPEED = 500;
 const LOOKSPEED = 0.075;
 
-class Camera extends THREE.PerspectiveCamera
+export default class Camera extends THREE.PerspectiveCamera
 {
+    /*@ngInject*/
     constructor (Renderer, MathHelper) {
         super(60, Renderer.ratio, 1, 10000);
 
@@ -263,7 +264,4 @@ class Camera extends THREE.PerspectiveCamera
                 break;
         }
     }
-}
-
-Camera.$inject = ['Renderer', 'MathHelper'];
-angular.module('terrainGenerator').service('Camera', Camera);
+};

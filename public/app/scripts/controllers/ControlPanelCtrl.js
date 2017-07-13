@@ -1,12 +1,11 @@
-'use strict';
-
-class ControlPanelCtrl
+export default class ControlPanelCtrl
 {
-    constructor (scope, settings, scene) {
-        this.$scope = scope;
-        this.scene = scene;
+    /*@ngInject*/
+    constructor ($scope, Settings, Scene) {
+        this.$scope = $scope;
+        this.scene = Scene;
 
-        this.$scope.settings = settings;
+        this.$scope.settings = Settings;
         
         var that = this;
 
@@ -33,7 +32,7 @@ class ControlPanelCtrl
         this.$scope.updateSmoothing = function () {
             that.scene.updateSmoothing(that.$scope.settings.smoothing.selected, that.$scope.settings.lastSetup);
             that.scene.updateScattering();
-            if (that.$scope.settings.lastSetup.heightmap) {
+            if (that.$scope.settings.lastSetup != null && that.$scope.settings.lastSetup.heightmap) {
                 THREE.Terrain.toHeightmap(that.scene.terrain.children[0].geometry.vertices, that.$scope.settings.lastSetup);
             }
         };
@@ -42,11 +41,8 @@ class ControlPanelCtrl
             that.scene.updateScattering();
         };
 
-        that.$scope.updateLightColor = function () {
-            that.scene.skylight.color.set(that.$scope.settings.lightColor);
+        this.$scope.updateLightColor = function () {
+            that.scene._skydome.material.color.set(that.$scope.settings.lightColor);
         };
     }
-}
-
-ControlPanelCtrl.$inject = ['$scope', 'Settings', 'Scene'];
-angular.module('terrainGenerator').controller('ControlPanelCtrl', ControlPanelCtrl);
+};

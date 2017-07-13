@@ -1,3 +1,8 @@
+import '../../../assets/libs/brownian';
+import '../../../assets/libs/gaussian';
+import '../../../assets/libs/weightedBoxBlurGaussian';
+import '../../../assets/libs/worley';
+
 class Terrain
 {
     constructor (Settings, Materials) {
@@ -34,21 +39,21 @@ class Terrain
     get object () { return this._object3D; }
 
     scatter () {
-        var s = parseInt(Settings.segments, 10);
+        var s = parseInt(this.$settings.segments, 10);
         var spread;
         var randomness;
-        var o = { xSegments: s, ySegments: Math.round(s * Settings.widthLengthRatio) };
-        if (Settings.scattering.selected === 'Linear') {
-            spread = Settings.spread * 0.0005;
+        var o = { xSegments: s, ySegments: Math.round(s * this.$settings.widthLengthRatio) };
+        if (this.$settings.scattering.selected === 'Linear') {
+            spread = this.$settings.spread * 0.0005;
             randomness = Math.random;
         }
-        else if (Settings.scattering.selected === 'Altitude') {
-            spread = Settings.altitudeSpread;
+        else if (this.$settings.scattering.selected === 'Altitude') {
+            spread = this.$settings.altitudeSpread;
         }
-        else if (Settings.scattering.selected === 'PerlinAltitude') {
+        else if (this.$settings.scattering.selected === 'PerlinAltitude') {
             spread = function (v, k) {
                 var h = THREE.Terrain.ScatterHelper(THREE.Terrain.Perlin, o, 2, 0.125)(),
-                    hs = THREE.Terrain.InEaseOut(Settings.spread * 0.01);
+                    hs = THREE.Terrain.InEaseOut(this.$settings.spread * 0.01);
 
                 var rv = h[k],
                     place = false;
@@ -62,13 +67,14 @@ class Terrain
             };
         }
         else {
-            spread = THREE.Terrain.InEaseOut(Settings.spread * 0.01) * (Settings.scattering.selected === 'Worley' ? 1 : 0.5);
-            randomness = THREE.Terrain.ScatterHelper(THREE.Terrain[Settings.scattering.selected], o, 2, 0.125);
+            spread = THREE.Terrain.InEaseOut(this.$settings.spread * 0.01) * (this.$settings.scattering.selected === 'Worley' ? 1 : 0.5);
+            randomness = THREE.Terrain.ScatterHelper(THREE.Terrain[this.$settings.scattering.selected], o, 2, 0.125);
         }
     }
 
     smooth (smoothing) {
-        var m = scene._terrain.children[0];
+        var o = this.options;
+        var m = this._object3D.children[0];
         var g = m.geometry.vertices;
         if (smoothing === 'Conservative (0.5)') THREE.Terrain.SmoothConservative(g, o, 0.5);
         if (smoothing === 'Conservative (1)') THREE.Terrain.SmoothConservative(g, o, 1);
@@ -85,7 +91,16 @@ class Terrain
         else if (smoothing === 'Median') THREE.Terrain.SmoothMedian(g, o);
         THREE.Terrain.Normalize(m, o);
     }
-}
+};
 
-Terrain.$inject = ['Settings', 'Materials'];
-angular.module('terrainGenerator').service('Terrain', Terrain);
+export default class TerrainFactory
+{
+    constructor (Settings, Materials) {
+        this._settings = Settings;
+        this._materials = Materials;
+    }
+
+    newTerrain () {
+        return new Terrain(this._settings, this._materials);
+    }
+};
