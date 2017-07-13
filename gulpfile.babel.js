@@ -121,7 +121,7 @@ gulp.task('babel-server', ["server_js", "routes_js", 'server_views', 'server_ass
 gulp.task('server', ['babel-server'], function () {
     return plugins.nodemon({
         script: server.script,
-        env: { 'NODE_ENV': 'development', 'PORT': 5000 },
+        env: { 'NODE_ENV': 'development', 'PORT': process.env.PORT || 5000 },
         tasks: ['babel-server'],
         watch: ["node_modules/", "gulpfile.babel.js", "package.json", 'bin/views/**/', "bin/www", "bin/**/*.js"]
     });
