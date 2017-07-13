@@ -1,9 +1,10 @@
-class GUI {
-    constructor (scope, uibModal, analytics, generator) {
-        this.$scope = scope;
-        this.$uibModal = uibModal;
-        this.generator = generator;
-        this.$scope.analytics = analytics;
+export default class GUICtrl {
+    /*@ngInject*/
+    constructor ($scope, $uibModal, Analytics, Generator) {
+        this.$scope = $scope;
+        this.$uibModal = $uibModal;
+        this.generator = Generator;
+        this.$scope.analytics = Analytics;
 
         var that = this;
 
@@ -22,6 +23,3 @@ class GUI {
         this.generator.start();
     }
 };
-
-GUI.$inject = ['$scope', '$uibModal', 'analytics', 'Generator'];
-export default GUI;

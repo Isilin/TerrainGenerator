@@ -18,7 +18,7 @@ module.export = {
                 exclude: /(node_modules|bower_components)/,
                 test: /\.js$/,
                 use: {
-                    loader: 'babel-loader',
+                    loaders: ['ng-annotate-loader'],
                     options: {
                         presets: ['env'],
                         plugins: ['transform-runtime']

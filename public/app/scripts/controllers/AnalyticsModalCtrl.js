@@ -1,9 +1,10 @@
-class AnalyticsModalCtrl
+export default class AnalyticsModalCtrl
 {
-    constructor (scope, analytics) {
-        this.$scope = scope;
+    /*@ngInject*/
+    constructor ($scope, Analytics) {
+        this.$scope = $scope;
 
-        this.$scope.analytics = analytics;
+        this.$scope.analytics = Analytics;
 
         this.$scope.isElevationCollapsed = true;
         this.$scope.isSlopeCollapsed = true;
@@ -23,7 +24,3 @@ class AnalyticsModalCtrl
         };
     }
 };
-
-AnalyticsModalCtrl.$inject = ['$scope', 'analytics'];
-
-export default AnalyticsModalCtrl;

@@ -45,7 +45,7 @@ gulp.task('default_bower', ['watch_bower']);
 /* ========== CLIENT TASKS ========== */
 
 var client = {
-    js: ['public/app/scripts/**/*.js'],
+    js: ['public/app/scripts/**/*.js', 'public/app/scripts/**/*.js'],
     html: ['public/app/**/*.html'],
     assets: ['public/assets/**/*'],
     dist: "dist/public/"
@@ -114,7 +114,7 @@ gulp.task('babel-server', ["server_js"], function () {
 gulp.task('server', ['babel-server'], function () {
     plugins.nodemon({
         script: server.script,
-        env: { 'NODE_ENV': 'development' },
+        env: { 'NODE_ENV': 'development', 'PORT': 5000 },
         tasks: ['babel-server'],
         watch: ["node_modules/", "gulpfile.babel.js", "package.json", 'bin/views/**/', "bin/www", "bin/**/*.js"]
     });
