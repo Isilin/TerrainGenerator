@@ -12,8 +12,8 @@ export default class Scene extends THREE.Scene
 
         /* ##### TERRAIN ##### */
         this._terrainFactory = TerrainFactory;
-        this._terrain = this._terrainFactory.newTerrain();
-        this.add(this._terrain.object);
+        this._terrain = null;
+        this.refreshTerrain();
         /* ################### */
 
         /* ##### SKYDOME ##### */
@@ -34,7 +34,7 @@ export default class Scene extends THREE.Scene
         /* ######################### */
         
         /* ##### SUN ##### */
-        var sun = new THREE.DirectionalLight(0xffff66, 1.5);
+        var sun = new THREE.DirectionalLight(0xdddd66, 1.5);
         sun.position.set(2950, 2625, -160);
         this.add(sun);
         /* ############### */
@@ -54,9 +54,16 @@ export default class Scene extends THREE.Scene
     }
 
     refreshTerrain() {
-        this.remove(this._terrain.object);
-        delete this._terrain;
+        if(this._terrain != null) {
+            this.remove(this._terrain.object);
+            delete this._terrain;
+        }
+        var heightmapCanvas = document.getElementById('heightmap');
+
         this._terrain = this._terrainFactory.newTerrain();
         this.add(this._terrain.object);
+        var options = this._terrain.options;
+        options.heightmap = heightmapCanvas;
+        THREE.Terrain.toHeightmap(this._terrain._object3D.children[0].geometry.vertices, options);
     }
 };
