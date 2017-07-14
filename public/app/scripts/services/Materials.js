@@ -3,7 +3,7 @@ export default class Materials
     constructor () {
         this.sand = null;
         this.water = null;
-        this.blend = null;
+        this.blend = new THREE.MeshBasicMaterial({ color: 0x5566aa, wireframe: true });
         this.mat = new THREE.MeshBasicMaterial({ color: 0x5566aa, wireframe: true });
         this.gray = new THREE.MeshPhongMaterial({ color: 0x88aaaa, specular: 0x444455, shininess: 10 });
     }

@@ -11,12 +11,17 @@ class Terrain
         var s = parseInt(this.$settings.segments, 10);
         var h = this.$settings.heightmap.selected === 'heightmap.png';
 
+        var that = this;
+        Materials.init(() => {
+            that._object3D.children[0].material = that.$settings.texture.selected == 'Wireframe' ? Materials.mat : (that.$settings.texture.selected == 'Blended' ? Materials.blend : Materials.gray)
+            that._object3D.children[0].material.needUpdate = true;
+        })
+
         this.options = {
             after: this.$settings.after,
             easing: THREE.Terrain[this.$settings.easing.selected],
             heightmap: h ? heightmapImage : THREE.Terrain[this.$settings.heightmap.selected],
-            material: Materials.mat,
-            /*material: this.$settings.texture.selected == 'Wireframe' ? Materials.mat : (this.$settings.texture.selected == 'Blended' ? Materials.blend : Material.gray),*/
+            material: this.$settings.texture.selected == 'Wireframe' ? Materials.mat : (this.$settings.texture.selected == 'Blended' ? Materials.blend : Materials.gray),
             maxHeight: this.$settings.maxHeight - 100,
             minHeight: -100,
             steps: this.$settings.steps,

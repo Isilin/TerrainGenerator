@@ -39,6 +39,9 @@ export default class ControlPanelCtrl
 
         this.$scope.updateScattering = function () {
             that.scene.updateScattering();
+            if (that.$scope.settings.lastSetup != null && that.$scope.settings.lastSetup.heightmap) {
+                THREE.Terrain.toHeightmap(that.scene.terrain.children[0].geometry.vertices, that.$scope.settings.lastSetup);
+            }
         };
 
         this.$scope.updateLightColor = function () {
