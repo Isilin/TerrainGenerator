@@ -21,8 +21,8 @@
     },
     "bin": "",
     "engines": {
-        "node": "~7.10.0",
-        "npm": "~4.5.0"
+        "node": "~8.1.4",
+        "npm": "~5.0.3"
     },
     "devDependencies": {
         "autoprefixer-loader": "^3.2.0",
@@ -54,15 +54,15 @@
         "main-bower-files": "^2.13.1",
         "morgan": "~1.8.1",
         "serve-favicon": "~2.4.2",
-        "webpack": "^3.1.0",
+        "webpack": "3.3.0",
         "webpack-stream": "^3.2.0"
     },
     "scripts": {
-        "postinstall": "bower install",
-        "prestart": "npm install",
+        "postinstall": "bower install & bower update",
+        "prestart": "npm install & npm update",
         "start": "concurrently \"gulp server\" \"gulp dev\"",
-        "pretest": "npm install",
-        "preupdate-webdriver": "npm install",
+        "pretest": "npm install & npm update",
+        "preupdate-webdriver": "npm install & npm update",
         "update-webdriver": "webdriver-manager update"
     },
     "main": "bin/www",
