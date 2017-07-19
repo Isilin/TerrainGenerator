@@ -1,3 +1,5 @@
+import THREE from 'three';
+
 import AnalyticsModalCtrl from "./controllers/AnalyticsModalCtrl";
 import ControlPanelCtrl from "./controllers/ControlPanelCtrl";
 import GUICtrl from "./controllers/GUICtrl";

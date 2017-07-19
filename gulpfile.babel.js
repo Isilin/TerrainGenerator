@@ -1,128 +1,40 @@
-'use strict';
-
-/* ========== GULP PLUGINS ========== */
 import gulp from 'gulp';
-var plugins = require('gulp-load-plugins')({
-	pattern: ['gulp-*', 'gulp.*', 'main-bower-files', 'webpack', 'webpack-stream'],
-	replaceString: /\bgulp[\-.]/
-    }
-);
+import webpack from 'webpack';
+import gwebpack from 'webpack-stream';
+import webpackClientConfig from './config/webpack-client.config.babel';
+import webpackServerConfig from './config/webpack-server.config.babel';
+import gnodemon from 'gulp-nodemon';
 
-var vendor = {
-    js: ['bower_components/**/*.js'],
-    css: ['bower_components/**/*.css'],
-    bower: ["bower.json"],
-    dist: "dist/public/vendor/"
-}
-
-/* ========== LIBRARIES ========== */
-gulp.task('bower_js', function () {
-    gulp.src(plugins.mainBowerFiles("**/*.js"), { base: 'bower_components' })
-        .pipe(plugins.concat("vendor.js"))
-        .pipe(plugins.uglify())
-        .pipe(plugins.rename("dist.min.js"))
-        .pipe(gulp.dest(vendor.dist));
+gulp.task('server-build', function () {
+    return gulp.src(['bin/**/*.js', 'bin/www.js'])
+        .pipe(gwebpack(webpackServerConfig, webpack))
+        .pipe(gulp.dest('dist/www/'));
+});
+    
+gulp.task('client-build', function () {
+    return gulp.src(['public/**/*.js'])
+        .pipe(gwebpack(webpackClientConfig, webpack))
+        .pipe(gulp.dest('dist/public/'));
 });
 
-gulp.task('bower_css', function () {
-    gulp.src(plugins.mainBowerFiles("**/*.css"), { base: 'bower_components' })
-        .pipe(plugins.concat("vendor.css"))
-        //.pipe(uglify())
-        .pipe(plugins.rename("dist.min.css"))
-        .pipe(gulp.dest(vendor.dist));
+gulp.task('build', ['server-build', 'client-build'], function () { return; });
+
+gulp.task('client-watch', function () {
+    return gulp.watch('public/**/*', ['client-build']);
 });
 
-gulp.task('bower', ['bower_js', 'bower_css']);
+gulp.task('watch', ['client-watch'], function () { return; });
 
-gulp.task('watch_bower', ['bower'], function () {
-    gulp.watch(vendor.js, ['bower_js']);
-    gulp.watch(vendor.css, ['bower_css']);
-    gulp.watch(vendor.bower, ['bower']);
-});
-
-gulp.task('default_bower', ['watch_bower']);
-
-/* ========== CLIENT TASKS ========== */
-
-var client = {
-    js: ['public/app/scripts/**/*.js', 'public/app/scripts/**/*.js'],
-    html: ['public/app/**/*.html'],
-    assets: ['public/assets/**/*'],
-    dist: "dist/public/"
-};
-
-gulp.task('build_js', function () {
-    return gulp.src(client.js)
-        .pipe(plugins.webpackStream(require('./webpack.config.js'), plugins.webpack))
-        .pipe(plugins.rename("bundle.min.js"))
-        .pipe(gulp.dest(client.dist + "app/scripts/"));
-});
-
-gulp.task('build_html', function () {
-    return gulp.src(client.html)
-        .pipe(plugins.minimize())
-        .pipe(gulp.dest(client.dist + "app/"));
-});
-
-gulp.task('build_assets', function () {
-    return gulp.src(client.assets)
-        .pipe(gulp.dest(client.dist + "assets/"));
-});
-
-gulp.task('build', ["build_js", 'build_html', 'build_assets']);
-
-gulp.task('watch_client', ['build'], function () {
-    gulp.watch(client.js, ['build_js']);
-    gulp.watch(client.html, ['build_html']);
-    gulp.watch(client.assets, ['build_assets']);
-});
-
-gulp.task('default_client', ['watch_client']);
-
-gulp.task('dev', ['default_bower', 'default_client']);
-
-/* ========== SERVER TASKS ========== */
-
-var server = {
-    js: ["bin/Server.js", "bin/www"],
-    js_routes: ["bin/routes/*.js"],
-    assets: ['bin/assets/**/*'],
-    dist: "./dist/bin/",
-    node: ["node_modules/", "gulpfile.babel.js", "package.json"],
-    script: __dirname + "/dist/bin/www"
-}
-
-gulp.task("server_js", function () {
-    return gulp.src(server.js)
-        .pipe(plugins.babel())
-        .pipe(plugins.uglify())
-        .pipe(gulp.dest(server.dist));
-});
-
-gulp.task("routes_js", function () {
-    return gulp.src(server.js_routes)
-        .pipe(plugins.babel())
-        .pipe(plugins.uglify())
-        .pipe(gulp.dest(server.dist + "routes/"));
-});
-
-gulp.task("server_views", function () {
-    return gulp.src(['bin/views/**/*.ejs'])
-        .pipe(gulp.dest(server.dist + 'views'));
-});
-
-gulp.task("server_assets", function () {
-    return gulp.src(server.assets)
-        .pipe(gulp.dest(server.dist + "assets"));
-});
-
-gulp.task('babel-server', ["server_js", "routes_js", 'server_views', 'server_assets']);
-
-gulp.task('server', ['babel-server'], function () {
-    return plugins.nodemon({
-        script: server.script,
-        env: { 'NODE_ENV': 'development', 'PORT': process.env.PORT || 5000 },
-        tasks: ['babel-server'],
-        watch: ["node_modules/", "gulpfile.babel.js", "package.json", 'bin/views/**/', "bin/www", "bin/**/*.js"]
+gulp.task('server-start', ['watch', 'build'],function () {
+    return gnodemon({
+        script: 'dist/www/server.bundle.js',
+        env: { 'NODE_ENV': 'development' },
+        tasks: ['server-build'],
+        watch: 'bin/**/*'
+    })
+    .on('restart', function () {
+      console.log('Server has restarted!');
     });
-});
+})
+
+gulp.task('default', ['server-start']);

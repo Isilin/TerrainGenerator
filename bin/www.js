@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import Server from './Server';
 import debug from 'debug';
 import http from 'http';
