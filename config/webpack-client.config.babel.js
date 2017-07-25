@@ -19,14 +19,17 @@ export default {
         rules: [
             {
                 test: /\.css$/,
+                exclude: /node_modules/,
                 use: ['style-loader', 'css-loader']
             },
             {
                 test: /\.(png|svg|jpg|gif|ico)$/,
-                use: ['file-loader']
+                exclude: /node_modules/,
+                use: ['file-loader?name=[name].[ext]']
             },
             {
                 test: /\.js$/,
+                exclude: /node_modules/,
                 use: ['babel-loader']
             }
         ]
@@ -35,7 +38,7 @@ export default {
         new CleanWebpackPlugin(['dist/public']),
         new HtmlWebpackPlugin({
             template: 'public/app/index.html',
-            title: 'Together',
+            title: 'TerrainGenerator',
             filename: 'index.html',
             inject: 'body',
             excludeChunks: [],
@@ -47,7 +50,7 @@ export default {
                 useShortDoctype: true
             }
         }),
-        new UglifyJSPlugin(),
+        //new UglifyJSPlugin(),
         new webpack.DefinePlugin({
             "process.env": {
                 NODE_ENV: JSON.stringify("production")

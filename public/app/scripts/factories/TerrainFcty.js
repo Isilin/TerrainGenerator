@@ -1,3 +1,5 @@
+import 'three.terrain.js';
+import '../../../assets/libs/filters';
 import '../../../assets/libs/brownian';
 import '../../../assets/libs/gaussian';
 import '../../../assets/libs/weightedBoxBlurGaussian';

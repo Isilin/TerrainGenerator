@@ -1,3 +1,5 @@
+import 'three';
+
 const SPEED = 500;
 const LOOKSPEED = 0.075;
 

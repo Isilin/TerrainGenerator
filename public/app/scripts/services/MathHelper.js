@@ -1,3 +1,5 @@
+import 'three.terrain.js';
+
 export default class MathHelper
 {
     constructor () {

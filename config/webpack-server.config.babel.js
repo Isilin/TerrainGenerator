@@ -6,6 +6,10 @@ export default {
     profile: true,
     target: 'node',
     context: path.join(__dirname, '..'),
+    node: {
+        __filename: false,
+        __dirname: false
+    },
     entry: {
         server: path.join(__dirname, '..', 'bin', 'www.js')
     },
@@ -17,23 +21,28 @@ export default {
         rules: [
             {
                 test: /\.html$/,
+                exclude: /node_modules/,
                 use: ['html-loader']
             },
             {
                 test: /\.css$/,
+                exclude: /node_modules/,
                 use: ['style-loader', 'css-loader']
             },
             {
                 test: /\.(png|svg|jpg|gif|ico)$/,
+                exclude: /node_modules/,
                 use: ['file-loader?name=[name].[ext]']
             },
             {
                 test: /\.js$/,
+                exclude: /node_modules/,
                 use: ['babel-loader']
             },
             {
                 test: /\.ejs$/,
-                use: ['file-loader?name=views/[name].[ext]']
+                exclude: /node_modules/,
+                use: ['ejs-compiled-loader?compileDebug&name=[name].[ext]']
             }
         ]
     },

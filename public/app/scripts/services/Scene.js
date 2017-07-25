@@ -1,3 +1,8 @@
+import 'three';
+import 'three.terrain.js';
+
+import sky from '../../../assets/images/sky1.jpg';
+
 export default class Scene extends THREE.Scene
 {
     /*@ngInject*/
@@ -20,7 +25,7 @@ export default class Scene extends THREE.Scene
         var sdGeometry = new THREE.SphereGeometry(8192, 16, 16, 0, Math.PI * 2, 0, Math.PI * 0.5);
         var loader = new THREE.TextureLoader();
         var sdMaterial = new THREE.MeshPhongMaterial({
-            map: loader.load('/assets/images/sky1.jpg'),
+            map: loader.load(sky),
             fog: false,
             side: THREE.BackSide
         });

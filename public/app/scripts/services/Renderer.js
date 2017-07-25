@@ -1,3 +1,5 @@
+import 'three';
+
 export default class Renderer
 {
     /*@ngInject*/

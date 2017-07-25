@@ -1,4 +1,5 @@
 import '../../../assets/libs/filters';
+import 'three.terrain.js';
 
 export default class Settings
 {

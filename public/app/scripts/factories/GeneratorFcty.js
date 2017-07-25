@@ -1,3 +1,5 @@
+import 'three';
+
 const MAX_FPS = 60;
 const FRAMERATE = 1 / MAX_FPS;
 

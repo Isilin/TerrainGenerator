@@ -1,4 +1,15 @@
-import THREE from 'three';
+import angular from 'angular';
+import ngAnimate from 'angular-animate';
+import ngRoute from 'angular-route';
+import ngSanitize from 'angular-sanitize';
+import ngTouch from 'angular-touch';
+import ngResource from 'angular-resource';
+import 'angular-ui-bootstrap';
+
+import '../../assets/css/style.css';
+import '../../assets/css/additional.css';
+import '../../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../../assets/css/bootstrap.cyborg.css';
 
 import AnalyticsModalCtrl from "./controllers/AnalyticsModalCtrl";
 import ControlPanelCtrl from "./controllers/ControlPanelCtrl";
