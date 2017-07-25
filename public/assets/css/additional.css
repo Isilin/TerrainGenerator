@@ -68,3 +68,8 @@ uib-accordion > .panel-group {
     bottom: 0px;
     left: 20px;
 }
+
+.row-button {
+    cursor: pointer;
+    text-align: center;
+}
