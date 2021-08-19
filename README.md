@@ -1,3 +1,3 @@
 # TerrainGenerator
 
-![OVerview](/images.png)
+![Overview](/image.png)
