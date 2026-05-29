@@ -10,13 +10,7 @@ export function InfiniteTerrain({
   onPerfUpdate,
   onHeightmapUpdate,
   textureMode,
-  showWater,
-  waterOpacity,
-  waterDepthOpacityBoost,
-  waterReflection,
-  waterWaveSpeed,
-  waterWaveAmplitude,
-  waterWaveFrequency,
+  water,
 }: InfiniteTerrainProps) {
   const [centerChunk, setCenterChunk] = useState({ x: 0, z: 0 })
 
@@ -43,7 +37,7 @@ export function InfiniteTerrain({
           lodStep={chunk.lodStep}
         />
       ))}
-      {showWater
+      {water.showWater
         ? chunks.map((chunk) => (
             <WaterChunk
               key={`water-${chunk.id}`}
@@ -51,12 +45,12 @@ export function InfiniteTerrain({
               chunkZ={chunk.z}
               heights={chunkHeights[chunk.id]}
               settings={settings}
-              baseOpacity={waterOpacity}
-              depthOpacityBoost={waterDepthOpacityBoost}
-              reflectionStrength={waterReflection}
-              waveSpeed={waterWaveSpeed}
-              waveAmplitude={waterWaveAmplitude}
-              waveFrequency={waterWaveFrequency}
+              baseOpacity={water.opacity}
+              depthOpacityBoost={water.depthOpacityBoost}
+              reflectionStrength={water.reflection}
+              waveSpeed={water.waveSpeed}
+              waveAmplitude={water.waveAmplitude}
+              waveFrequency={water.waveFrequency}
               lodStep={Math.min(8, chunk.lodStep * 2)}
             />
           ))

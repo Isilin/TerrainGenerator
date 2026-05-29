@@ -6,13 +6,7 @@ import type { TerrainSceneProps } from '../types'
 export function TerrainScene({
   onPerfUpdate,
   onHeightmapUpdate,
-  showWater,
-  waterOpacity,
-  waterDepthOpacityBoost,
-  waterReflection,
-  waterWaveSpeed,
-  waterWaveAmplitude,
-  waterWaveFrequency,
+  water,
 }: TerrainSceneProps) {
   const { settings, terrainKey } = useTerrainControls()
 
@@ -22,25 +16,13 @@ export function TerrainScene({
       onPerfUpdate,
       onHeightmapUpdate,
       textureMode: settings.texture,
-      showWater,
-      waterOpacity,
-      waterDepthOpacityBoost,
-      waterReflection,
-      waterWaveSpeed,
-      waterWaveAmplitude,
-      waterWaveFrequency,
+      water,
     }),
     [
       settings,
       onPerfUpdate,
       onHeightmapUpdate,
-      showWater,
-      waterOpacity,
-      waterDepthOpacityBoost,
-      waterReflection,
-      waterWaveSpeed,
-      waterWaveAmplitude,
-      waterWaveFrequency,
+      water,
     ],
   )
 

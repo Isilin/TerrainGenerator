@@ -1,15 +1,17 @@
 import { Canvas } from '@react-three/fiber'
 import { Leva } from 'leva'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import styles from './App.module.css'
 import { useDisplayControls } from './features/display'
 import { HeightmapOverlay, PerformanceOverlay } from './features/overlays'
 import {
+  SCENE_CAMERA,
   SceneCameraControls,
   TerrainScene,
   initialPerfStats,
   type HeightmapPreviewData,
   type PerfStats,
+  type WaterRenderConfig,
 } from './features/terrain'
 
 function App() {
@@ -27,6 +29,27 @@ function App() {
     setHeightmapPreview(preview)
   }, [])
 
+  const waterConfig = useMemo<WaterRenderConfig>(
+    () => ({
+      showWater: displayControls.showWater,
+      opacity: displayControls.waterOpacity,
+      depthOpacityBoost: displayControls.waterDepthOpacityBoost,
+      reflection: displayControls.waterReflection,
+      waveSpeed: displayControls.waterWaveSpeed,
+      waveAmplitude: displayControls.waterWaveAmplitude,
+      waveFrequency: displayControls.waterWaveFrequency,
+    }),
+    [
+      displayControls.showWater,
+      displayControls.waterOpacity,
+      displayControls.waterDepthOpacityBoost,
+      displayControls.waterReflection,
+      displayControls.waterWaveSpeed,
+      displayControls.waterWaveAmplitude,
+      displayControls.waterWaveFrequency,
+    ],
+  )
+
   return (
     <main className={styles.appShell}>
       <header className={styles.hud}>
@@ -38,7 +61,12 @@ function App() {
       <Canvas
         className={styles.viewport}
         shadows
-        camera={{ position: [0, 85, 140], fov: 48, near: 0.1, far: 2000 }}
+        camera={{
+          position: SCENE_CAMERA.position,
+          fov: SCENE_CAMERA.fov,
+          near: SCENE_CAMERA.near,
+          far: SCENE_CAMERA.far,
+        }}
       >
         <color attach="background" args={["#d8e2dc"]} />
         <fog attach="fog" args={["#d8e2dc", 180, 480]} />
@@ -53,13 +81,7 @@ function App() {
         <TerrainScene
           onPerfUpdate={handlePerfUpdate}
           onHeightmapUpdate={handleHeightmapUpdate}
-          showWater={displayControls.showWater}
-          waterOpacity={displayControls.waterOpacity}
-          waterDepthOpacityBoost={displayControls.waterDepthOpacityBoost}
-          waterReflection={displayControls.waterReflection}
-          waterWaveSpeed={displayControls.waterWaveSpeed}
-          waterWaveAmplitude={displayControls.waterWaveAmplitude}
-          waterWaveFrequency={displayControls.waterWaveFrequency}
+          water={waterConfig}
         />
         <SceneCameraControls />
       </Canvas>

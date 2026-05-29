@@ -90,28 +90,26 @@ export type WaterChunkProps = {
   lodStep?: number
 }
 
+export type WaterRenderConfig = {
+  showWater: boolean
+  opacity: number
+  depthOpacityBoost: number
+  reflection: number
+  waveSpeed: number
+  waveAmplitude: number
+  waveFrequency: number
+}
+
 export type InfiniteTerrainProps = {
   settings: TerrainChunkSettings
   onPerfUpdate: (stats: PerfStats) => void
   onHeightmapUpdate: (preview: HeightmapPreviewData | null) => void
   textureMode: LegacyTextureOption
-  showWater: boolean
-  waterOpacity: number
-  waterDepthOpacityBoost: number
-  waterReflection: number
-  waterWaveSpeed: number
-  waterWaveAmplitude: number
-  waterWaveFrequency: number
+  water: WaterRenderConfig
 }
 
 export type TerrainSceneProps = {
   onPerfUpdate: (stats: PerfStats) => void
   onHeightmapUpdate: (preview: HeightmapPreviewData | null) => void
-  showWater: boolean
-  waterOpacity: number
-  waterDepthOpacityBoost: number
-  waterReflection: number
-  waterWaveSpeed: number
-  waterWaveAmplitude: number
-  waterWaveFrequency: number
+  water: WaterRenderConfig
 }
