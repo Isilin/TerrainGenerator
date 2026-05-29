@@ -478,6 +478,11 @@ function App() {
   const [heightmapPreview, setHeightmapPreview] =
     useState<HeightmapPreviewData | null>(null)
 
+  const displayControls = useControls('Display', {
+    showPerfDebug: true,
+    showHeightmap: true,
+  })
+
   const handlePerfUpdate = useCallback((stats: PerfStats) => {
     setPerfStats(stats)
   }, [])
@@ -492,8 +497,8 @@ function App() {
         <h1>Terrain Generator v2</h1>
         <p>Refonte en cours: rendu moderne avec seed reproducible et controles live.</p>
       </header>
-      <PerformanceOverlay stats={perfStats} />
-      <HeightmapOverlay preview={heightmapPreview} />
+      {displayControls.showPerfDebug ? <PerformanceOverlay stats={perfStats} /> : null}
+      {displayControls.showHeightmap ? <HeightmapOverlay preview={heightmapPreview} /> : null}
       <Canvas
         className="viewport"
         shadows
