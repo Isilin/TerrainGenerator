@@ -43,6 +43,29 @@ export const sampleHeightAtWorld = (
   return value * settings.amplitude
 }
 
+const getPostProcessPadding = (settings: TerrainGenerationSettings) => {
+  return settings.postProcess.mode === 'none' ? 0 : 1
+}
+
+const cropCenterGrid = (
+  source: Float32Array,
+  sourceSide: number,
+  targetSide: number,
+  padding: number,
+) => {
+  if (padding === 0) {
+    return source
+  }
+
+  const target = new Float32Array(targetSide * targetSide)
+  for (let row = 0; row < targetSide; row += 1) {
+    const sourceStart = (row + padding) * sourceSide + padding
+    const targetStart = row * targetSide
+    target.set(source.subarray(sourceStart, sourceStart + targetSide), targetStart)
+  }
+  return target
+}
+
 export const generateChunkHeights = (
   chunkX: number,
   chunkZ: number,
@@ -50,17 +73,19 @@ export const generateChunkHeights = (
 ) => {
   const noise2d = createSeededNoise2D(settings.seed)
   const vertexCountPerSide = settings.chunkSegments + 1
+  const padding = getPostProcessPadding(settings)
+  const sampledSide = vertexCountPerSide + padding * 2
   const step = settings.chunkSize / settings.chunkSegments
-  const half = settings.chunkSize * 0.5
-  const heights = new Float32Array(vertexCountPerSide * vertexCountPerSide)
+  const half = settings.chunkSize * 0.5 + padding * step
+  const heights = new Float32Array(sampledSide * sampledSide)
   const chunkOffsetX = chunkX * settings.chunkSize
   const chunkOffsetZ = chunkZ * settings.chunkSize
 
-  for (let row = 0; row < vertexCountPerSide; row += 1) {
+  for (let row = 0; row < sampledSide; row += 1) {
     const localZ = -half + row * step
-    for (let col = 0; col < vertexCountPerSide; col += 1) {
+    for (let col = 0; col < sampledSide; col += 1) {
       const localX = -half + col * step
-      const index = row * vertexCountPerSide + col
+      const index = row * sampledSide + col
       heights[index] = sampleHeightAtWorld(
         localX + chunkOffsetX,
         localZ + chunkOffsetZ,
@@ -70,11 +95,13 @@ export const generateChunkHeights = (
     }
   }
 
-  return applyPostProcess(
+  const processed = applyPostProcess(
     heights,
-    { width: vertexCountPerSide, height: vertexCountPerSide },
+    { width: sampledSide, height: sampledSide },
     settings.postProcess,
   )
+
+  return cropCenterGrid(processed, sampledSide, vertexCountPerSide, padding)
 }
 
 export const createChunkGeometryFromHeights = (

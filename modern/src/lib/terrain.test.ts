@@ -19,6 +19,14 @@ const chunkSettings = {
 }
 
 describe('terrain sampling', () => {
+  const assertSeamlessX = (left: Float32Array, right: Float32Array, side: number) => {
+    for (let row = 0; row < side; row += 1) {
+      const leftEdge = left[row * side + (side - 1)]
+      const rightEdge = right[row * side]
+      expect(leftEdge).toBeCloseTo(rightEdge, 6)
+    }
+  }
+
   it('returns deterministic values for a given seed', () => {
     const noiseA = createSeededNoise2D('seed-a')
     const noiseB = createSeededNoise2D('seed-a')
@@ -43,11 +51,32 @@ describe('terrain sampling', () => {
     const left = generateChunkHeights(0, 0, chunkSettings)
     const right = generateChunkHeights(1, 0, chunkSettings)
     const side = chunkSettings.chunkSegments + 1
+    assertSeamlessX(left, right, side)
+  })
 
-    for (let row = 0; row < side; row += 1) {
-      const leftEdge = left[row * side + (side - 1)]
-      const rightEdge = right[row * side]
-      expect(leftEdge).toBeCloseTo(rightEdge, 6)
-    }
+  it('keeps neighboring chunk borders seamless with mean smoothing', () => {
+    const left = generateChunkHeights(0, 0, {
+      ...chunkSettings,
+      postProcess: { mode: 'mean', weight: 0 },
+    })
+    const right = generateChunkHeights(1, 0, {
+      ...chunkSettings,
+      postProcess: { mode: 'mean', weight: 0 },
+    })
+    const side = chunkSettings.chunkSegments + 1
+    assertSeamlessX(left, right, side)
+  })
+
+  it('keeps neighboring chunk borders seamless with conservative smoothing', () => {
+    const left = generateChunkHeights(0, 0, {
+      ...chunkSettings,
+      postProcess: { mode: 'conservative', multiplier: 1 },
+    })
+    const right = generateChunkHeights(1, 0, {
+      ...chunkSettings,
+      postProcess: { mode: 'conservative', multiplier: 1 },
+    })
+    const side = chunkSettings.chunkSegments + 1
+    assertSeamlessX(left, right, side)
   })
 })
