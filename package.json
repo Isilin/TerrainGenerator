@@ -24,6 +24,8 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",
+        "build:report": "npm run build && npm run bundle:report",
+        "bundle:report": "node scripts/bundle-report.mjs",
         "lint": "eslint .",
         "test": "vitest run",
         "test:watch": "vitest",

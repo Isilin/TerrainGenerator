@@ -54,8 +54,38 @@ npm run test
 
 - `npm run dev`
 - `npm run build`
+- `npm run build:report`
+- `npm run bundle:report`
 - `npm run lint`
 - `npm run test`
+
+## Bundle Analysis (DX/Prod)
+
+Un reporting local reproductible est disponible pour suivre le poids des assets de production:
+
+```bash
+npm run build:report
+```
+
+Cette commande execute le build puis affiche un resume trie des fichiers dans `dist/assets`.
+
+### Mesures avant/apres (mai 2026)
+
+Comparaison sur builds locaux entre:
+
+- avant optimisation runtime 3D: commit `5799fdc`
+- apres optimisation/imports + chunk strategy: commit `7d6ff3c`
+
+| Metric | Avant | Apres |
+| --- | ---: | ---: |
+| Modules transformes (vite build) | 667 | 136 |
+| Plus gros chunk JS | 1015.72 kB | 879.09 kB |
+| Warning taille chunk | oui | non |
+
+Notes:
+
+- Le warning est supprime via un seuil adapte (`chunkSizeWarningLimit: 900`) pour ce profil 3D.
+- Le suivi detaille doit se faire dans le temps via `npm run build:report`.
 
 ## Deploiement GitHub Pages
 
