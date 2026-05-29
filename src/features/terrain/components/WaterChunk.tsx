@@ -11,13 +11,14 @@ export function WaterChunk({
   baseOpacity,
   depthOpacityBoost,
   reflectionStrength,
+  lodStep = 1,
 }: WaterChunkProps) {
   const geometry = useMemo(() => {
     if (heights === undefined) {
       return null
     }
-    return createWaterGeometryFromHeights(settings, heights)
-  }, [heights, settings])
+    return createWaterGeometryFromHeights(settings, heights, { lodStep })
+  }, [heights, lodStep, settings])
 
   const uniforms = useMemo(
     () => ({

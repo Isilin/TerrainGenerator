@@ -160,24 +160,45 @@ export const createChunkGeometryFromHeights = (
   settings: TerrainGenerationSettings,
   heights: Float32Array,
   colorMode: TerrainColorMode = 'none',
+  lodStep = 1,
 ) => {
+  const sourceSegments = settings.chunkSegments
+  const targetSegments = Math.max(1, Math.floor(sourceSegments / Math.max(1, lodStep)))
+  const sourceSide = sourceSegments + 1
+  const targetSide = targetSegments + 1
+
+  const sampledHeights =
+    targetSegments === sourceSegments
+      ? heights
+      : (() => {
+          const out = new Float32Array(targetSide * targetSide)
+          for (let row = 0; row < targetSide; row += 1) {
+            const sourceRow = Math.round((row / (targetSide - 1)) * (sourceSide - 1))
+            for (let col = 0; col < targetSide; col += 1) {
+              const sourceCol = Math.round((col / (targetSide - 1)) * (sourceSide - 1))
+              out[row * targetSide + col] = heights[sourceRow * sourceSide + sourceCol]
+            }
+          }
+          return out
+        })()
+
   const geometry = new PlaneGeometry(
     settings.chunkSize,
     settings.chunkSize,
-    settings.chunkSegments,
-    settings.chunkSegments,
+    targetSegments,
+    targetSegments,
   )
 
   const position = geometry.getAttribute('position') as BufferAttribute
   for (let i = 0; i < position.count; i += 1) {
-    position.setZ(i, heights[i])
+    position.setZ(i, sampledHeights[i])
   }
 
   if (colorMode !== 'none') {
     let min = Number.POSITIVE_INFINITY
     let max = Number.NEGATIVE_INFINITY
-    for (let i = 0; i < heights.length; i += 1) {
-      const value = heights[i]
+    for (let i = 0; i < sampledHeights.length; i += 1) {
+      const value = sampledHeights[i]
       if (value < min) min = value
       if (value > max) max = value
     }
@@ -186,7 +207,7 @@ export const createChunkGeometryFromHeights = (
     const colors = new Float32Array(position.count * 3)
 
     for (let i = 0; i < position.count; i += 1) {
-      const normalized = Math.max(0, Math.min(1, (heights[i] - min) / range))
+      const normalized = Math.max(0, Math.min(1, (sampledHeights[i] - min) / range))
       let color: Color
 
       if (colorMode === 'grayscale') {
@@ -225,24 +246,46 @@ export const createWaterGeometryFromHeights = (
     waterLevel?: number
     surfaceLift?: number
     maxDepthForOpacity?: number
+    lodStep?: number
   },
 ) => {
   const waterLevel = options?.waterLevel ?? 0
   const surfaceLift = options?.surfaceLift ?? 0.08
   const maxDepthForOpacity = options?.maxDepthForOpacity ?? Math.max(1, settings.amplitude)
+  const lodStep = options?.lodStep ?? 1
+
+  const sourceSegments = settings.chunkSegments
+  const targetSegments = Math.max(1, Math.floor(sourceSegments / Math.max(1, lodStep)))
+  const sourceSide = sourceSegments + 1
+  const targetSide = targetSegments + 1
+
+  const sampledHeights =
+    targetSegments === sourceSegments
+      ? heights
+      : (() => {
+          const out = new Float32Array(targetSide * targetSide)
+          for (let row = 0; row < targetSide; row += 1) {
+            const sourceRow = Math.round((row / (targetSide - 1)) * (sourceSide - 1))
+            for (let col = 0; col < targetSide; col += 1) {
+              const sourceCol = Math.round((col / (targetSide - 1)) * (sourceSide - 1))
+              out[row * targetSide + col] = heights[sourceRow * sourceSide + sourceCol]
+            }
+          }
+          return out
+        })()
 
   const geometry = new PlaneGeometry(
     settings.chunkSize,
     settings.chunkSize,
-    settings.chunkSegments,
-    settings.chunkSegments,
+    targetSegments,
+    targetSegments,
   )
 
   const position = geometry.getAttribute('position') as BufferAttribute
   const depthFactor = new Float32Array(position.count)
 
   for (let i = 0; i < position.count; i += 1) {
-    const depth = Math.max(0, waterLevel - heights[i])
+    const depth = Math.max(0, waterLevel - sampledHeights[i])
     depthFactor[i] = Math.max(0, Math.min(1, depth / maxDepthForOpacity))
     position.setZ(i, waterLevel + surfaceLift)
   }

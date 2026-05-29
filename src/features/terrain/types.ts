@@ -67,6 +67,7 @@ export type TerrainChunkProps = {
   heights: Float32Array | undefined
   settings: TerrainChunkSettings
   textureMode: LegacyTextureOption
+  lodStep?: number
 }
 
 export type WaterChunkProps = {
@@ -77,6 +78,7 @@ export type WaterChunkProps = {
   baseOpacity: number
   depthOpacityBoost: number
   reflectionStrength: number
+  lodStep?: number
 }
 
 export type InfiniteTerrainProps = {

@@ -37,6 +37,7 @@ export function InfiniteTerrain({
           heights={chunkHeights[chunk.id]}
           settings={settings}
           textureMode={textureMode}
+          lodStep={chunk.lodStep}
         />
       ))}
       {showWater
@@ -50,6 +51,7 @@ export function InfiniteTerrain({
               baseOpacity={waterOpacity}
               depthOpacityBoost={waterDepthOpacityBoost}
               reflectionStrength={waterReflection}
+              lodStep={chunk.lodStep}
             />
           ))
         : null}

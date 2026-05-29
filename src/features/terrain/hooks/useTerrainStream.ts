@@ -11,8 +11,18 @@ import type { TerrainChunkResponse } from '../contracts/terrainWorker.contract'
 import type { HeightmapPreviewData, PerfStats } from '../types'
 
 export type TerrainStreamState = {
-  chunks: Array<{ id: string; x: number; z: number }>
+  chunks: Array<{ id: string; x: number; z: number; lodStep: number }>
   chunkHeights: Record<string, Float32Array>
+}
+
+const getLodStepForDistance = (distance: number) => {
+  if (distance <= 1) {
+    return 1
+  }
+  if (distance <= 2) {
+    return 2
+  }
+  return 4
 }
 
 export const useTerrainStream = (
@@ -98,8 +108,25 @@ export const useTerrainStream = (
   }, [settings.cacheSize])
 
   const chunks = useMemo(
-    () => buildVisibleChunks(centerChunk, settings.viewRadius, createChunkId),
+    () =>
+      buildVisibleChunks(centerChunk, settings.viewRadius, createChunkId).map((chunk) => {
+        const distance = Math.max(
+          Math.abs(chunk.x - centerChunk.x),
+          Math.abs(chunk.z - centerChunk.z),
+        )
+
+        return {
+          ...chunk,
+          lodStep: getLodStepForDistance(distance),
+          distance,
+        }
+      }),
     [centerChunk, settings.viewRadius],
+  )
+
+  const prioritizedChunks = useMemo(
+    () => [...chunks].sort((a, b) => a.distance - b.distance),
+    [chunks],
   )
 
   useFrame((_, delta) => {
@@ -134,7 +161,7 @@ export const useTerrainStream = (
     let availableSlots = Math.max(1, settings.maxInFlight - activeRequestsRef.current.size)
     const hydrateFromCache: Array<{ id: string; heights: Float32Array }> = []
 
-    for (const chunk of chunks) {
+    for (const chunk of prioritizedChunks) {
       if (chunkHeights[chunk.id] !== undefined) {
         continue
       }
@@ -178,7 +205,7 @@ export const useTerrainStream = (
         })
       })
     }
-  }, [chunkHeights, chunks, generationSettings, settings.maxInFlight])
+  }, [chunkHeights, generationSettings, prioritizedChunks, settings.maxInFlight])
 
   useEffect(() => {
     const centerId = createChunkId(centerChunk.x, centerChunk.z)
@@ -196,7 +223,12 @@ export const useTerrainStream = (
   }, [centerChunk, chunkHeights, onHeightmapUpdate, settings.chunkSegments])
 
   return {
-    chunks,
+    chunks: chunks.map((chunk) => ({
+      id: chunk.id,
+      x: chunk.x,
+      z: chunk.z,
+      lodStep: chunk.lodStep,
+    })),
     chunkHeights,
   }
 }

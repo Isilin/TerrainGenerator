@@ -9,6 +9,7 @@ export function TerrainChunk({
   heights,
   settings,
   textureMode,
+  lodStep = 1,
 }: TerrainChunkProps) {
   const geometry = useMemo(() => {
     if (heights === undefined) {
@@ -16,8 +17,8 @@ export function TerrainChunk({
     }
     const colorMode: TerrainColorMode =
       textureMode === 'Grayscale' ? 'grayscale' : 'altitude'
-    return createChunkGeometryFromHeights(settings, heights, colorMode)
-  }, [heights, settings, textureMode])
+    return createChunkGeometryFromHeights(settings, heights, colorMode, lodStep)
+  }, [heights, lodStep, settings, textureMode])
 
   if (geometry === null) {
     return null
