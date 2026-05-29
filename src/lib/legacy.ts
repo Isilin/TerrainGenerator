@@ -73,6 +73,97 @@ export type LegacyTextureOption = (typeof LEGACY_TEXTURE_OPTIONS)[number]
 export type LegacyScatteringOption = (typeof LEGACY_SCATTERING_OPTIONS)[number]
 export type LegacyCurveOption = (typeof LEGACY_CURVE_OPTIONS)[number]
 
+const clamp01 = (value: number) => Math.max(0, Math.min(1, value))
+
+export const mapLegacyEasingFunction = (option: LegacyEasingOption) => {
+  if (option === 'EaseOut') {
+    return (t: number) => 1 - (1 - clamp01(t)) * (1 - clamp01(t))
+  }
+  if (option === 'EaseInOut') {
+    return (t: number) => {
+      const x = clamp01(t)
+      return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) * 0.5
+    }
+  }
+  if (option === 'InEaseOut') {
+    return (t: number) => {
+      const x = clamp01(t)
+      return x * x * x * (x * (x * 6 - 15) + 10)
+    }
+  }
+  if (option === 'Easeln') {
+    return (t: number) => {
+      const x = clamp01(t)
+      return Math.log1p(4 * x) / Math.log(5)
+    }
+  }
+  if (option === 'EalsenWeak') {
+    return (t: number) => {
+      const x = clamp01(t)
+      return Math.log1p(2 * x) / Math.log(3)
+    }
+  }
+  return (t: number) => clamp01(t)
+}
+
+export const mapLegacyCurveFunction = (option: LegacyCurveOption) => {
+  if (option === 'EaseIn') {
+    return (t: number) => {
+      const x = clamp01(t)
+      return x * x
+    }
+  }
+  if (option === 'EaseOut') {
+    return (t: number) => {
+      const x = clamp01(t)
+      return 1 - (1 - x) * (1 - x)
+    }
+  }
+  if (option === 'EaseInOut') {
+    return (t: number) => {
+      const x = clamp01(t)
+      return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) * 0.5
+    }
+  }
+  return (t: number) => clamp01(t)
+}
+
+export type ScatteringDescriptor = {
+  algorithm: NoiseAlgorithm
+  strength: number
+  altitudeAware: boolean
+}
+
+export const mapLegacyScattering = (
+  option: LegacyScatteringOption,
+): ScatteringDescriptor => {
+  switch (option) {
+    case 'Linear':
+      return { algorithm: 'simplex', strength: 0, altitudeAware: false }
+    case 'Altitude':
+      return { algorithm: 'value', strength: 0.18, altitudeAware: true }
+    case 'PerlinAltitude':
+      return { algorithm: 'simplex', strength: 0.26, altitudeAware: true }
+    case 'Value':
+      return { algorithm: 'value', strength: 0.2, altitudeAware: false }
+    case 'Worley':
+      return { algorithm: 'cellular', strength: 0.24, altitudeAware: false }
+    case 'Particles':
+      return { algorithm: 'cellular', strength: 0.28, altitudeAware: false }
+    case 'Cosine':
+    case 'CosineLayers':
+      return { algorithm: 'value', strength: 0.14, altitudeAware: false }
+    case 'DiamondSquare':
+    case 'Weierstrass':
+      return { algorithm: 'simplex', strength: 0.22, altitudeAware: false }
+    case 'Perlin':
+    case 'Simplex':
+      return { algorithm: 'simplex', strength: 0.2, altitudeAware: false }
+    default:
+      return { algorithm: 'simplex', strength: 0.18, altitudeAware: false }
+  }
+}
+
 export const mapHeightmapToNoiseAlgorithm = (
   heightmap: LegacyHeightmapOption,
 ): NoiseAlgorithm => {

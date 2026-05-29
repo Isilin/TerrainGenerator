@@ -126,6 +126,9 @@ function InfiniteTerrain({
     () => ({
       seed: settings.seed,
       noiseAlgorithm: settings.noiseAlgorithm,
+      easing: settings.easing,
+      scattering: settings.scattering,
+      curve: settings.curve,
       chunkSize: settings.chunkSize,
       chunkSegments: settings.chunkSegments,
       amplitude: settings.amplitude,
@@ -138,6 +141,9 @@ function InfiniteTerrain({
     [
       settings.seed,
       settings.noiseAlgorithm,
+      settings.easing,
+      settings.scattering,
+      settings.curve,
       settings.chunkSize,
       settings.chunkSegments,
       settings.amplitude,

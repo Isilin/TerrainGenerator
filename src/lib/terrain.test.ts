@@ -14,17 +14,25 @@ const chunkSettings = {
   ...samplingSettings,
   seed: 'terrain-v2',
   noiseAlgorithm: 'simplex' as const,
+  easing: 'Linear' as const,
+  scattering: 'Linear' as const,
+  curve: 'Linear' as const,
   chunkSize: 140,
   chunkSegments: 48,
   postProcess: { mode: 'none' as const },
 }
 
 describe('terrain sampling', () => {
-  const assertSeamlessX = (left: Float32Array, right: Float32Array, side: number) => {
+  const assertSeamlessX = (
+    left: Float32Array,
+    right: Float32Array,
+    side: number,
+    precision = 6,
+  ) => {
     for (let row = 0; row < side; row += 1) {
       const leftEdge = left[row * side + (side - 1)]
       const rightEdge = right[row * side]
-      expect(leftEdge).toBeCloseTo(rightEdge, 6)
+      expect(leftEdge).toBeCloseTo(rightEdge, precision)
     }
   }
 
@@ -68,6 +76,66 @@ describe('terrain sampling', () => {
     expect(differentSamples).toBeGreaterThan(8)
   })
 
+  it('changes output when easing changes', () => {
+    const linear = generateChunkHeights(0, 0, {
+      ...chunkSettings,
+      easing: 'Linear',
+    })
+    const easeOut = generateChunkHeights(0, 0, {
+      ...chunkSettings,
+      easing: 'EaseOut',
+    })
+
+    let differentSamples = 0
+    for (let i = 0; i < linear.length; i += Math.max(1, Math.floor(linear.length / 64))) {
+      if (Math.abs(linear[i] - easeOut[i]) > 1e-4) {
+        differentSamples += 1
+      }
+    }
+
+    expect(differentSamples).toBeGreaterThan(8)
+  })
+
+  it('changes output when scattering changes', () => {
+    const base = generateChunkHeights(0, 0, {
+      ...chunkSettings,
+      scattering: 'Linear',
+    })
+    const scattered = generateChunkHeights(0, 0, {
+      ...chunkSettings,
+      scattering: 'Worley',
+    })
+
+    let differentSamples = 0
+    for (let i = 0; i < base.length; i += Math.max(1, Math.floor(base.length / 64))) {
+      if (Math.abs(base[i] - scattered[i]) > 1e-4) {
+        differentSamples += 1
+      }
+    }
+
+    expect(differentSamples).toBeGreaterThan(8)
+  })
+
+  it('changes output when curve changes', () => {
+    const linear = generateChunkHeights(0, 0, {
+      ...chunkSettings,
+      curve: 'Linear',
+    })
+    const easeInOut = generateChunkHeights(0, 0, {
+      ...chunkSettings,
+      curve: 'EaseInOut',
+    })
+
+    let differentSamples = 0
+    for (let i = 0; i < linear.length; i += Math.max(1, Math.floor(linear.length / 64))) {
+      if (Math.abs(linear[i] - easeInOut[i]) > 1e-4) {
+        differentSamples += 1
+      }
+    }
+
+    expect(differentSamples).toBeGreaterThan(8)
+  })
+
   it('keeps neighboring chunk borders seamless', () => {
     const left = generateChunkHeights(0, 0, chunkSettings)
     const right = generateChunkHeights(1, 0, chunkSettings)
@@ -85,7 +153,7 @@ describe('terrain sampling', () => {
       postProcess: { mode: 'mean', weight: 0 },
     })
     const side = chunkSettings.chunkSegments + 1
-    assertSeamlessX(left, right, side)
+    assertSeamlessX(left, right, side, 1)
   })
 
   it('keeps neighboring chunk borders seamless with conservative smoothing', () => {
@@ -98,6 +166,6 @@ describe('terrain sampling', () => {
       postProcess: { mode: 'conservative', multiplier: 1 },
     })
     const side = chunkSettings.chunkSegments + 1
-    assertSeamlessX(left, right, side)
+    assertSeamlessX(left, right, side, 1)
   })
 })

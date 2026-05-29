@@ -1,5 +1,13 @@
 import { BufferAttribute, PlaneGeometry } from 'three'
 import { applyPostProcess, type PostProcessSettings } from './filters'
+import {
+  mapLegacyCurveFunction,
+  mapLegacyEasingFunction,
+  mapLegacyScattering,
+  type LegacyCurveOption,
+  type LegacyEasingOption,
+  type LegacyScatteringOption,
+} from './legacy'
 import { createNoiseSampler2D, type NoiseAlgorithm } from './noise'
 
 export type TerrainSamplingSettings = {
@@ -13,6 +21,9 @@ export type TerrainSamplingSettings = {
 export type TerrainGenerationSettings = TerrainSamplingSettings & {
   seed: string
   noiseAlgorithm: NoiseAlgorithm
+  easing: LegacyEasingOption
+  scattering: LegacyScatteringOption
+  curve: LegacyCurveOption
   chunkSize: number
   chunkSegments: number
   postProcess: PostProcessSettings
@@ -73,6 +84,13 @@ export const generateChunkHeights = (
   settings: TerrainGenerationSettings,
 ) => {
   const noise2d = createNoiseSampler2D(settings.seed, settings.noiseAlgorithm)
+  const scatteringDescriptor = mapLegacyScattering(settings.scattering)
+  const scatterNoise2d = createNoiseSampler2D(
+    `${settings.seed}:${settings.scattering}`,
+    scatteringDescriptor.algorithm,
+  )
+  const easingFn = mapLegacyEasingFunction(settings.easing)
+  const curveFn = mapLegacyCurveFunction(settings.curve)
   const vertexCountPerSide = settings.chunkSegments + 1
   const padding = getPostProcessPadding(settings)
   const sampledSide = vertexCountPerSide + padding * 2
@@ -87,12 +105,32 @@ export const generateChunkHeights = (
     for (let col = 0; col < sampledSide; col += 1) {
       const localX = -half + col * step
       const index = row * sampledSide + col
-      heights[index] = sampleHeightAtWorld(
+      const baseHeight = sampleHeightAtWorld(
         localX + chunkOffsetX,
         localZ + chunkOffsetZ,
         noise2d,
         settings,
       )
+
+      const scatterSample = scatterNoise2d(
+        (localX + chunkOffsetX) * settings.frequency,
+        (localZ + chunkOffsetZ) * settings.frequency,
+      )
+      const altitudeFactor = scatteringDescriptor.altitudeAware
+        ? Math.max(0, Math.min(1, (baseHeight / Math.max(1e-6, settings.amplitude) + 1) * 0.5))
+        : 1
+      const scatterDelta =
+        scatterSample * settings.amplitude * scatteringDescriptor.strength * altitudeFactor
+
+      const edgeDistance =
+        1 -
+        Math.max(
+          Math.min(1, Math.abs(localX) / (settings.chunkSize * 0.5 + padding * step)),
+          Math.min(1, Math.abs(localZ) / (settings.chunkSize * 0.5 + padding * step)),
+        )
+      const curveFactor = 0.85 + curveFn(edgeDistance) * 0.3
+
+      heights[index] = (baseHeight + scatterDelta) * curveFactor
     }
   }
 
@@ -102,7 +140,18 @@ export const generateChunkHeights = (
     settings.postProcess,
   )
 
-  return cropCenterGrid(processed, sampledSide, vertexCountPerSide, padding)
+  const eased = processed
+  const maxAbsInput = Math.max(
+    1e-6,
+    settings.amplitude * (1 + scatteringDescriptor.strength) * 1.3,
+  )
+
+  for (let i = 0; i < eased.length; i += 1) {
+    const normalized = Math.max(0, Math.min(1, (eased[i] + maxAbsInput) / (2 * maxAbsInput)))
+    eased[i] = (easingFn(normalized) * 2 - 1) * settings.amplitude
+  }
+
+  return cropCenterGrid(eased, sampledSide, vertexCountPerSide, padding)
 }
 
 export const createChunkGeometryFromHeights = (
