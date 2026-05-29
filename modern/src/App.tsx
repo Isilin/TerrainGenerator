@@ -1,34 +1,86 @@
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
-import { useMemo } from 'react'
-import { BufferAttribute, PlaneGeometry } from 'three'
-import { createNoise2D } from 'simplex-noise'
+import { useMemo, useState } from 'react'
+import { createChunkGeometry, type TerrainChunkSettings } from './lib/terrain'
 import './App.css'
 
-const hashSeed = (input: string) => {
-  let hash = 1779033703 ^ input.length
-  for (let i = 0; i < input.length; i += 1) {
-    hash = Math.imul(hash ^ input.charCodeAt(i), 3432918353)
-    hash = (hash << 13) | (hash >>> 19)
-  }
-  return hash >>> 0
+const getChunkId = (x: number, z: number) => `${x}:${z}`
+
+function TerrainChunk({
+  chunkX,
+  chunkZ,
+  settings,
+}: {
+  chunkX: number
+  chunkZ: number
+  settings: TerrainChunkSettings
+}) {
+  const geometry = useMemo(
+    () => createChunkGeometry(chunkX, chunkZ, settings),
+    [chunkX, chunkZ, settings],
+  )
+
+  return (
+    <mesh
+      geometry={geometry}
+      position={[chunkX * settings.chunkSize, 0, chunkZ * settings.chunkSize]}
+      receiveShadow
+      castShadow
+    >
+      <meshStandardMaterial
+        color="#97a97c"
+        roughness={0.92}
+        metalness={0.05}
+        wireframe={settings.wireframe}
+      />
+    </mesh>
+  )
 }
 
-const mulberry32 = (seed: number) => {
-  return () => {
-    let t = (seed += 0x6d2b79f5)
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
+function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
+  const [centerChunk, setCenterChunk] = useState({ x: 0, z: 0 })
+
+  useFrame(({ camera }) => {
+    const x = Math.round(camera.position.x / settings.chunkSize)
+    const z = Math.round(camera.position.z / settings.chunkSize)
+    if (x !== centerChunk.x || z !== centerChunk.z) {
+      setCenterChunk({ x, z })
+    }
+  })
+
+  const chunks = useMemo(() => {
+    const next: Array<{ x: number; z: number; id: string }> = []
+    for (let dz = -settings.viewRadius; dz <= settings.viewRadius; dz += 1) {
+      for (let dx = -settings.viewRadius; dx <= settings.viewRadius; dx += 1) {
+        const x = centerChunk.x + dx
+        const z = centerChunk.z + dz
+        next.push({ x, z, id: getChunkId(x, z) })
+      }
+    }
+    return next
+  }, [centerChunk, settings.viewRadius])
+
+  return (
+    <group>
+      {chunks.map((chunk) => (
+        <TerrainChunk
+          key={chunk.id}
+          chunkX={chunk.x}
+          chunkZ={chunk.z}
+          settings={settings}
+        />
+      ))}
+    </group>
+  )
 }
 
-function TerrainSurface() {
-  const settings = useControls('Generator', {
+function TerrainScene() {
+  const controls = useControls('Generator', {
     seed: 'terrain-v2',
-    size: { value: 220, min: 64, max: 512, step: 1 },
-    segments: { value: 180, min: 32, max: 256, step: 1 },
+    chunkSize: { value: 140, min: 64, max: 280, step: 1 },
+    chunkSegments: { value: 96, min: 16, max: 192, step: 1 },
+    viewRadius: { value: 2, min: 1, max: 4, step: 1 },
     amplitude: { value: 24, min: 1, max: 80, step: 1 },
     frequency: { value: 0.012, min: 0.002, max: 0.08, step: 0.001 },
     octaves: { value: 5, min: 1, max: 8, step: 1 },
@@ -37,48 +89,30 @@ function TerrainSurface() {
     wireframe: false,
   })
 
-  const geometry = useMemo(() => {
-    const rng = mulberry32(hashSeed(settings.seed))
-    const noise2d = createNoise2D(rng)
-    const geo = new PlaneGeometry(
-      settings.size,
-      settings.size,
-      settings.segments,
-      settings.segments,
-    )
-
-    const position = geo.getAttribute('position') as BufferAttribute
-    for (let i = 0; i < position.count; i += 1) {
-      const x = position.getX(i)
-      const y = position.getY(i)
-
-      let value = 0
-      let amplitude = 1
-      let frequency = settings.frequency
-      for (let octave = 0; octave < settings.octaves; octave += 1) {
-        value += noise2d(x * frequency, y * frequency) * amplitude
-        amplitude *= settings.persistence
-        frequency *= settings.lacunarity
-      }
-
-      position.setZ(i, value * settings.amplitude)
-    }
-
-    position.needsUpdate = true
-    geo.computeVertexNormals()
-    geo.rotateX(-Math.PI / 2)
-    return geo
-  }, [settings])
+  const settings = useMemo(
+    () => ({
+      seed: controls.seed,
+      chunkSize: controls.chunkSize,
+      chunkSegments: controls.chunkSegments,
+      viewRadius: controls.viewRadius,
+      amplitude: controls.amplitude,
+      frequency: controls.frequency,
+      octaves: controls.octaves,
+      persistence: controls.persistence,
+      lacunarity: controls.lacunarity,
+      wireframe: controls.wireframe,
+    }),
+    [controls],
+  )
 
   return (
-    <mesh geometry={geometry} receiveShadow castShadow>
-      <meshStandardMaterial
-        color="#97a97c"
-        roughness={0.92}
-        metalness={0.05}
-        wireframe={settings.wireframe}
-      />
-    </mesh>
+    <group>
+      <InfiniteTerrain settings={settings} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.25, 0]} receiveShadow>
+        <planeGeometry args={[2800, 2800, 1, 1]} />
+        <meshStandardMaterial color="#718355" roughness={1} metalness={0} />
+      </mesh>
+    </group>
   )
 }
 
@@ -104,15 +138,11 @@ function App() {
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
         />
-        <TerrainSurface />
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.15, 0]} receiveShadow>
-          <planeGeometry args={[900, 900, 1, 1]} />
-          <meshStandardMaterial color="#718355" roughness={1} metalness={0} />
-        </mesh>
+        <TerrainScene />
         <OrbitControls
-          enablePan={false}
+          enablePan
           minDistance={45}
-          maxDistance={300}
+          maxDistance={520}
           maxPolarAngle={Math.PI * 0.49}
         />
       </Canvas>
