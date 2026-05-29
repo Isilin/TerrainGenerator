@@ -1,6 +1,6 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-import { Leva, useControls } from 'leva'
+import { folder, Leva, useControls } from 'leva'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PostProcessSettings } from './lib/filters'
 import { buildVisibleChunks } from './lib/chunks'
@@ -52,6 +52,102 @@ type HeightmapPreviewData = {
   heights: Float32Array
   side: number
 }
+
+type GeneratorControlValues = {
+  easing: LegacyEasingOption
+  heightmap: LegacyHeightmapOption
+  smoothing: LegacySmoothingOption
+  texture: LegacyTextureOption
+  scattering: LegacyScatteringOption
+  curve: LegacyCurveOption
+  seed: string
+  chunkSize: number
+  chunkSegments: number
+  viewRadius: number
+  amplitude: number
+  frequency: number
+  octaves: number
+  persistence: number
+  lacunarity: number
+  cacheSize: number
+  maxInFlight: number
+  wireframe: boolean
+}
+
+type TerrainPresetName =
+  | 'Custom'
+  | 'Archipelago'
+  | 'AlpineRidges'
+  | 'SoftDunes'
+  | 'VolcanicPlateau'
+
+const TERRAIN_PRESET_OPTIONS: TerrainPresetName[] = [
+  'Custom',
+  'Archipelago',
+  'AlpineRidges',
+  'SoftDunes',
+  'VolcanicPlateau',
+]
+
+const TERRAIN_PRESETS: Record<Exclude<TerrainPresetName, 'Custom'>, Partial<GeneratorControlValues>>
+  = {
+    Archipelago: {
+      seed: 'archipelago-v2',
+      heightmap: 'PerlinDiamond',
+      smoothing: 'Gaussian (1.0, 7)',
+      scattering: 'PerlinAltitude',
+      curve: 'EaseInOut',
+      texture: 'Blended',
+      amplitude: 22,
+      frequency: 0.016,
+      octaves: 5,
+      persistence: 0.52,
+      lacunarity: 2.1,
+      viewRadius: 2,
+    },
+    AlpineRidges: {
+      seed: 'alpine-v2',
+      heightmap: 'SimplexLayers',
+      smoothing: 'Conservative (1)',
+      scattering: 'Worley',
+      curve: 'EaseIn',
+      texture: 'Blended',
+      amplitude: 40,
+      frequency: 0.01,
+      octaves: 6,
+      persistence: 0.46,
+      lacunarity: 2.25,
+      viewRadius: 2,
+    },
+    SoftDunes: {
+      seed: 'dunes-v2',
+      heightmap: 'Value',
+      smoothing: 'GaussianBox',
+      scattering: 'Linear',
+      curve: 'EaseOut',
+      texture: 'Grayscale',
+      amplitude: 14,
+      frequency: 0.02,
+      octaves: 4,
+      persistence: 0.58,
+      lacunarity: 1.8,
+      viewRadius: 3,
+    },
+    VolcanicPlateau: {
+      seed: 'volcano-v2',
+      heightmap: 'Worley',
+      smoothing: 'Median',
+      scattering: 'Worley',
+      curve: 'EaseOut',
+      texture: 'Blended',
+      amplitude: 34,
+      frequency: 0.013,
+      octaves: 5,
+      persistence: 0.49,
+      lacunarity: 2.35,
+      viewRadius: 2,
+    },
+  }
 
 const initialPerfStats: PerfStats = {
   fps: 0,
@@ -445,76 +541,115 @@ function TerrainScene({
   waterDepthOpacityBoost: number
   waterReflection: number
 }) {
-  const controls = useControls('Generator', {
-    easing: {
-      options: LEGACY_EASING_OPTIONS as unknown as string[],
-      value: 'Linear',
+  const presetControls = useControls('Presets', {
+    preset: {
+      options: TERRAIN_PRESET_OPTIONS,
+      value: 'Custom' as TerrainPresetName,
+      label: 'Terrain preset',
     },
-    heightmap: {
-      options: LEGACY_HEIGHTMAP_OPTIONS as unknown as string[],
-      value: 'PerlinDiamond',
-    },
-    smoothing: {
-      options: LEGACY_SMOOTHING_OPTIONS as unknown as string[],
-      value: 'None',
-    },
-    texture: {
-      options: LEGACY_TEXTURE_OPTIONS as unknown as string[],
-      value: 'Blended',
-    },
-    scattering: {
-      options: LEGACY_SCATTERING_OPTIONS as unknown as string[],
-      value: 'PerlinAltitude',
-    },
-    curve: {
-      options: LEGACY_CURVE_OPTIONS as unknown as string[],
-      value: 'EaseInOut',
-    },
-    seed: 'terrain-v2',
-    chunkSize: { value: 140, min: 64, max: 280, step: 1 },
-    chunkSegments: { value: 96, min: 16, max: 192, step: 1 },
-    viewRadius: { value: 2, min: 1, max: 4, step: 1 },
-    amplitude: { value: 24, min: 1, max: 80, step: 1 },
-    frequency: { value: 0.012, min: 0.002, max: 0.08, step: 0.001 },
-    octaves: { value: 5, min: 1, max: 8, step: 1 },
-    persistence: { value: 0.5, min: 0.2, max: 0.8, step: 0.01 },
-    lacunarity: { value: 2, min: 1.2, max: 3, step: 0.1 },
-    cacheSize: { value: 96, min: 16, max: 192, step: 1 },
-    maxInFlight: { value: 8, min: 1, max: 24, step: 1 },
-    wireframe: false,
   })
 
+  const controls = useControls('Generator', {
+    Terrain: folder(
+      {
+        seed: { value: 'terrain-v2', label: 'Seed' },
+        heightmap: {
+          options: LEGACY_HEIGHTMAP_OPTIONS as unknown as string[],
+          value: 'PerlinDiamond',
+        },
+        smoothing: {
+          options: LEGACY_SMOOTHING_OPTIONS as unknown as string[],
+          value: 'None',
+        },
+        texture: {
+          options: LEGACY_TEXTURE_OPTIONS as unknown as string[],
+          value: 'Blended',
+        },
+        curve: {
+          options: LEGACY_CURVE_OPTIONS as unknown as string[],
+          value: 'EaseInOut',
+        },
+        scattering: {
+          options: LEGACY_SCATTERING_OPTIONS as unknown as string[],
+          value: 'PerlinAltitude',
+        },
+        easing: {
+          options: LEGACY_EASING_OPTIONS as unknown as string[],
+          value: 'Linear',
+        },
+      },
+      { collapsed: false },
+    ),
+    Noise: folder(
+      {
+        amplitude: { value: 24, min: 1, max: 80, step: 1 },
+        frequency: { value: 0.012, min: 0.002, max: 0.08, step: 0.001 },
+        octaves: { value: 5, min: 1, max: 8, step: 1 },
+        persistence: { value: 0.5, min: 0.2, max: 0.8, step: 0.01 },
+        lacunarity: { value: 2, min: 1.2, max: 3, step: 0.1 },
+      },
+      { collapsed: false },
+    ),
+    Streaming: folder(
+      {
+        chunkSize: { value: 140, min: 64, max: 280, step: 1 },
+        chunkSegments: { value: 96, min: 16, max: 192, step: 1 },
+        viewRadius: { value: 2, min: 1, max: 4, step: 1 },
+        cacheSize: { value: 96, min: 16, max: 192, step: 1 },
+        maxInFlight: { value: 8, min: 1, max: 24, step: 1 },
+      },
+      { collapsed: false },
+    ),
+    Render: folder(
+      {
+        wireframe: false,
+      },
+      { collapsed: true },
+    ),
+  })
+
+  const activeControls = useMemo(() => {
+    if (presetControls.preset === 'Custom') {
+      return controls as GeneratorControlValues
+    }
+
+    return {
+      ...(controls as GeneratorControlValues),
+      ...TERRAIN_PRESETS[presetControls.preset],
+    } as GeneratorControlValues
+  }, [controls, presetControls.preset])
+
   const postProcess = useMemo<PostProcessSettings>(
-    () => mapSmoothingToPostProcess(controls.smoothing as LegacySmoothingOption),
-    [controls.smoothing],
+    () => mapSmoothingToPostProcess(activeControls.smoothing as LegacySmoothingOption),
+    [activeControls.smoothing],
   )
 
   const settings = useMemo(
     () => ({
-      easing: controls.easing as LegacyEasingOption,
-      seed: controls.seed,
-      heightmap: controls.heightmap as LegacyHeightmapOption,
+      easing: activeControls.easing as LegacyEasingOption,
+      seed: activeControls.seed,
+      heightmap: activeControls.heightmap as LegacyHeightmapOption,
       noiseAlgorithm: mapHeightmapToNoiseAlgorithm(
-        controls.heightmap as LegacyHeightmapOption,
+        activeControls.heightmap as LegacyHeightmapOption,
       ),
-      smoothing: controls.smoothing as LegacySmoothingOption,
-      texture: controls.texture as LegacyTextureOption,
-      scattering: controls.scattering as LegacyScatteringOption,
-      curve: controls.curve as LegacyCurveOption,
-      chunkSize: controls.chunkSize,
-      chunkSegments: controls.chunkSegments,
-      viewRadius: controls.viewRadius,
-      amplitude: controls.amplitude,
-      frequency: controls.frequency,
-      octaves: controls.octaves,
-      persistence: controls.persistence,
-      lacunarity: controls.lacunarity,
+      smoothing: activeControls.smoothing as LegacySmoothingOption,
+      texture: activeControls.texture as LegacyTextureOption,
+      scattering: activeControls.scattering as LegacyScatteringOption,
+      curve: activeControls.curve as LegacyCurveOption,
+      chunkSize: activeControls.chunkSize,
+      chunkSegments: activeControls.chunkSegments,
+      viewRadius: activeControls.viewRadius,
+      amplitude: activeControls.amplitude,
+      frequency: activeControls.frequency,
+      octaves: activeControls.octaves,
+      persistence: activeControls.persistence,
+      lacunarity: activeControls.lacunarity,
       postProcess,
-      cacheSize: controls.cacheSize,
-      maxInFlight: controls.maxInFlight,
-      wireframe: controls.wireframe,
+      cacheSize: activeControls.cacheSize,
+      maxInFlight: activeControls.maxInFlight,
+      wireframe: activeControls.wireframe,
     }),
-    [controls, postProcess],
+    [activeControls, postProcess],
   )
 
   const terrainKey = useMemo(
@@ -665,12 +800,22 @@ function App() {
     useState<HeightmapPreviewData | null>(null)
 
   const displayControls = useControls('Display', {
-    showPerfDebug: true,
-    showHeightmap: true,
-    showWater: true,
-    waterOpacity: { value: 0.26, min: 0.05, max: 0.8, step: 0.01 },
-    waterDepthOpacityBoost: { value: 0.56, min: 0, max: 1.2, step: 0.01 },
-    waterReflection: { value: 0.26, min: 0, max: 1.1, step: 0.01 },
+    Overlays: folder(
+      {
+        showPerfDebug: { value: true, label: 'Perf debug' },
+        showHeightmap: { value: true, label: 'Heightmap preview' },
+      },
+      { collapsed: false },
+    ),
+    Water: folder(
+      {
+        showWater: { value: true, label: 'Enable water' },
+        waterOpacity: { value: 0.26, min: 0.05, max: 0.8, step: 0.01 },
+        waterDepthOpacityBoost: { value: 0.56, min: 0, max: 1.2, step: 0.01 },
+        waterReflection: { value: 0.26, min: 0, max: 1.1, step: 0.01 },
+      },
+      { collapsed: false },
+    ),
   })
 
   const handlePerfUpdate = useCallback((stats: PerfStats) => {
