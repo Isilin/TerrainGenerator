@@ -76,6 +76,28 @@ const hasTerrainControlChanged = (
   return false
 }
 
+const wrapDescription = (text: string, maxLineLength = 56) => {
+  const words = text.split(' ')
+  const lines: string[] = []
+  let currentLine = ''
+
+  for (const word of words) {
+    if ((currentLine + word).length > maxLineLength) {
+      lines.push(currentLine.trim())
+      currentLine = `${word} `
+      continue
+    }
+
+    currentLine += `${word} `
+  }
+
+  if (currentLine.trim().length > 0) {
+    lines.push(currentLine.trim())
+  }
+
+  return lines.join('\n')
+}
+
 export const useTerrainControls = () => {
   const persistedState = useMemo(() => loadPersistedTerrainState(), [])
   const urlState = useMemo(() => {
@@ -313,13 +335,23 @@ export const useTerrainControls = () => {
     return TERRAIN_PRESET_DESCRIPTIONS[effectivePreset]
   }, [effectivePreset, isPresetDetached, presetControls.preset])
 
-  useControls('Presets', {
-    presetDescription: {
-      value: presetDescription,
-      label: 'Description',
-      disabled: true,
+  const wrappedPresetDescription = useMemo(
+    () => wrapDescription(presetDescription),
+    [presetDescription],
+  )
+
+  useControls(
+    'Presets',
+    {
+      presetDescription: {
+        value: wrappedPresetDescription,
+        label: 'Description',
+        rows: 4,
+        disabled: true,
+      },
     },
-  })
+    [wrappedPresetDescription],
+  )
 
   useEffect(() => {
     if (typeof window === 'undefined') {
