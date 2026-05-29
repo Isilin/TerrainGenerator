@@ -1,3 +1,7 @@
-export { TERRAIN_PRESET_OPTIONS, TERRAIN_PRESETS } from './presets'
+export {
+	TERRAIN_PRESET_DESCRIPTIONS,
+	TERRAIN_PRESET_OPTIONS,
+	TERRAIN_PRESETS,
+} from './presets'
 export { SCENE_CAMERA } from './sceneCamera'
 export { WATER_FRAGMENT_SHADER, WATER_VERTEX_SHADER } from './waterShaders'

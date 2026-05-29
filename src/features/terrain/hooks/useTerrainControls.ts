@@ -19,7 +19,11 @@ import {
   type LegacySmoothingOption,
   type LegacyTextureOption,
 } from '../../../lib/legacy'
-import { TERRAIN_PRESET_OPTIONS, TERRAIN_PRESETS } from '../config'
+import {
+  TERRAIN_PRESET_DESCRIPTIONS,
+  TERRAIN_PRESET_OPTIONS,
+  TERRAIN_PRESETS,
+} from '../config'
 import type { GeneratorControlValues, TerrainPresetName } from '../types'
 
 type PersistedTerrainState = {
@@ -300,6 +304,22 @@ export const useTerrainControls = () => {
 
   const effectivePreset: TerrainPresetName =
     isPresetDetached && presetControls.preset !== 'Custom' ? 'Custom' : presetControls.preset
+
+  const presetDescription = useMemo(() => {
+    if (isPresetDetached && presetControls.preset !== 'Custom') {
+      return `Custom (base ${presetControls.preset}): controles ajustes manuellement.`
+    }
+
+    return TERRAIN_PRESET_DESCRIPTIONS[effectivePreset]
+  }, [effectivePreset, isPresetDetached, presetControls.preset])
+
+  useControls('Presets', {
+    presetDescription: {
+      value: presetDescription,
+      label: 'Description',
+      disabled: true,
+    },
+  })
 
   useEffect(() => {
     if (typeof window === 'undefined') {

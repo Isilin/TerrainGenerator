@@ -53,6 +53,21 @@ export type TerrainPresetName =
   | 'AlpineRidges'
   | 'SoftDunes'
   | 'VolcanicPlateau'
+  | 'CanyonMaze'
+  | 'FrozenHighlands'
+  | 'CoastalShelf'
+  | 'CraterField'
+  | 'RollingHills'
+  | 'JungleCraters'
+  | 'RiverValley'
+  | 'GlacialValley'
+  | 'SandstoneArches'
+  | 'HighlandSteppe'
+  | 'AtollChain'
+  | 'StormCliffs'
+  | 'LavaDelta'
+  | 'MistyIslands'
+  | 'TectonicSpine'
 
 export const initialPerfStats: PerfStats = {
   fps: 0,
