@@ -13,9 +13,9 @@
 .hud {
   position: absolute;
   top: 18px;
-  left: 18px;
+  left: 372px;
   z-index: 10;
-  max-width: min(620px, calc(100vw - 36px));
+  max-width: min(620px, calc(100vw - 390px));
   padding: 14px 18px;
   border-radius: 14px;
   color: #102a43;
@@ -108,10 +108,31 @@
   display: block;
 }
 
+.control-panel-shell {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 12;
+  width: 336px;
+  max-width: calc(100vw - 36px);
+  height: min(680px, calc(100svh - 36px));
+  min-height: 360px;
+}
+
+.control-panel-shell > [data-leva-root='true'] {
+  height: 100%;
+}
+
+.control-panel-shell > [data-leva-root='true'] > div {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
 @media (max-width: 760px) {
   .hud {
-    top: 12px;
+    top: 68px;
     left: 12px;
+    max-width: calc(100vw - 24px);
     padding: 12px 14px;
     border-radius: 12px;
   }
@@ -130,5 +151,15 @@
     right: 12px;
     width: 140px;
     border-radius: 12px;
+  }
+
+  .control-panel-shell {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-width: none;
+    height: min(420px, calc(100svh - 24px));
+    min-height: 300px;
   }
 }

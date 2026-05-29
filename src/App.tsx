@@ -312,9 +312,13 @@ function InfiniteTerrain({
 function TerrainScene({
   onPerfUpdate,
   onHeightmapUpdate,
+  showWater,
+  waterOpacity,
 }: {
   onPerfUpdate: (stats: PerfStats) => void
   onHeightmapUpdate: (preview: HeightmapPreviewData | null) => void
+  showWater: boolean
+  waterOpacity: number
 }) {
   const controls = useControls('Generator', {
     easing: {
@@ -422,10 +426,19 @@ function TerrainScene({
         onHeightmapUpdate={onHeightmapUpdate}
         textureMode={settings.texture}
       />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.25, 0]} receiveShadow>
-        <planeGeometry args={[2800, 2800, 1, 1]} />
-        <meshStandardMaterial color="#718355" roughness={1} metalness={0} />
-      </mesh>
+      {showWater ? (
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+          <planeGeometry args={[3200, 3200, 1, 1]} />
+          <meshStandardMaterial
+            color="#4ea8de"
+            transparent
+            opacity={waterOpacity}
+            roughness={0.24}
+            metalness={0.05}
+            depthWrite={false}
+          />
+        </mesh>
+      ) : null}
     </group>
   )
 }
@@ -538,6 +551,8 @@ function App() {
   const displayControls = useControls('Display', {
     showPerfDebug: true,
     showHeightmap: true,
+    showWater: true,
+    waterOpacity: { value: 0.26, min: 0.05, max: 0.8, step: 0.01 },
   })
 
   const handlePerfUpdate = useCallback((stats: PerfStats) => {
@@ -574,6 +589,8 @@ function App() {
         <TerrainScene
           onPerfUpdate={handlePerfUpdate}
           onHeightmapUpdate={handleHeightmapUpdate}
+          showWater={displayControls.showWater}
+          waterOpacity={displayControls.waterOpacity}
         />
         <OrbitControls
           enablePan
@@ -582,7 +599,9 @@ function App() {
           maxPolarAngle={Math.PI * 0.49}
         />
       </Canvas>
-      <Leva collapsed={false} titleBar={{ title: 'Control Panel' }} />
+      <div className="control-panel-shell" role="complementary" aria-label="Control panel">
+        <Leva fill collapsed={false} titleBar={{ title: 'Control Panel' }} />
+      </div>
     </main>
   )
 }
