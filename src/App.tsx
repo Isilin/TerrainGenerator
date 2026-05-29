@@ -52,6 +52,9 @@ function App() {
           waterOpacity={displayControls.waterOpacity}
           waterDepthOpacityBoost={displayControls.waterDepthOpacityBoost}
           waterReflection={displayControls.waterReflection}
+          waterWaveSpeed={displayControls.waterWaveSpeed}
+          waterWaveAmplitude={displayControls.waterWaveAmplitude}
+          waterWaveFrequency={displayControls.waterWaveFrequency}
         />
         <OrbitControls
           enablePan

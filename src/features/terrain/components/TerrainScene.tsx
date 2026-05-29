@@ -10,6 +10,9 @@ export function TerrainScene({
   waterOpacity,
   waterDepthOpacityBoost,
   waterReflection,
+  waterWaveSpeed,
+  waterWaveAmplitude,
+  waterWaveFrequency,
 }: TerrainSceneProps) {
   const { settings, terrainKey } = useTerrainControls()
 
@@ -23,6 +26,9 @@ export function TerrainScene({
       waterOpacity,
       waterDepthOpacityBoost,
       waterReflection,
+      waterWaveSpeed,
+      waterWaveAmplitude,
+      waterWaveFrequency,
     }),
     [
       settings,
@@ -32,6 +38,9 @@ export function TerrainScene({
       waterOpacity,
       waterDepthOpacityBoost,
       waterReflection,
+      waterWaveSpeed,
+      waterWaveAmplitude,
+      waterWaveFrequency,
     ],
   )
 

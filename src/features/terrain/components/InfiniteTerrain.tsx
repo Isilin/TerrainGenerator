@@ -14,6 +14,9 @@ export function InfiniteTerrain({
   waterOpacity,
   waterDepthOpacityBoost,
   waterReflection,
+  waterWaveSpeed,
+  waterWaveAmplitude,
+  waterWaveFrequency,
 }: InfiniteTerrainProps) {
   const [centerChunk, setCenterChunk] = useState({ x: 0, z: 0 })
 
@@ -51,6 +54,9 @@ export function InfiniteTerrain({
               baseOpacity={waterOpacity}
               depthOpacityBoost={waterDepthOpacityBoost}
               reflectionStrength={waterReflection}
+              waveSpeed={waterWaveSpeed}
+              waveAmplitude={waterWaveAmplitude}
+              waveFrequency={waterWaveFrequency}
               lodStep={chunk.lodStep}
             />
           ))

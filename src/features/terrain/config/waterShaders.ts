@@ -1,5 +1,9 @@
 export const WATER_VERTEX_SHADER = `
   attribute float depthFactor;
+  uniform float time;
+  uniform float waveSpeed;
+  uniform float waveAmplitude;
+  uniform float waveFrequency;
   varying float vDepth;
   varying vec3 vWorldPos;
   varying vec3 vWorldNormal;
@@ -7,8 +11,18 @@ export const WATER_VERTEX_SHADER = `
   void main() {
     vDepth = depthFactor;
     vec4 worldPos = modelMatrix * vec4(position, 1.0);
+    float wavePhaseX = (worldPos.x + time * waveSpeed) * waveFrequency;
+    float wavePhaseZ = (worldPos.z - time * waveSpeed * 0.7) * waveFrequency;
+    float wave = (sin(wavePhaseX) + cos(wavePhaseZ)) * 0.5 * waveAmplitude;
+    worldPos.y += wave;
+
+    float slopeX = cos(wavePhaseX) * waveFrequency * 0.5 * waveAmplitude;
+    float slopeZ = -sin(wavePhaseZ) * waveFrequency * 0.35 * waveAmplitude;
+    vec3 tangentX = normalize(vec3(1.0, slopeX, 0.0));
+    vec3 tangentZ = normalize(vec3(0.0, slopeZ, 1.0));
+
     vWorldPos = worldPos.xyz;
-    vWorldNormal = normalize(mat3(modelMatrix) * normal);
+    vWorldNormal = normalize(mat3(modelMatrix) * normalize(cross(tangentZ, tangentX)));
     gl_Position = projectionMatrix * viewMatrix * worldPos;
   }
 `

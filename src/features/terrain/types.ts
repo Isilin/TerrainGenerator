@@ -78,6 +78,9 @@ export type WaterChunkProps = {
   baseOpacity: number
   depthOpacityBoost: number
   reflectionStrength: number
+  waveSpeed: number
+  waveAmplitude: number
+  waveFrequency: number
   lodStep?: number
 }
 
@@ -90,6 +93,9 @@ export type InfiniteTerrainProps = {
   waterOpacity: number
   waterDepthOpacityBoost: number
   waterReflection: number
+  waterWaveSpeed: number
+  waterWaveAmplitude: number
+  waterWaveFrequency: number
 }
 
 export type TerrainSceneProps = {
@@ -99,4 +105,7 @@ export type TerrainSceneProps = {
   waterOpacity: number
   waterDepthOpacityBoost: number
   waterReflection: number
+  waterWaveSpeed: number
+  waterWaveAmplitude: number
+  waterWaveFrequency: number
 }

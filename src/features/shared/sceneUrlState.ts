@@ -35,6 +35,9 @@ const QUERY_KEYS = [
   'waterOpacity',
   'waterDepthOpacityBoost',
   'waterReflection',
+  'waterWaveSpeed',
+  'waterWaveAmplitude',
+  'waterWaveFrequency',
 ] as const
 
 const parseBoolean = (value: string | null, fallback: boolean) => {
@@ -122,6 +125,9 @@ export const parseSceneUrlState = (search: string): SceneUrlState => {
     'waterOpacity',
     'waterDepthOpacityBoost',
     'waterReflection',
+    'waterWaveSpeed',
+    'waterWaveAmplitude',
+    'waterWaveFrequency',
   ]
   for (const key of displayNumberKeys) {
     const value = params.get(`${QUERY_PREFIX}.${key}`)
@@ -207,6 +213,9 @@ export const serializeSceneUrlState = (state: SceneUrlState) => {
       'waterOpacity',
       'waterDepthOpacityBoost',
       'waterReflection',
+      'waterWaveSpeed',
+      'waterWaveAmplitude',
+      'waterWaveFrequency',
     ]
     for (const key of displayNumberKeys) {
       const value = display[key]
