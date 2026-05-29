@@ -1,6 +1,7 @@
 import { button, folder, useControls } from 'leva'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { DISPLAY_STORAGE_KEY, TERRAIN_STORAGE_KEY } from '../../shared/persistenceKeys'
+import { parseSceneUrlState, serializeSceneUrlState } from '../../shared/sceneUrlState'
 import type { PostProcessSettings } from '../../../lib/filters'
 import {
   LEGACY_CURVE_OPTIONS,
@@ -73,11 +74,19 @@ const hasTerrainControlChanged = (
 
 export const useTerrainControls = () => {
   const persistedState = useMemo(() => loadPersistedTerrainState(), [])
+  const urlState = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {}
+    }
+
+    return parseSceneUrlState(window.location.search)
+  }, [])
+  const urlTerrainState = urlState.terrain
 
   const presetControls = useControls('Presets', {
     preset: {
       options: TERRAIN_PRESET_OPTIONS,
-      value: persistedState.preset ?? ('Custom' as TerrainPresetName),
+      value: urlTerrainState?.preset ?? persistedState.preset ?? ('Custom' as TerrainPresetName),
       label: 'Terrain preset',
     },
   })
@@ -157,52 +166,60 @@ export const useTerrainControls = () => {
   const controls = useControls('Generator', {
     Terrain: folder(
       {
-        seed: { value: persistedState.controls?.seed ?? 'terrain-v2', label: 'Seed' },
+        seed: {
+          value: urlTerrainState?.seed ?? persistedState.controls?.seed ?? 'terrain-v2',
+          label: 'Seed',
+        },
         heightmap: {
           options: LEGACY_HEIGHTMAP_OPTIONS as unknown as string[],
-          value: persistedState.controls?.heightmap ?? 'PerlinDiamond',
+          value: urlTerrainState?.heightmap ?? persistedState.controls?.heightmap ?? 'PerlinDiamond',
         },
         smoothing: {
           options: LEGACY_SMOOTHING_OPTIONS as unknown as string[],
-          value: persistedState.controls?.smoothing ?? 'None',
+          value: urlTerrainState?.smoothing ?? persistedState.controls?.smoothing ?? 'None',
         },
         texture: {
           options: LEGACY_TEXTURE_OPTIONS as unknown as string[],
-          value: persistedState.controls?.texture ?? 'Blended',
+          value: urlTerrainState?.texture ?? persistedState.controls?.texture ?? 'Blended',
         },
         curve: {
           options: LEGACY_CURVE_OPTIONS as unknown as string[],
-          value: persistedState.controls?.curve ?? 'EaseInOut',
+          value: urlTerrainState?.curve ?? persistedState.controls?.curve ?? 'EaseInOut',
         },
         scattering: {
           options: LEGACY_SCATTERING_OPTIONS as unknown as string[],
-          value: persistedState.controls?.scattering ?? 'PerlinAltitude',
+          value: urlTerrainState?.scattering ?? persistedState.controls?.scattering ?? 'PerlinAltitude',
         },
         easing: {
           options: LEGACY_EASING_OPTIONS as unknown as string[],
-          value: persistedState.controls?.easing ?? 'Linear',
+          value: urlTerrainState?.easing ?? persistedState.controls?.easing ?? 'Linear',
         },
       },
       { collapsed: false },
     ),
     Noise: folder(
       {
-        amplitude: { value: persistedState.controls?.amplitude ?? 24, min: 1, max: 80, step: 1 },
+        amplitude: {
+          value: urlTerrainState?.amplitude ?? persistedState.controls?.amplitude ?? 24,
+          min: 1,
+          max: 80,
+          step: 1,
+        },
         frequency: {
-          value: persistedState.controls?.frequency ?? 0.012,
+          value: urlTerrainState?.frequency ?? persistedState.controls?.frequency ?? 0.012,
           min: 0.002,
           max: 0.08,
           step: 0.001,
         },
-        octaves: { value: persistedState.controls?.octaves ?? 5, min: 1, max: 8, step: 1 },
+        octaves: { value: urlTerrainState?.octaves ?? persistedState.controls?.octaves ?? 5, min: 1, max: 8, step: 1 },
         persistence: {
-          value: persistedState.controls?.persistence ?? 0.5,
+          value: urlTerrainState?.persistence ?? persistedState.controls?.persistence ?? 0.5,
           min: 0.2,
           max: 0.8,
           step: 0.01,
         },
         lacunarity: {
-          value: persistedState.controls?.lacunarity ?? 2,
+          value: urlTerrainState?.lacunarity ?? persistedState.controls?.lacunarity ?? 2,
           min: 1.2,
           max: 3,
           step: 0.1,
@@ -212,17 +229,32 @@ export const useTerrainControls = () => {
     ),
     Streaming: folder(
       {
-        chunkSize: { value: persistedState.controls?.chunkSize ?? 140, min: 64, max: 280, step: 1 },
+        chunkSize: {
+          value: urlTerrainState?.chunkSize ?? persistedState.controls?.chunkSize ?? 140,
+          min: 64,
+          max: 280,
+          step: 1,
+        },
         chunkSegments: {
-          value: persistedState.controls?.chunkSegments ?? 96,
+          value: urlTerrainState?.chunkSegments ?? persistedState.controls?.chunkSegments ?? 96,
           min: 16,
           max: 192,
           step: 1,
         },
-        viewRadius: { value: persistedState.controls?.viewRadius ?? 2, min: 1, max: 4, step: 1 },
-        cacheSize: { value: persistedState.controls?.cacheSize ?? 96, min: 16, max: 192, step: 1 },
+        viewRadius: {
+          value: urlTerrainState?.viewRadius ?? persistedState.controls?.viewRadius ?? 2,
+          min: 1,
+          max: 4,
+          step: 1,
+        },
+        cacheSize: {
+          value: urlTerrainState?.cacheSize ?? persistedState.controls?.cacheSize ?? 96,
+          min: 16,
+          max: 192,
+          step: 1,
+        },
         maxInFlight: {
-          value: persistedState.controls?.maxInFlight ?? 8,
+          value: urlTerrainState?.maxInFlight ?? persistedState.controls?.maxInFlight ?? 8,
           min: 1,
           max: 24,
           step: 1,
@@ -232,7 +264,7 @@ export const useTerrainControls = () => {
     ),
     Render: folder(
       {
-        wireframe: persistedState.controls?.wireframe ?? false,
+        wireframe: urlTerrainState?.wireframe ?? persistedState.controls?.wireframe ?? false,
       },
       { collapsed: true },
     ),
@@ -274,12 +306,18 @@ export const useTerrainControls = () => {
       return
     }
 
+    const currentUrlState = parseSceneUrlState(window.location.search)
     const stateToPersist: PersistedTerrainState = {
       preset: effectivePreset,
       controls: controls as GeneratorControlValues,
     }
 
     window.localStorage.setItem(TERRAIN_STORAGE_KEY, JSON.stringify(stateToPersist))
+    const nextUrl = serializeSceneUrlState({
+      ...currentUrlState,
+      terrain: stateToPersist,
+    })
+    window.history.replaceState(null, '', `${window.location.pathname}${nextUrl}${window.location.hash}`)
   }, [controls, effectivePreset])
 
   const activeControls = useMemo(() => {

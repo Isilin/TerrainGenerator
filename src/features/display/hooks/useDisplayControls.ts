@@ -1,24 +1,10 @@
 import { folder, useControls } from 'leva'
 import { useEffect, useMemo } from 'react'
 import { DISPLAY_STORAGE_KEY } from '../../shared/persistenceKeys'
+import { parseSceneUrlState, serializeSceneUrlState } from '../../shared/sceneUrlState'
+import { DEFAULT_DISPLAY_STATE, type DisplayControlsState } from '../types'
 
-type DisplayControlsState = {
-  showPerfDebug: boolean
-  showHeightmap: boolean
-  showWater: boolean
-  waterOpacity: number
-  waterDepthOpacityBoost: number
-  waterReflection: number
-}
-
-const DEFAULT_DISPLAY_STATE: DisplayControlsState = {
-  showPerfDebug: true,
-  showHeightmap: true,
-  showWater: true,
-  waterOpacity: 0.26,
-  waterDepthOpacityBoost: 0.56,
-  waterReflection: 0.26,
-}
+export type { DisplayControlsState } from '../types'
 
 const loadPersistedDisplayState = (): DisplayControlsState => {
   if (typeof window === 'undefined') {
@@ -43,27 +29,49 @@ const loadPersistedDisplayState = (): DisplayControlsState => {
 
 export const useDisplayControls = () => {
   const persistedState = useMemo(() => loadPersistedDisplayState(), [])
+  const urlState = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return {}
+    }
+
+    return parseSceneUrlState(window.location.search)
+  }, [])
+  const urlDisplayState = urlState.display
 
   const controls = useControls('Display', {
     Overlays: folder(
       {
-        showPerfDebug: { value: persistedState.showPerfDebug, label: 'Perf debug' },
-        showHeightmap: { value: persistedState.showHeightmap, label: 'Heightmap preview' },
+        showPerfDebug: {
+          value: urlDisplayState?.showPerfDebug ?? persistedState.showPerfDebug,
+          label: 'Perf debug',
+        },
+        showHeightmap: {
+          value: urlDisplayState?.showHeightmap ?? persistedState.showHeightmap,
+          label: 'Heightmap preview',
+        },
       },
       { collapsed: false },
     ),
     Water: folder(
       {
-        showWater: { value: persistedState.showWater, label: 'Enable water' },
-        waterOpacity: { value: persistedState.waterOpacity, min: 0.05, max: 0.8, step: 0.01 },
+        showWater: {
+          value: urlDisplayState?.showWater ?? persistedState.showWater,
+          label: 'Enable water',
+        },
+        waterOpacity: {
+          value: urlDisplayState?.waterOpacity ?? persistedState.waterOpacity,
+          min: 0.05,
+          max: 0.8,
+          step: 0.01,
+        },
         waterDepthOpacityBoost: {
-          value: persistedState.waterDepthOpacityBoost,
+          value: urlDisplayState?.waterDepthOpacityBoost ?? persistedState.waterDepthOpacityBoost,
           min: 0,
           max: 1.2,
           step: 0.01,
         },
         waterReflection: {
-          value: persistedState.waterReflection,
+          value: urlDisplayState?.waterReflection ?? persistedState.waterReflection,
           min: 0,
           max: 1.1,
           step: 0.01,
@@ -78,7 +86,13 @@ export const useDisplayControls = () => {
       return
     }
 
+    const currentUrlState = parseSceneUrlState(window.location.search)
     window.localStorage.setItem(DISPLAY_STORAGE_KEY, JSON.stringify(controls))
+    const nextUrl = serializeSceneUrlState({
+      ...currentUrlState,
+      display: controls as DisplayControlsState,
+    })
+    window.history.replaceState(null, '', `${window.location.pathname}${nextUrl}${window.location.hash}`)
   }, [controls])
 
   return controls
