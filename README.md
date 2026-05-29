@@ -1,5 +1,8 @@
 # TerrainGenerator
 
+[![Deploy App to GitHub Pages](https://github.com/Isilin/TerrainGenerator/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/Isilin/TerrainGenerator/actions/workflows/deploy-pages.yml)
+[![Live Demo](https://img.shields.io/badge/demo-online-2ea44f)](https://isilin.github.io/TerrainGenerator/)
+
 Refonte moderne d'un generateur procedural de terrain pour le web.
 
 Le projet historique (AngularJS/Gulp/Bower/Express) a ete retire du runtime actif.
@@ -14,6 +17,10 @@ La version maintenue est maintenant a la racine du repo avec:
 - Deploiement automatique GitHub Pages via GitHub Actions
 
 ## Getting Started
+
+Demo en ligne:
+
+- https://isilin.github.io/TerrainGenerator/
 
 Prerequis:
 
@@ -53,6 +60,11 @@ npm run test
 ## Deploiement GitHub Pages
 
 Workflow: `.github/workflows/deploy-pages.yml`
+
+URL de demo publiee: https://isilin.github.io/TerrainGenerator/
+
+Ce projet est deploye en mode project page GitHub Pages.
+Le workflow est declenche automatiquement sur push vers `master` (et `main`).
 
 Pipeline sur push:
 
