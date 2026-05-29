@@ -40,6 +40,10 @@ export class LruCache<K, V> {
     return this.store.has(key)
   }
 
+  get size(): number {
+    return this.store.size
+  }
+
   clear(): void {
     this.store.clear()
   }

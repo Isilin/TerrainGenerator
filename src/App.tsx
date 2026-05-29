@@ -1,7 +1,7 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PostProcessSettings } from './lib/filters'
 import { buildVisibleChunks } from './lib/chunks'
 import { LruCache } from './lib/lru'
@@ -18,6 +18,26 @@ type TerrainChunkResponse = {
   chunkX: number
   chunkZ: number
   heights: Float32Array
+}
+
+type PerfStats = {
+  fps: number
+  centerChunkX: number
+  centerChunkZ: number
+  visibleChunks: number
+  loadedChunks: number
+  inFlightRequests: number
+  cacheSize: number
+}
+
+const initialPerfStats: PerfStats = {
+  fps: 0,
+  centerChunkX: 0,
+  centerChunkZ: 0,
+  visibleChunks: 0,
+  loadedChunks: 0,
+  inFlightRequests: 0,
+  cacheSize: 0,
 }
 
 function TerrainChunk({
@@ -59,7 +79,13 @@ function TerrainChunk({
   )
 }
 
-function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
+function InfiniteTerrain({
+  settings,
+  onPerfUpdate,
+}: {
+  settings: TerrainChunkSettings
+  onPerfUpdate: (stats: PerfStats) => void
+}) {
   const [centerChunk, setCenterChunk] = useState({ x: 0, z: 0 })
   const [chunkHeights, setChunkHeights] = useState<Record<string, Float32Array>>({})
   const workerRef = useRef<Worker | null>(null)
@@ -67,6 +93,7 @@ function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
   const cacheRef = useRef<LruCache<string, Float32Array>>(
     new LruCache<string, Float32Array>(settings.cacheSize),
   )
+  const fpsAccumulator = useRef({ elapsed: 0, frames: 0 })
 
   const generationSettings: TerrainGenerationSettings = useMemo(
     () => ({
@@ -118,6 +145,8 @@ function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
     }
   }, [])
 
+  const chunks = buildVisibleChunks(centerChunk, settings.viewRadius, createChunkId)
+
   useFrame(({ camera }) => {
     const x = Math.round(camera.position.x / settings.chunkSize)
     const z = Math.round(camera.position.z / settings.chunkSize)
@@ -126,9 +155,35 @@ function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
     }
   })
 
-  const chunks = useMemo(() => {
-    return buildVisibleChunks(centerChunk, settings.viewRadius, createChunkId)
-  }, [centerChunk, settings.viewRadius])
+  useFrame((_, delta) => {
+    const accumulator = fpsAccumulator.current
+    accumulator.elapsed += delta
+    accumulator.frames += 1
+
+    if (accumulator.elapsed < 0.35) {
+      return
+    }
+
+    let loadedChunks = 0
+    for (const chunk of chunks) {
+      if (chunkHeights[chunk.id] !== undefined) {
+        loadedChunks += 1
+      }
+    }
+
+    onPerfUpdate({
+      fps: accumulator.frames / accumulator.elapsed,
+      centerChunkX: centerChunk.x,
+      centerChunkZ: centerChunk.z,
+      visibleChunks: chunks.length,
+      loadedChunks,
+      inFlightRequests: activeRequestsRef.current.size,
+      cacheSize: cacheRef.current.size,
+    })
+
+    accumulator.elapsed = 0
+    accumulator.frames = 0
+  })
 
   useEffect(() => {
     const hydrateFromCache: Array<{ id: string; heights: Float32Array }> = []
@@ -199,7 +254,7 @@ function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
   )
 }
 
-function TerrainScene() {
+function TerrainScene({ onPerfUpdate }: { onPerfUpdate: (stats: PerfStats) => void }) {
   const controls = useControls('Generator', {
     seed: 'terrain-v2',
     chunkSize: { value: 140, min: 64, max: 280, step: 1 },
@@ -276,7 +331,7 @@ function TerrainScene() {
 
   return (
     <group>
-      <InfiniteTerrain key={terrainKey} settings={settings} />
+      <InfiniteTerrain key={terrainKey} settings={settings} onPerfUpdate={onPerfUpdate} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.25, 0]} receiveShadow>
         <planeGeometry args={[2800, 2800, 1, 1]} />
         <meshStandardMaterial color="#718355" roughness={1} metalness={0} />
@@ -285,13 +340,56 @@ function TerrainScene() {
   )
 }
 
+function PerformanceOverlay({ stats }: { stats: PerfStats }) {
+  return (
+    <aside className="perf-overlay" aria-live="polite">
+      <h2>Perf Debug</h2>
+      <dl>
+        <div>
+          <dt>FPS</dt>
+          <dd>{stats.fps.toFixed(1)}</dd>
+        </div>
+        <div>
+          <dt>Chunk center</dt>
+          <dd>
+            {stats.centerChunkX}, {stats.centerChunkZ}
+          </dd>
+        </div>
+        <div>
+          <dt>Chunks visibles</dt>
+          <dd>{stats.visibleChunks}</dd>
+        </div>
+        <div>
+          <dt>Chunks charges</dt>
+          <dd>{stats.loadedChunks}</dd>
+        </div>
+        <div>
+          <dt>Req. en vol</dt>
+          <dd>{stats.inFlightRequests}</dd>
+        </div>
+        <div>
+          <dt>Cache LRU</dt>
+          <dd>{stats.cacheSize}</dd>
+        </div>
+      </dl>
+    </aside>
+  )
+}
+
 function App() {
+  const [perfStats, setPerfStats] = useState<PerfStats>(initialPerfStats)
+
+  const handlePerfUpdate = useCallback((stats: PerfStats) => {
+    setPerfStats(stats)
+  }, [])
+
   return (
     <main className="app-shell">
       <header className="hud">
         <h1>Terrain Generator v2</h1>
         <p>Refonte en cours: rendu moderne avec seed reproducible et controles live.</p>
       </header>
+      <PerformanceOverlay stats={perfStats} />
       <Canvas
         className="viewport"
         shadows
@@ -307,7 +405,7 @@ function App() {
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
         />
-        <TerrainScene />
+        <TerrainScene onPerfUpdate={handlePerfUpdate} />
         <OrbitControls
           enablePan
           minDistance={45}
