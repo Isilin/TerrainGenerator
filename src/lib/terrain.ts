@@ -1,4 +1,4 @@
-import { BufferAttribute, PlaneGeometry } from 'three'
+import { BufferAttribute, Color, Float32BufferAttribute, PlaneGeometry } from 'three'
 import { applyPostProcess, type PostProcessSettings } from './filters'
 import {
   mapLegacyCurveFunction,
@@ -35,6 +35,8 @@ export type TerrainChunkSettings = TerrainGenerationSettings & {
   cacheSize: number
   maxInFlight: number
 }
+
+export type TerrainColorMode = 'none' | 'grayscale' | 'altitude'
 
 export const createChunkId = (x: number, z: number) => `${x}:${z}`
 
@@ -157,6 +159,7 @@ export const generateChunkHeights = (
 export const createChunkGeometryFromHeights = (
   settings: TerrainGenerationSettings,
   heights: Float32Array,
+  colorMode: TerrainColorMode = 'none',
 ) => {
   const geometry = new PlaneGeometry(
     settings.chunkSize,
@@ -168,6 +171,45 @@ export const createChunkGeometryFromHeights = (
   const position = geometry.getAttribute('position') as BufferAttribute
   for (let i = 0; i < position.count; i += 1) {
     position.setZ(i, heights[i])
+  }
+
+  if (colorMode !== 'none') {
+    let min = Number.POSITIVE_INFINITY
+    let max = Number.NEGATIVE_INFINITY
+    for (let i = 0; i < heights.length; i += 1) {
+      const value = heights[i]
+      if (value < min) min = value
+      if (value > max) max = value
+    }
+
+    const range = max - min || 1
+    const colors = new Float32Array(position.count * 3)
+
+    for (let i = 0; i < position.count; i += 1) {
+      const normalized = Math.max(0, Math.min(1, (heights[i] - min) / range))
+      let color: Color
+
+      if (colorMode === 'grayscale') {
+        color = new Color(normalized, normalized, normalized)
+      } else if (normalized < 0.24) {
+        color = new Color('#2f6690')
+      } else if (normalized < 0.38) {
+        color = new Color('#9b7653')
+      } else if (normalized < 0.72) {
+        color = new Color('#588157')
+      } else if (normalized < 0.9) {
+        color = new Color('#6b705c')
+      } else {
+        color = new Color('#f8f9fa')
+      }
+
+      const offset = i * 3
+      colors[offset] = color.r
+      colors[offset + 1] = color.g
+      colors[offset + 2] = color.b
+    }
+
+    geometry.setAttribute('color', new Float32BufferAttribute(colors, 3))
   }
 
   position.needsUpdate = true

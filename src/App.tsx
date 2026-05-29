@@ -24,6 +24,7 @@ import { LruCache } from './lib/lru'
 import {
   createChunkGeometryFromHeights,
   createChunkId,
+  type TerrainColorMode,
   type TerrainChunkSettings,
   type TerrainGenerationSettings,
 } from './lib/terrain'
@@ -78,8 +79,10 @@ function TerrainChunk({
     if (heights === undefined) {
       return null
     }
-    return createChunkGeometryFromHeights(settings, heights)
-  }, [heights, settings])
+    const colorMode: TerrainColorMode =
+      textureMode === 'Grayscale' ? 'grayscale' : 'altitude'
+    return createChunkGeometryFromHeights(settings, heights, colorMode)
+  }, [heights, settings, textureMode])
 
   if (geometry === null) {
     return null
@@ -93,8 +96,9 @@ function TerrainChunk({
       castShadow
     >
       <meshStandardMaterial
-        color={textureMode === 'Grayscale' ? '#a0a4ab' : '#97a97c'}
-        roughness={textureMode === 'Grayscale' ? 0.96 : 0.92}
+        color="#ffffff"
+        vertexColors
+        roughness={textureMode === 'Grayscale' ? 0.98 : 0.92}
         metalness={0.05}
         wireframe={settings.wireframe}
       />
@@ -346,12 +350,6 @@ function TerrainScene({
     octaves: { value: 5, min: 1, max: 8, step: 1 },
     persistence: { value: 0.5, min: 0.2, max: 0.8, step: 0.01 },
     lacunarity: { value: 2, min: 1.2, max: 3, step: 0.1 },
-    postProcess: {
-      options: ['none', 'mean', 'median', 'conservative'],
-      value: 'none',
-    },
-    meanWeight: { value: 0, min: 0, max: 8, step: 0.5 },
-    conservativeMultiplier: { value: 1, min: 0.25, max: 12, step: 0.25 },
     cacheSize: { value: 96, min: 16, max: 192, step: 1 },
     maxInFlight: { value: 8, min: 1, max: 24, step: 1 },
     wireframe: false,
