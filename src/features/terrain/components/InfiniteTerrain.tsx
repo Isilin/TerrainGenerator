@@ -6,9 +6,10 @@ import {
   createChunkId,
   type TerrainGenerationSettings,
 } from '../../../lib/terrain'
+import type { TerrainChunkResponse } from '../contracts/terrainWorker.contract'
 import { TerrainChunk } from './TerrainChunk'
 import { WaterChunk } from './WaterChunk'
-import type { InfiniteTerrainProps, TerrainChunkResponse } from '../types'
+import type { InfiniteTerrainProps } from '../types'
 
 export function InfiniteTerrain({
   settings,

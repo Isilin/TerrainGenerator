@@ -1,5 +1,6 @@
-import { folder, useControls } from 'leva'
-import { useMemo } from 'react'
+import { button, folder, useControls } from 'leva'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { DISPLAY_STORAGE_KEY, TERRAIN_STORAGE_KEY } from '../../shared/persistenceKeys'
 import type { PostProcessSettings } from '../../../lib/filters'
 import {
   LEGACY_CURVE_OPTIONS,
@@ -20,84 +21,277 @@ import {
 import { TERRAIN_PRESET_OPTIONS, TERRAIN_PRESETS } from '../config'
 import type { GeneratorControlValues, TerrainPresetName } from '../types'
 
+type PersistedTerrainState = {
+  preset?: TerrainPresetName
+  controls?: Partial<GeneratorControlValues>
+}
+
+type PersistedDisplayState = {
+  showPerfDebug?: boolean
+  showHeightmap?: boolean
+  showWater?: boolean
+  waterOpacity?: number
+  waterDepthOpacityBoost?: number
+  waterReflection?: number
+}
+
+type ExportedProfilePayload = {
+  version: 1
+  terrain: PersistedTerrainState
+  display?: PersistedDisplayState
+}
+
+const loadPersistedTerrainState = (): PersistedTerrainState => {
+  if (typeof window === 'undefined') {
+    return {}
+  }
+
+  const raw = window.localStorage.getItem(TERRAIN_STORAGE_KEY)
+  if (raw === null) {
+    return {}
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as PersistedTerrainState
+    return parsed ?? {}
+  } catch {
+    return {}
+  }
+}
+
+const hasTerrainControlChanged = (
+  previous: GeneratorControlValues,
+  next: GeneratorControlValues,
+) => {
+  for (const key of Object.keys(previous) as Array<keyof GeneratorControlValues>) {
+    if (previous[key] !== next[key]) {
+      return true
+    }
+  }
+  return false
+}
+
 export const useTerrainControls = () => {
+  const persistedState = useMemo(() => loadPersistedTerrainState(), [])
+
   const presetControls = useControls('Presets', {
     preset: {
       options: TERRAIN_PRESET_OPTIONS,
-      value: 'Custom' as TerrainPresetName,
+      value: persistedState.preset ?? ('Custom' as TerrainPresetName),
       label: 'Terrain preset',
     },
+  })
+
+  const handleExportProfile = () => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const displayRaw = window.localStorage.getItem(DISPLAY_STORAGE_KEY)
+    const display = displayRaw !== null ? (JSON.parse(displayRaw) as PersistedDisplayState) : undefined
+
+    const payload: ExportedProfilePayload = {
+      version: 1,
+      terrain: {
+        preset: effectivePreset,
+        controls: controls as GeneratorControlValues,
+      },
+      display,
+    }
+
+    const json = JSON.stringify(payload, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.download = 'terrain-profile.json'
+    anchor.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImportProfile = () => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const raw = window.prompt('Paste terrain profile JSON')
+    if (raw === null || raw.trim() === '') {
+      return
+    }
+
+    try {
+      const payload = JSON.parse(raw) as ExportedProfilePayload
+      if (payload.terrain !== undefined) {
+        window.localStorage.setItem(TERRAIN_STORAGE_KEY, JSON.stringify(payload.terrain))
+      }
+      if (payload.display !== undefined) {
+        window.localStorage.setItem(DISPLAY_STORAGE_KEY, JSON.stringify(payload.display))
+      }
+      window.location.reload()
+    } catch {
+      window.alert('Invalid profile JSON')
+    }
+  }
+
+  const handleResetDefaults = () => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    window.localStorage.removeItem(TERRAIN_STORAGE_KEY)
+    window.localStorage.removeItem(DISPLAY_STORAGE_KEY)
+    window.location.reload()
+  }
+
+  useControls('Presets', {
+    profileActions: folder(
+      {
+        exportProfile: button(handleExportProfile),
+        importProfile: button(handleImportProfile),
+        resetDefaults: button(handleResetDefaults),
+      },
+      { collapsed: true },
+    ),
   })
 
   const controls = useControls('Generator', {
     Terrain: folder(
       {
-        seed: { value: 'terrain-v2', label: 'Seed' },
+        seed: { value: persistedState.controls?.seed ?? 'terrain-v2', label: 'Seed' },
         heightmap: {
           options: LEGACY_HEIGHTMAP_OPTIONS as unknown as string[],
-          value: 'PerlinDiamond',
+          value: persistedState.controls?.heightmap ?? 'PerlinDiamond',
         },
         smoothing: {
           options: LEGACY_SMOOTHING_OPTIONS as unknown as string[],
-          value: 'None',
+          value: persistedState.controls?.smoothing ?? 'None',
         },
         texture: {
           options: LEGACY_TEXTURE_OPTIONS as unknown as string[],
-          value: 'Blended',
+          value: persistedState.controls?.texture ?? 'Blended',
         },
         curve: {
           options: LEGACY_CURVE_OPTIONS as unknown as string[],
-          value: 'EaseInOut',
+          value: persistedState.controls?.curve ?? 'EaseInOut',
         },
         scattering: {
           options: LEGACY_SCATTERING_OPTIONS as unknown as string[],
-          value: 'PerlinAltitude',
+          value: persistedState.controls?.scattering ?? 'PerlinAltitude',
         },
         easing: {
           options: LEGACY_EASING_OPTIONS as unknown as string[],
-          value: 'Linear',
+          value: persistedState.controls?.easing ?? 'Linear',
         },
       },
       { collapsed: false },
     ),
     Noise: folder(
       {
-        amplitude: { value: 24, min: 1, max: 80, step: 1 },
-        frequency: { value: 0.012, min: 0.002, max: 0.08, step: 0.001 },
-        octaves: { value: 5, min: 1, max: 8, step: 1 },
-        persistence: { value: 0.5, min: 0.2, max: 0.8, step: 0.01 },
-        lacunarity: { value: 2, min: 1.2, max: 3, step: 0.1 },
+        amplitude: { value: persistedState.controls?.amplitude ?? 24, min: 1, max: 80, step: 1 },
+        frequency: {
+          value: persistedState.controls?.frequency ?? 0.012,
+          min: 0.002,
+          max: 0.08,
+          step: 0.001,
+        },
+        octaves: { value: persistedState.controls?.octaves ?? 5, min: 1, max: 8, step: 1 },
+        persistence: {
+          value: persistedState.controls?.persistence ?? 0.5,
+          min: 0.2,
+          max: 0.8,
+          step: 0.01,
+        },
+        lacunarity: {
+          value: persistedState.controls?.lacunarity ?? 2,
+          min: 1.2,
+          max: 3,
+          step: 0.1,
+        },
       },
       { collapsed: false },
     ),
     Streaming: folder(
       {
-        chunkSize: { value: 140, min: 64, max: 280, step: 1 },
-        chunkSegments: { value: 96, min: 16, max: 192, step: 1 },
-        viewRadius: { value: 2, min: 1, max: 4, step: 1 },
-        cacheSize: { value: 96, min: 16, max: 192, step: 1 },
-        maxInFlight: { value: 8, min: 1, max: 24, step: 1 },
+        chunkSize: { value: persistedState.controls?.chunkSize ?? 140, min: 64, max: 280, step: 1 },
+        chunkSegments: {
+          value: persistedState.controls?.chunkSegments ?? 96,
+          min: 16,
+          max: 192,
+          step: 1,
+        },
+        viewRadius: { value: persistedState.controls?.viewRadius ?? 2, min: 1, max: 4, step: 1 },
+        cacheSize: { value: persistedState.controls?.cacheSize ?? 96, min: 16, max: 192, step: 1 },
+        maxInFlight: {
+          value: persistedState.controls?.maxInFlight ?? 8,
+          min: 1,
+          max: 24,
+          step: 1,
+        },
       },
       { collapsed: false },
     ),
     Render: folder(
       {
-        wireframe: false,
+        wireframe: persistedState.controls?.wireframe ?? false,
       },
       { collapsed: true },
     ),
   })
 
+  const [isPresetDetached, setIsPresetDetached] = useState(false)
+  const previousPresetRef = useRef(presetControls.preset)
+
+  useEffect(() => {
+    if (presetControls.preset !== previousPresetRef.current) {
+      previousPresetRef.current = presetControls.preset
+      setIsPresetDetached(false)
+    }
+  }, [presetControls.preset])
+
+  const previousControlsRef = useRef<GeneratorControlValues | null>(null)
+  useEffect(() => {
+    const currentControls = controls as GeneratorControlValues
+    if (previousControlsRef.current === null) {
+      previousControlsRef.current = currentControls
+      return
+    }
+
+    if (
+      presetControls.preset !== 'Custom' &&
+      hasTerrainControlChanged(previousControlsRef.current, currentControls)
+    ) {
+      setIsPresetDetached(true)
+    }
+
+    previousControlsRef.current = currentControls
+  }, [controls, presetControls.preset])
+
+  const effectivePreset: TerrainPresetName =
+    isPresetDetached && presetControls.preset !== 'Custom' ? 'Custom' : presetControls.preset
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return
+    }
+
+    const stateToPersist: PersistedTerrainState = {
+      preset: effectivePreset,
+      controls: controls as GeneratorControlValues,
+    }
+
+    window.localStorage.setItem(TERRAIN_STORAGE_KEY, JSON.stringify(stateToPersist))
+  }, [controls, effectivePreset])
+
   const activeControls = useMemo(() => {
-    if (presetControls.preset === 'Custom') {
+    if (effectivePreset === 'Custom') {
       return controls as GeneratorControlValues
     }
 
     return {
       ...(controls as GeneratorControlValues),
-      ...TERRAIN_PRESETS[presetControls.preset],
+      ...TERRAIN_PRESETS[effectivePreset],
     } as GeneratorControlValues
-  }, [controls, presetControls.preset])
+  }, [controls, effectivePreset])
 
   const postProcess = useMemo<PostProcessSettings>(
     () => mapSmoothingToPostProcess(activeControls.smoothing as LegacySmoothingOption),

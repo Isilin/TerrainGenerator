@@ -3,23 +3,13 @@
 import {
   createChunkId,
   generateChunkHeights,
-  type TerrainGenerationSettings,
 } from '../lib/terrain'
+import type {
+  TerrainChunkRequest,
+  TerrainChunkResponse,
+} from '../features/terrain/contracts/terrainWorker.contract'
 
 declare const self: DedicatedWorkerGlobalScope
-
-type TerrainChunkRequest = {
-  chunkX: number
-  chunkZ: number
-  settings: TerrainGenerationSettings
-}
-
-type TerrainChunkResponse = {
-  chunkId: string
-  chunkX: number
-  chunkZ: number
-  heights: Float32Array
-}
 
 self.onmessage = (event: MessageEvent<TerrainChunkRequest>) => {
   const { chunkX, chunkZ, settings } = event.data

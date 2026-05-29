@@ -8,13 +8,6 @@ import type {
 } from '../../lib/legacy'
 import type { TerrainChunkSettings } from '../../lib/terrain'
 
-export type TerrainChunkResponse = {
-  chunkId: string
-  chunkX: number
-  chunkZ: number
-  heights: Float32Array
-}
-
 export type PerfStats = {
   fps: number
   centerChunkX: number
