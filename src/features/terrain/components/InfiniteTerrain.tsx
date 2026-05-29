@@ -57,7 +57,7 @@ export function InfiniteTerrain({
               waveSpeed={waterWaveSpeed}
               waveAmplitude={waterWaveAmplitude}
               waveFrequency={waterWaveFrequency}
-              lodStep={chunk.lodStep}
+              lodStep={Math.min(8, chunk.lodStep * 2)}
             />
           ))
         : null}

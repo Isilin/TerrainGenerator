@@ -15,14 +15,21 @@ export type TerrainStreamState = {
   chunkHeights: Record<string, Float32Array>
 }
 
-const getLodStepForDistance = (distance: number) => {
-  if (distance <= 1) {
+const getLodStepForDistance = (distance: number, viewRadius: number) => {
+  const nearRing = 1
+  const midRing = Math.min(2, viewRadius)
+  const farRing = Math.min(3, viewRadius)
+
+  if (distance <= nearRing) {
     return 1
   }
-  if (distance <= 2) {
+  if (distance <= midRing) {
     return 2
   }
-  return 4
+  if (distance <= farRing) {
+    return 4
+  }
+  return 8
 }
 
 export const useTerrainStream = (
@@ -161,7 +168,7 @@ export const useTerrainStream = (
 
         return {
           ...chunk,
-          lodStep: getLodStepForDistance(distance),
+          lodStep: getLodStepForDistance(distance, settings.viewRadius),
           distance,
         }
       }),

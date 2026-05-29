@@ -43,6 +43,18 @@ jobs:
       - name: Run build
         run: npm run build
 
+      - name: Generate bundle report
+        run: |
+          npm run bundle:report | tee bundle-report.txt
+
+      - name: Upload bundle report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-report
+          path: |
+            bundle-report.txt
+            dist/assets
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

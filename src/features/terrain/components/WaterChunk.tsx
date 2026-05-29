@@ -19,6 +19,7 @@ export function WaterChunk({
   lodStep = 1,
 }: WaterChunkProps) {
   const materialRef = useRef<ShaderMaterial | null>(null)
+  const lodWaveFactor = 1 / Math.sqrt(Math.max(1, lodStep))
 
   const geometry = useMemo(() => {
     if (heights === undefined) {
@@ -35,11 +36,19 @@ export function WaterChunk({
       reflectionStrength: { value: reflectionStrength },
       time: { value: 0 },
       waveSpeed: { value: waveSpeed },
-      waveAmplitude: { value: waveAmplitude },
-      waveFrequency: { value: waveFrequency },
+      waveAmplitude: { value: waveAmplitude * lodWaveFactor },
+      waveFrequency: { value: waveFrequency * lodWaveFactor },
       lightDirection: { value: [0.52, 0.8, 0.32] },
     }),
-    [baseOpacity, depthOpacityBoost, reflectionStrength, waveAmplitude, waveFrequency, waveSpeed],
+    [
+      baseOpacity,
+      depthOpacityBoost,
+      reflectionStrength,
+      waveAmplitude,
+      waveFrequency,
+      waveSpeed,
+      lodWaveFactor,
+    ],
   )
 
   useFrame(({ clock }) => {
