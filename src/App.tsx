@@ -88,6 +88,11 @@ function App() {
       <div className={styles.controlPanelShell} role="complementary" aria-label="Control panel">
         <Leva fill collapsed={false} titleBar={{ title: 'Control Panel' }} />
       </div>
+      {displayControls.showControlsHint ? (
+        <p className={styles.controlsHint} aria-live="polite">
+          Deplacement: ZQSD / WASD / Fleches · Sprint: Shift
+        </p>
+      ) : null}
     </main>
   )
 }

@@ -6,6 +6,13 @@ import {
 } from './sceneUrlState'
 
 describe('sceneUrlState water controls', () => {
+  it('parses controls hint visibility from query string', () => {
+    const state = parseSceneUrlState('?terrain.showControlsHint=0')
+
+    expect(state.display).toBeDefined()
+    expect(state.display?.showControlsHint).toBe(false)
+  })
+
   it('parses advanced water wave controls from query string', () => {
     const state = parseSceneUrlState(
       '?terrain.waterWaveSpeed=1.75&terrain.waterWaveAmplitude=0.92&terrain.waterWaveFrequency=0.081',
@@ -22,6 +29,7 @@ describe('sceneUrlState water controls', () => {
       display: {
         showPerfDebug: true,
         showHeightmap: true,
+        showControlsHint: true,
         showWater: true,
         waterOpacity: 0.3,
         waterDepthOpacityBoost: 0.45,
@@ -32,6 +40,7 @@ describe('sceneUrlState water controls', () => {
       },
     })
 
+    expect(query).toContain('terrain.showControlsHint=1')
     expect(query).toContain('terrain.waterWaveSpeed=2')
     expect(query).toContain('terrain.waterWaveAmplitude=1.25')
     expect(query).toContain('terrain.waterWaveFrequency=0.11')
@@ -43,5 +52,6 @@ describe('sceneUrlState water controls', () => {
     expect(keys).toContain('waterWaveSpeed')
     expect(keys).toContain('waterWaveAmplitude')
     expect(keys).toContain('waterWaveFrequency')
+    expect(keys).toContain('showControlsHint')
   })
 })

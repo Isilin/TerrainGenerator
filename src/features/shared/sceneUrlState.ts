@@ -31,6 +31,7 @@ const QUERY_KEYS = [
   'wireframe',
   'showPerfDebug',
   'showHeightmap',
+  'showControlsHint',
   'showWater',
   'waterOpacity',
   'waterDepthOpacityBoost',
@@ -111,6 +112,7 @@ export const parseSceneUrlState = (search: string): SceneUrlState => {
   const displayBooleanKeys: Array<keyof DisplayControlsState> = [
     'showPerfDebug',
     'showHeightmap',
+    'showControlsHint',
     'showWater',
   ]
   for (const key of displayBooleanKeys) {
@@ -200,6 +202,7 @@ export const serializeSceneUrlState = (state: SceneUrlState) => {
     const displayBooleanKeys: Array<keyof DisplayControlsState> = [
       'showPerfDebug',
       'showHeightmap',
+      'showControlsHint',
       'showWater',
     ]
     for (const key of displayBooleanKeys) {

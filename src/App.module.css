@@ -59,6 +59,24 @@
   overflow: visible;
 }
 
+.controlsHint {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  z-index: 11;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: #102a43;
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
+  background: rgba(250, 251, 246, 0.84);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 18px rgba(16, 42, 67, 0.14);
+  pointer-events: none;
+}
+
 @media (max-width: 760px) {
   .hud {
     top: 68px;
@@ -78,5 +96,13 @@
     max-height: calc(100svh - 24px);
     overflow-x: hidden;
     overflow-y: auto;
+  }
+
+  .controlsHint {
+    bottom: 10px;
+    font-size: 0.72rem;
+    padding: 7px 10px;
+    max-width: calc(100vw - 24px);
+    text-align: center;
   }
 }

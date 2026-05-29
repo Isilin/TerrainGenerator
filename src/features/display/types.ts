@@ -1,6 +1,7 @@
 export type DisplayControlsState = {
   showPerfDebug: boolean
   showHeightmap: boolean
+  showControlsHint: boolean
   showWater: boolean
   waterOpacity: number
   waterDepthOpacityBoost: number
@@ -13,6 +14,7 @@ export type DisplayControlsState = {
 export const DEFAULT_DISPLAY_STATE: DisplayControlsState = {
   showPerfDebug: true,
   showHeightmap: true,
+  showControlsHint: true,
   showWater: true,
   waterOpacity: 0.26,
   waterDepthOpacityBoost: 0.56,

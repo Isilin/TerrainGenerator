@@ -49,6 +49,10 @@ export const useDisplayControls = () => {
           value: urlDisplayState?.showHeightmap ?? persistedState.showHeightmap,
           label: 'Heightmap preview',
         },
+        showControlsHint: {
+          value: urlDisplayState?.showControlsHint ?? persistedState.showControlsHint,
+          label: 'Controls hint',
+        },
       },
       { collapsed: false },
     ),
