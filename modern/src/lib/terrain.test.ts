@@ -15,6 +15,7 @@ const chunkSettings = {
   seed: 'terrain-v2',
   chunkSize: 140,
   chunkSegments: 48,
+  postProcess: { mode: 'none' as const },
 }
 
 describe('terrain sampling', () => {
