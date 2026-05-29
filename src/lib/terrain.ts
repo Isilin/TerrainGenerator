@@ -1,6 +1,6 @@
 import { BufferAttribute, PlaneGeometry } from 'three'
 import { applyPostProcess, type PostProcessSettings } from './filters'
-import { createSeededNoise2D } from './noise'
+import { createNoiseSampler2D, type NoiseAlgorithm } from './noise'
 
 export type TerrainSamplingSettings = {
   amplitude: number
@@ -12,6 +12,7 @@ export type TerrainSamplingSettings = {
 
 export type TerrainGenerationSettings = TerrainSamplingSettings & {
   seed: string
+  noiseAlgorithm: NoiseAlgorithm
   chunkSize: number
   chunkSegments: number
   postProcess: PostProcessSettings
@@ -71,7 +72,7 @@ export const generateChunkHeights = (
   chunkZ: number,
   settings: TerrainGenerationSettings,
 ) => {
-  const noise2d = createSeededNoise2D(settings.seed)
+  const noise2d = createNoiseSampler2D(settings.seed, settings.noiseAlgorithm)
   const vertexCountPerSide = settings.chunkSegments + 1
   const padding = getPostProcessPadding(settings)
   const sampledSide = vertexCountPerSide + padding * 2

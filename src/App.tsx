@@ -3,6 +3,7 @@ import { OrbitControls } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PostProcessSettings } from './lib/filters'
+import type { NoiseAlgorithm } from './lib/noise'
 import { buildVisibleChunks } from './lib/chunks'
 import { LruCache } from './lib/lru'
 import {
@@ -105,6 +106,7 @@ function InfiniteTerrain({
   const generationSettings: TerrainGenerationSettings = useMemo(
     () => ({
       seed: settings.seed,
+      noiseAlgorithm: settings.noiseAlgorithm,
       chunkSize: settings.chunkSize,
       chunkSegments: settings.chunkSegments,
       amplitude: settings.amplitude,
@@ -116,6 +118,7 @@ function InfiniteTerrain({
     }),
     [
       settings.seed,
+      settings.noiseAlgorithm,
       settings.chunkSize,
       settings.chunkSegments,
       settings.amplitude,
@@ -285,6 +288,10 @@ function TerrainScene({
 }) {
   const controls = useControls('Generator', {
     seed: 'terrain-v2',
+    noiseAlgorithm: {
+      options: ['simplex', 'value', 'cellular'],
+      value: 'simplex',
+    },
     chunkSize: { value: 140, min: 64, max: 280, step: 1 },
     chunkSegments: { value: 96, min: 16, max: 192, step: 1 },
     viewRadius: { value: 2, min: 1, max: 4, step: 1 },
@@ -323,6 +330,7 @@ function TerrainScene({
   const settings = useMemo(
     () => ({
       seed: controls.seed,
+      noiseAlgorithm: controls.noiseAlgorithm as NoiseAlgorithm,
       chunkSize: controls.chunkSize,
       chunkSegments: controls.chunkSegments,
       viewRadius: controls.viewRadius,
@@ -343,6 +351,7 @@ function TerrainScene({
     () =>
       JSON.stringify({
         seed: settings.seed,
+        noiseAlgorithm: settings.noiseAlgorithm,
         chunkSize: settings.chunkSize,
         chunkSegments: settings.chunkSegments,
         amplitude: settings.amplitude,

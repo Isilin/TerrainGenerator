@@ -13,6 +13,7 @@ const samplingSettings = {
 const chunkSettings = {
   ...samplingSettings,
   seed: 'terrain-v2',
+  noiseAlgorithm: 'simplex' as const,
   chunkSize: 140,
   chunkSegments: 48,
   postProcess: { mode: 'none' as const },
@@ -45,6 +46,26 @@ describe('terrain sampling', () => {
     const heightB = sampleHeightAtWorld(33.2, 190.1, noiseB, samplingSettings)
 
     expect(heightA).not.toBeCloseTo(heightB, 8)
+  })
+
+  it('changes output when algorithm changes', () => {
+    const simplex = generateChunkHeights(0, 0, {
+      ...chunkSettings,
+      noiseAlgorithm: 'simplex',
+    })
+    const value = generateChunkHeights(0, 0, {
+      ...chunkSettings,
+      noiseAlgorithm: 'value',
+    })
+
+    let differentSamples = 0
+    for (let i = 0; i < simplex.length; i += Math.max(1, Math.floor(simplex.length / 64))) {
+      if (Math.abs(simplex[i] - value[i]) > 1e-4) {
+        differentSamples += 1
+      }
+    }
+
+    expect(differentSamples).toBeGreaterThan(8)
   })
 
   it('keeps neighboring chunk borders seamless', () => {
