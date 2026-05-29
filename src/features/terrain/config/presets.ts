@@ -1,0 +1,71 @@
+import type { GeneratorControlValues, TerrainPresetName } from '../types'
+
+export const TERRAIN_PRESET_OPTIONS: TerrainPresetName[] = [
+  'Custom',
+  'Archipelago',
+  'AlpineRidges',
+  'SoftDunes',
+  'VolcanicPlateau',
+]
+
+export const TERRAIN_PRESETS: Record<
+  Exclude<TerrainPresetName, 'Custom'>,
+  Partial<GeneratorControlValues>
+> = {
+  Archipelago: {
+    seed: 'archipelago-v2',
+    heightmap: 'PerlinDiamond',
+    smoothing: 'Gaussian (1.0, 7)',
+    scattering: 'PerlinAltitude',
+    curve: 'EaseInOut',
+    texture: 'Blended',
+    amplitude: 22,
+    frequency: 0.016,
+    octaves: 5,
+    persistence: 0.52,
+    lacunarity: 2.1,
+    viewRadius: 2,
+  },
+  AlpineRidges: {
+    seed: 'alpine-v2',
+    heightmap: 'SimplexLayers',
+    smoothing: 'Conservative (1)',
+    scattering: 'Worley',
+    curve: 'EaseIn',
+    texture: 'Blended',
+    amplitude: 40,
+    frequency: 0.01,
+    octaves: 6,
+    persistence: 0.46,
+    lacunarity: 2.25,
+    viewRadius: 2,
+  },
+  SoftDunes: {
+    seed: 'dunes-v2',
+    heightmap: 'Value',
+    smoothing: 'GaussianBox',
+    scattering: 'Linear',
+    curve: 'EaseOut',
+    texture: 'Grayscale',
+    amplitude: 14,
+    frequency: 0.02,
+    octaves: 4,
+    persistence: 0.58,
+    lacunarity: 1.8,
+    viewRadius: 3,
+  },
+  VolcanicPlateau: {
+    seed: 'volcano-v2',
+    heightmap: 'Worley',
+    smoothing: 'Median',
+    scattering: 'Worley',
+    curve: 'EaseOut',
+    texture: 'Blended',
+    amplitude: 34,
+    frequency: 0.013,
+    octaves: 5,
+    persistence: 0.49,
+    lacunarity: 2.35,
+    viewRadius: 2,
+  },
+}
