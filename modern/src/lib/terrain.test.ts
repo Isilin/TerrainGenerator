@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createSeededNoise2D } from './noise'
-import { sampleHeightAtWorld } from './terrain'
+import { generateChunkHeights, sampleHeightAtWorld } from './terrain'
 
 const samplingSettings = {
   amplitude: 24,
@@ -8,6 +8,13 @@ const samplingSettings = {
   octaves: 5,
   persistence: 0.5,
   lacunarity: 2,
+}
+
+const chunkSettings = {
+  ...samplingSettings,
+  seed: 'terrain-v2',
+  chunkSize: 140,
+  chunkSegments: 48,
 }
 
 describe('terrain sampling', () => {
@@ -29,5 +36,17 @@ describe('terrain sampling', () => {
     const heightB = sampleHeightAtWorld(33.2, 190.1, noiseB, samplingSettings)
 
     expect(heightA).not.toBeCloseTo(heightB, 8)
+  })
+
+  it('keeps neighboring chunk borders seamless', () => {
+    const left = generateChunkHeights(0, 0, chunkSettings)
+    const right = generateChunkHeights(1, 0, chunkSettings)
+    const side = chunkSettings.chunkSegments + 1
+
+    for (let row = 0; row < side; row += 1) {
+      const leftEdge = left[row * side + (side - 1)]
+      const rightEdge = right[row * side]
+      expect(leftEdge).toBeCloseTo(rightEdge, 6)
+    }
   })
 })
