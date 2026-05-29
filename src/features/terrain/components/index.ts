@@ -1,4 +1,5 @@
 export { InfiniteTerrain } from './InfiniteTerrain'
+export { SceneCameraControls } from './SceneCameraControls'
 export { TerrainChunk } from './TerrainChunk'
 export { TerrainScene } from './TerrainScene'
 export { WaterChunk } from './WaterChunk'

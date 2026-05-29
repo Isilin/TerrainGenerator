@@ -108,6 +108,8 @@ export const useTerrainStream = (
       const metrics = perfMetricsRef.current
       const requestMeta = requestMetaRef.current.get(chunkId)
 
+      // A response can arrive after a newer request for the same chunk.
+      // If we no longer track metadata for this chunk, it is stale.
       if (requestMeta === undefined) {
         metrics.staleResponsesDiscarded += 1
         return
@@ -121,6 +123,7 @@ export const useTerrainStream = (
         requestMeta.streamRevision !== streamRevision ||
         !visibleChunkIdsRef.current.has(chunkId)
       ) {
+        // Keep stale data in cache for potential reuse, but do not display it.
         metrics.staleResponsesDiscarded += 1
         cacheRef.current.set(chunkId, heights)
         return
@@ -181,6 +184,8 @@ export const useTerrainStream = (
   )
 
   useEffect(() => {
+    // Bump revision whenever visibility or generation parameters change,
+    // so older worker responses can be ignored deterministically.
     streamRevisionRef.current += 1
     const visibleIds = new Set<string>(chunks.map((chunk) => chunk.id))
     visibleChunkIdsRef.current = visibleIds

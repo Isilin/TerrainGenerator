@@ -1,38 +1,16 @@
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Canvas } from '@react-three/fiber'
 import { Leva } from 'leva'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { OrbitControls as ThreeOrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { useCallback, useState } from 'react'
 import styles from './App.module.css'
 import { useDisplayControls } from './features/display'
 import { HeightmapOverlay, PerformanceOverlay } from './features/overlays'
-import { TerrainScene, initialPerfStats, type HeightmapPreviewData, type PerfStats } from './features/terrain'
-
-function CameraOrbitControls() {
-  const camera = useThree((state) => state.camera)
-  const gl = useThree((state) => state.gl)
-  const controlsRef = useRef<ThreeOrbitControls | null>(null)
-
-  useEffect(() => {
-    const controls = new ThreeOrbitControls(camera, gl.domElement)
-    controls.enablePan = true
-    controls.minDistance = 45
-    controls.maxDistance = 520
-    controls.maxPolarAngle = Math.PI * 0.49
-    controls.enableDamping = true
-    controlsRef.current = controls
-
-    return () => {
-      controls.dispose()
-      controlsRef.current = null
-    }
-  }, [camera, gl])
-
-  useFrame(() => {
-    controlsRef.current?.update()
-  })
-
-  return null
-}
+import {
+  SceneCameraControls,
+  TerrainScene,
+  initialPerfStats,
+  type HeightmapPreviewData,
+  type PerfStats,
+} from './features/terrain'
 
 function App() {
   const [perfStats, setPerfStats] = useState<PerfStats>(initialPerfStats)
@@ -83,7 +61,7 @@ function App() {
           waterWaveAmplitude={displayControls.waterWaveAmplitude}
           waterWaveFrequency={displayControls.waterWaveFrequency}
         />
-        <CameraOrbitControls />
+        <SceneCameraControls />
       </Canvas>
       <div className={styles.controlPanelShell} role="complementary" aria-label="Control panel">
         <Leva fill collapsed={false} titleBar={{ title: 'Control Panel' }} />
