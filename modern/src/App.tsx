@@ -2,6 +2,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import type { PostProcessSettings } from './lib/filters'
 import { buildVisibleChunks } from './lib/chunks'
 import { LruCache } from './lib/lru'
 import {
@@ -77,6 +78,7 @@ function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
       octaves: settings.octaves,
       persistence: settings.persistence,
       lacunarity: settings.lacunarity,
+      postProcess: settings.postProcess,
     }),
     [
       settings.seed,
@@ -87,6 +89,7 @@ function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
       settings.octaves,
       settings.persistence,
       settings.lacunarity,
+      settings.postProcess,
     ],
   )
 
@@ -207,10 +210,32 @@ function TerrainScene() {
     octaves: { value: 5, min: 1, max: 8, step: 1 },
     persistence: { value: 0.5, min: 0.2, max: 0.8, step: 0.01 },
     lacunarity: { value: 2, min: 1.2, max: 3, step: 0.1 },
+    postProcess: {
+      options: ['none', 'mean', 'median', 'conservative'],
+      value: 'none',
+    },
+    meanWeight: { value: 0, min: 0, max: 8, step: 0.5 },
+    conservativeMultiplier: { value: 1, min: 0.25, max: 12, step: 0.25 },
     cacheSize: { value: 96, min: 16, max: 192, step: 1 },
     maxInFlight: { value: 8, min: 1, max: 24, step: 1 },
     wireframe: false,
   })
+
+  const postProcess = useMemo<PostProcessSettings>(() => {
+    if (controls.postProcess === 'mean') {
+      return { mode: 'mean', weight: controls.meanWeight }
+    }
+    if (controls.postProcess === 'median') {
+      return { mode: 'median' }
+    }
+    if (controls.postProcess === 'conservative') {
+      return {
+        mode: 'conservative',
+        multiplier: controls.conservativeMultiplier,
+      }
+    }
+    return { mode: 'none' }
+  }, [controls.postProcess, controls.meanWeight, controls.conservativeMultiplier])
 
   const settings = useMemo(
     () => ({
@@ -223,11 +248,12 @@ function TerrainScene() {
       octaves: controls.octaves,
       persistence: controls.persistence,
       lacunarity: controls.lacunarity,
+      postProcess,
       cacheSize: controls.cacheSize,
       maxInFlight: controls.maxInFlight,
       wireframe: controls.wireframe,
     }),
-    [controls],
+    [controls, postProcess],
   )
 
   const terrainKey = useMemo(
@@ -241,6 +267,7 @@ function TerrainScene() {
         octaves: settings.octaves,
         persistence: settings.persistence,
         lacunarity: settings.lacunarity,
+        postProcess: settings.postProcess,
         cacheSize: settings.cacheSize,
         maxInFlight: settings.maxInFlight,
       }),
