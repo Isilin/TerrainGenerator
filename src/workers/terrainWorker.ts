@@ -12,10 +12,12 @@ import type {
 declare const self: DedicatedWorkerGlobalScope
 
 self.onmessage = (event: MessageEvent<TerrainChunkRequest>) => {
-  const { chunkX, chunkZ, settings } = event.data
+  const { requestId, streamRevision, chunkX, chunkZ, settings } = event.data
 
   const heights = generateChunkHeights(chunkX, chunkZ, settings)
   const response: TerrainChunkResponse = {
+    requestId,
+    streamRevision,
     chunkId: createChunkId(chunkX, chunkZ),
     chunkX,
     chunkZ,

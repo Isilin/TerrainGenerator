@@ -16,6 +16,9 @@ export type PerfStats = {
   loadedChunks: number
   inFlightRequests: number
   cacheSize: number
+  lastChunkLatencyMs: number
+  avgChunkLatencyMs: number
+  staleResponsesDiscarded: number
 }
 
 export type HeightmapPreviewData = {
@@ -59,6 +62,9 @@ export const initialPerfStats: PerfStats = {
   loadedChunks: 0,
   inFlightRequests: 0,
   cacheSize: 0,
+  lastChunkLatencyMs: 0,
+  avgChunkLatencyMs: 0,
+  staleResponsesDiscarded: 0,
 }
 
 export type TerrainChunkProps = {

@@ -7,7 +7,7 @@ import {
   type TerrainChunkSettings,
   type TerrainGenerationSettings,
 } from '../../../lib/terrain'
-import type { TerrainChunkResponse } from '../contracts/terrainWorker.contract'
+import type { TerrainChunkRequest, TerrainChunkResponse } from '../contracts/terrainWorker.contract'
 import type { HeightmapPreviewData, PerfStats } from '../types'
 
 export type TerrainStreamState = {
@@ -31,9 +31,24 @@ export const useTerrainStream = (
   onPerfUpdate: (stats: PerfStats) => void,
   onHeightmapUpdate: (preview: HeightmapPreviewData | null) => void,
 ) => {
+  type RequestMeta = {
+    requestId: string
+    streamRevision: number
+    startedAtMs: number
+  }
+
   const [chunkHeights, setChunkHeights] = useState<Record<string, Float32Array>>({})
   const workerRef = useRef<Worker | null>(null)
   const activeRequestsRef = useRef<Set<string>>(new Set())
+  const requestMetaRef = useRef<Map<string, RequestMeta>>(new Map())
+  const streamRevisionRef = useRef(0)
+  const visibleChunkIdsRef = useRef<Set<string>>(new Set())
+  const perfMetricsRef = useRef({
+    lastChunkLatencyMs: 0,
+    totalLatencyMs: 0,
+    completedRequests: 0,
+    staleResponsesDiscarded: 0,
+  })
   const cacheRef = useRef<LruCache<string, Float32Array>>(
     new LruCache<string, Float32Array>(settings.cacheSize),
   )
@@ -74,14 +89,41 @@ export const useTerrainStream = (
   )
 
   useEffect(() => {
+    const activeRequests = activeRequestsRef.current
+    const requestMeta = requestMetaRef.current
+
     const worker = new Worker(new URL('../../../workers/terrainWorker.ts', import.meta.url), {
       type: 'module',
     })
 
     worker.onmessage = (event: MessageEvent<TerrainChunkResponse>) => {
-      const { chunkId, heights } = event.data
+      const { requestId, streamRevision, chunkId, heights } = event.data
+      const metrics = perfMetricsRef.current
+      const requestMeta = requestMetaRef.current.get(chunkId)
+
+      if (requestMeta === undefined) {
+        metrics.staleResponsesDiscarded += 1
+        return
+      }
 
       activeRequestsRef.current.delete(chunkId)
+      requestMetaRef.current.delete(chunkId)
+
+      if (
+        requestMeta.requestId !== requestId ||
+        requestMeta.streamRevision !== streamRevision ||
+        !visibleChunkIdsRef.current.has(chunkId)
+      ) {
+        metrics.staleResponsesDiscarded += 1
+        cacheRef.current.set(chunkId, heights)
+        return
+      }
+
+      const latencyMs = Math.max(0, performance.now() - requestMeta.startedAtMs)
+      metrics.lastChunkLatencyMs = latencyMs
+      metrics.totalLatencyMs += latencyMs
+      metrics.completedRequests += 1
+
       cacheRef.current.set(chunkId, heights)
       setChunkHeights((previous) => {
         if (previous[chunkId] === heights) {
@@ -95,6 +137,8 @@ export const useTerrainStream = (
     return () => {
       worker.terminate()
       workerRef.current = null
+      activeRequests.clear()
+      requestMeta.clear()
     }
   }, [])
 
@@ -129,6 +173,21 @@ export const useTerrainStream = (
     [chunks],
   )
 
+  useEffect(() => {
+    streamRevisionRef.current += 1
+    const visibleIds = new Set<string>(chunks.map((chunk) => chunk.id))
+    visibleChunkIdsRef.current = visibleIds
+
+    for (const [chunkId, requestMeta] of requestMetaRef.current.entries()) {
+      if (!visibleIds.has(chunkId)) {
+        requestMetaRef.current.set(chunkId, {
+          ...requestMeta,
+          streamRevision: streamRevisionRef.current,
+        })
+      }
+    }
+  }, [chunks, generationSettings])
+
   useFrame((_, delta) => {
     const accumulator = fpsAccumulator.current
     accumulator.elapsed += delta
@@ -151,6 +210,12 @@ export const useTerrainStream = (
       loadedChunks,
       inFlightRequests: activeRequestsRef.current.size,
       cacheSize: cacheRef.current.size,
+      lastChunkLatencyMs: perfMetricsRef.current.lastChunkLatencyMs,
+      avgChunkLatencyMs:
+        perfMetricsRef.current.completedRequests > 0
+          ? perfMetricsRef.current.totalLatencyMs / perfMetricsRef.current.completedRequests
+          : 0,
+      staleResponsesDiscarded: perfMetricsRef.current.staleResponsesDiscarded,
     })
 
     accumulator.elapsed = 0
@@ -182,11 +247,22 @@ export const useTerrainStream = (
       }
 
       activeRequestsRef.current.add(chunk.id)
-      worker.postMessage({
+      const requestId = `${chunk.id}:${streamRevisionRef.current}:${performance.now().toFixed(3)}`
+      const request: TerrainChunkRequest = {
+        requestId,
+        streamRevision: streamRevisionRef.current,
         chunkX: chunk.x,
         chunkZ: chunk.z,
         settings: generationSettings,
+      }
+
+      requestMetaRef.current.set(chunk.id, {
+        requestId,
+        streamRevision: streamRevisionRef.current,
+        startedAtMs: performance.now(),
       })
+
+      worker.postMessage(request)
       availableSlots -= 1
     }
 

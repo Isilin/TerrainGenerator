@@ -32,6 +32,18 @@ export function PerformanceOverlay({ stats }: { stats: PerfStats }) {
           <dt>Cache LRU</dt>
           <dd>{stats.cacheSize}</dd>
         </div>
+        <div>
+          <dt>Latence req. (derniere)</dt>
+          <dd>{stats.lastChunkLatencyMs.toFixed(1)} ms</dd>
+        </div>
+        <div>
+          <dt>Latence req. (moyenne)</dt>
+          <dd>{stats.avgChunkLatencyMs.toFixed(1)} ms</dd>
+        </div>
+        <div>
+          <dt>Reponses obsoletes</dt>
+          <dd>{stats.staleResponsesDiscarded}</dd>
+        </div>
       </dl>
     </aside>
   )
