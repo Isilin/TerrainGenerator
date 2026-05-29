@@ -9,13 +9,19 @@ export type TerrainSamplingSettings = {
   lacunarity: number
 }
 
-export type TerrainChunkSettings = TerrainSamplingSettings & {
+export type TerrainGenerationSettings = TerrainSamplingSettings & {
   seed: string
   chunkSize: number
   chunkSegments: number
+}
+
+export type TerrainChunkSettings = TerrainGenerationSettings & {
   viewRadius: number
   wireframe: boolean
+  cacheSize: number
 }
+
+export const createChunkId = (x: number, z: number) => `${x}:${z}`
 
 export const sampleHeightAtWorld = (
   x: number,
@@ -34,12 +40,40 @@ export const sampleHeightAtWorld = (
   return value * settings.amplitude
 }
 
-export const createChunkGeometry = (
+export const generateChunkHeights = (
   chunkX: number,
   chunkZ: number,
-  settings: TerrainChunkSettings,
+  settings: TerrainGenerationSettings,
 ) => {
   const noise2d = createSeededNoise2D(settings.seed)
+  const vertexCountPerSide = settings.chunkSegments + 1
+  const step = settings.chunkSize / settings.chunkSegments
+  const half = settings.chunkSize * 0.5
+  const heights = new Float32Array(vertexCountPerSide * vertexCountPerSide)
+  const chunkOffsetX = chunkX * settings.chunkSize
+  const chunkOffsetZ = chunkZ * settings.chunkSize
+
+  for (let row = 0; row < vertexCountPerSide; row += 1) {
+    const localZ = -half + row * step
+    for (let col = 0; col < vertexCountPerSide; col += 1) {
+      const localX = -half + col * step
+      const index = row * vertexCountPerSide + col
+      heights[index] = sampleHeightAtWorld(
+        localX + chunkOffsetX,
+        localZ + chunkOffsetZ,
+        noise2d,
+        settings,
+      )
+    }
+  }
+
+  return heights
+}
+
+export const createChunkGeometryFromHeights = (
+  settings: TerrainGenerationSettings,
+  heights: Float32Array,
+) => {
   const geometry = new PlaneGeometry(
     settings.chunkSize,
     settings.chunkSize,
@@ -47,25 +81,22 @@ export const createChunkGeometry = (
     settings.chunkSegments,
   )
 
-  geometry.rotateX(-Math.PI / 2)
-
   const position = geometry.getAttribute('position') as BufferAttribute
-  const chunkOffsetX = chunkX * settings.chunkSize
-  const chunkOffsetZ = chunkZ * settings.chunkSize
-
   for (let i = 0; i < position.count; i += 1) {
-    const localX = position.getX(i)
-    const localZ = position.getZ(i)
-    const height = sampleHeightAtWorld(
-      localX + chunkOffsetX,
-      localZ + chunkOffsetZ,
-      noise2d,
-      settings,
-    )
-    position.setY(i, height)
+    position.setZ(i, heights[i])
   }
 
   position.needsUpdate = true
+  geometry.rotateX(-Math.PI / 2)
   geometry.computeVertexNormals()
   return geometry
+}
+
+export const createChunkGeometry = (
+  chunkX: number,
+  chunkZ: number,
+  settings: TerrainGenerationSettings,
+) => {
+  const heights = generateChunkHeights(chunkX, chunkZ, settings)
+  return createChunkGeometryFromHeights(settings, heights)
 }
