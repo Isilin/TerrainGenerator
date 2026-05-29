@@ -830,7 +830,7 @@ function App() {
     <main className="app-shell">
       <header className="hud">
         <h1>Terrain Generator v2</h1>
-        <p>Refonte en cours: rendu moderne avec seed reproducible et controles live.</p>
+        <p>Rendu moderne avec seed reproducible et controles live.</p>
       </header>
       {displayControls.showPerfDebug ? <PerformanceOverlay stats={perfStats} /> : null}
       {displayControls.showHeightmap ? <HeightmapOverlay preview={heightmapPreview} /> : null}

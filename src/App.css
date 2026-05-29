@@ -115,8 +115,11 @@
   z-index: 12;
   width: 336px;
   max-width: calc(100vw - 36px);
-  height: min(680px, calc(100svh - 36px));
-  min-height: 360px;
+  height: clamp(300px, calc(100svh - 120px), 560px);
+  max-height: calc(100svh - 36px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 
 .control-panel-shell > [data-leva-root='true'] {
@@ -124,8 +127,8 @@
 }
 
 .control-panel-shell > [data-leva-root='true'] > div {
-  max-height: 100%;
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
 }
 
 @media (max-width: 760px) {
@@ -159,7 +162,9 @@
     right: 12px;
     width: auto;
     max-width: none;
-    height: min(420px, calc(100svh - 24px));
-    min-height: 300px;
+    height: clamp(260px, calc(100svh - 180px), 380px);
+    max-height: calc(100svh - 24px);
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 }
