@@ -2,6 +2,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { buildVisibleChunks } from './lib/chunks'
 import { LruCache } from './lib/lru'
 import {
   createChunkGeometryFromHeights,
@@ -123,19 +124,12 @@ function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
   })
 
   const chunks = useMemo(() => {
-    const next: Array<{ x: number; z: number; id: string }> = []
-    for (let dz = -settings.viewRadius; dz <= settings.viewRadius; dz += 1) {
-      for (let dx = -settings.viewRadius; dx <= settings.viewRadius; dx += 1) {
-        const x = centerChunk.x + dx
-        const z = centerChunk.z + dz
-        next.push({ x, z, id: createChunkId(x, z) })
-      }
-    }
-    return next
+    return buildVisibleChunks(centerChunk, settings.viewRadius, createChunkId)
   }, [centerChunk, settings.viewRadius])
 
   useEffect(() => {
     const hydrateFromCache: Array<{ id: string; heights: Float32Array }> = []
+    let availableSlots = Math.max(1, settings.maxInFlight - activeRequestsRef.current.size)
 
     for (const chunk of chunks) {
       if (chunkHeights[chunk.id] !== undefined) {
@@ -152,6 +146,10 @@ function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
         continue
       }
 
+      if (availableSlots <= 0) {
+        continue
+      }
+
       const worker = workerRef.current
       if (worker === null) {
         continue
@@ -163,6 +161,7 @@ function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
         chunkZ: chunk.z,
         settings: generationSettings,
       })
+      availableSlots -= 1
     }
 
     if (hydrateFromCache.length > 0) {
@@ -180,7 +179,7 @@ function InfiniteTerrain({ settings }: { settings: TerrainChunkSettings }) {
         })
       })
     }
-  }, [chunks, chunkHeights, generationSettings])
+  }, [chunks, chunkHeights, generationSettings, settings.maxInFlight])
 
   return (
     <group>
@@ -209,6 +208,7 @@ function TerrainScene() {
     persistence: { value: 0.5, min: 0.2, max: 0.8, step: 0.01 },
     lacunarity: { value: 2, min: 1.2, max: 3, step: 0.1 },
     cacheSize: { value: 96, min: 16, max: 192, step: 1 },
+    maxInFlight: { value: 8, min: 1, max: 24, step: 1 },
     wireframe: false,
   })
 
@@ -224,6 +224,7 @@ function TerrainScene() {
       persistence: controls.persistence,
       lacunarity: controls.lacunarity,
       cacheSize: controls.cacheSize,
+      maxInFlight: controls.maxInFlight,
       wireframe: controls.wireframe,
     }),
     [controls],
@@ -241,6 +242,7 @@ function TerrainScene() {
         persistence: settings.persistence,
         lacunarity: settings.lacunarity,
         cacheSize: settings.cacheSize,
+        maxInFlight: settings.maxInFlight,
       }),
     [settings],
   )

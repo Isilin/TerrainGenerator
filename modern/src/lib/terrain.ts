@@ -19,6 +19,7 @@ export type TerrainChunkSettings = TerrainGenerationSettings & {
   viewRadius: number
   wireframe: boolean
   cacheSize: number
+  maxInFlight: number
 }
 
 export const createChunkId = (x: number, z: number) => `${x}:${z}`
