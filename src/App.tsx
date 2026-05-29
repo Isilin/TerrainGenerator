@@ -30,6 +30,11 @@ type PerfStats = {
   cacheSize: number
 }
 
+type HeightmapPreviewData = {
+  heights: Float32Array
+  side: number
+}
+
 const initialPerfStats: PerfStats = {
   fps: 0,
   centerChunkX: 0,
@@ -82,9 +87,11 @@ function TerrainChunk({
 function InfiniteTerrain({
   settings,
   onPerfUpdate,
+  onHeightmapUpdate,
 }: {
   settings: TerrainChunkSettings
   onPerfUpdate: (stats: PerfStats) => void
+  onHeightmapUpdate: (preview: HeightmapPreviewData | null) => void
 }) {
   const [centerChunk, setCenterChunk] = useState({ x: 0, z: 0 })
   const [chunkHeights, setChunkHeights] = useState<Record<string, Float32Array>>({})
@@ -239,6 +246,21 @@ function InfiniteTerrain({
     }
   }, [chunks, chunkHeights, generationSettings, settings.maxInFlight])
 
+  useEffect(() => {
+    const centerId = createChunkId(centerChunk.x, centerChunk.z)
+    const centerHeights = chunkHeights[centerId]
+
+    if (centerHeights === undefined) {
+      onHeightmapUpdate(null)
+      return
+    }
+
+    onHeightmapUpdate({
+      heights: centerHeights,
+      side: settings.chunkSegments + 1,
+    })
+  }, [centerChunk, chunkHeights, onHeightmapUpdate, settings.chunkSegments])
+
   return (
     <group>
       {chunks.map((chunk) => (
@@ -254,7 +276,13 @@ function InfiniteTerrain({
   )
 }
 
-function TerrainScene({ onPerfUpdate }: { onPerfUpdate: (stats: PerfStats) => void }) {
+function TerrainScene({
+  onPerfUpdate,
+  onHeightmapUpdate,
+}: {
+  onPerfUpdate: (stats: PerfStats) => void
+  onHeightmapUpdate: (preview: HeightmapPreviewData | null) => void
+}) {
   const controls = useControls('Generator', {
     seed: 'terrain-v2',
     chunkSize: { value: 140, min: 64, max: 280, step: 1 },
@@ -331,7 +359,12 @@ function TerrainScene({ onPerfUpdate }: { onPerfUpdate: (stats: PerfStats) => vo
 
   return (
     <group>
-      <InfiniteTerrain key={terrainKey} settings={settings} onPerfUpdate={onPerfUpdate} />
+      <InfiniteTerrain
+        key={terrainKey}
+        settings={settings}
+        onPerfUpdate={onPerfUpdate}
+        onHeightmapUpdate={onHeightmapUpdate}
+      />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.25, 0]} receiveShadow>
         <planeGeometry args={[2800, 2800, 1, 1]} />
         <meshStandardMaterial color="#718355" roughness={1} metalness={0} />
@@ -376,11 +409,81 @@ function PerformanceOverlay({ stats }: { stats: PerfStats }) {
   )
 }
 
+function HeightmapOverlay({ preview }: { preview: HeightmapPreviewData | null }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (canvas === null) {
+      return
+    }
+
+    const context = canvas.getContext('2d')
+    if (context === null) {
+      return
+    }
+
+    const width = canvas.width
+    const height = canvas.height
+    const image = context.createImageData(width, height)
+
+    if (preview === null) {
+      image.data.fill(0)
+      for (let i = 3; i < image.data.length; i += 4) {
+        image.data[i] = 255
+      }
+      context.putImageData(image, 0, 0)
+      return
+    }
+
+    let min = Number.POSITIVE_INFINITY
+    let max = Number.NEGATIVE_INFINITY
+
+    for (let i = 0; i < preview.heights.length; i += 1) {
+      const value = preview.heights[i]
+      if (value < min) min = value
+      if (value > max) max = value
+    }
+
+    const range = max - min || 1
+
+    for (let y = 0; y < height; y += 1) {
+      const sampleY = Math.floor((y / (height - 1)) * (preview.side - 1))
+      for (let x = 0; x < width; x += 1) {
+        const sampleX = Math.floor((x / (width - 1)) * (preview.side - 1))
+        const sourceIndex = sampleY * preview.side + sampleX
+        const normalized = (preview.heights[sourceIndex] - min) / range
+        const gray = Math.max(0, Math.min(255, Math.round(normalized * 255)))
+        const pixelIndex = (y * width + x) * 4
+        image.data[pixelIndex] = gray
+        image.data[pixelIndex + 1] = gray
+        image.data[pixelIndex + 2] = gray
+        image.data[pixelIndex + 3] = 255
+      }
+    }
+
+    context.putImageData(image, 0, 0)
+  }, [preview])
+
+  return (
+    <aside className="heightmap-overlay" aria-live="polite">
+      <h2>Heightmap</h2>
+      <canvas ref={canvasRef} width={128} height={128} />
+    </aside>
+  )
+}
+
 function App() {
   const [perfStats, setPerfStats] = useState<PerfStats>(initialPerfStats)
+  const [heightmapPreview, setHeightmapPreview] =
+    useState<HeightmapPreviewData | null>(null)
 
   const handlePerfUpdate = useCallback((stats: PerfStats) => {
     setPerfStats(stats)
+  }, [])
+
+  const handleHeightmapUpdate = useCallback((preview: HeightmapPreviewData | null) => {
+    setHeightmapPreview(preview)
   }, [])
 
   return (
@@ -390,6 +493,7 @@ function App() {
         <p>Refonte en cours: rendu moderne avec seed reproducible et controles live.</p>
       </header>
       <PerformanceOverlay stats={perfStats} />
+      <HeightmapOverlay preview={heightmapPreview} />
       <Canvas
         className="viewport"
         shadows
@@ -405,7 +509,10 @@ function App() {
           shadow-mapSize-width={2048}
           shadow-mapSize-height={2048}
         />
-        <TerrainScene onPerfUpdate={handlePerfUpdate} />
+        <TerrainScene
+          onPerfUpdate={handlePerfUpdate}
+          onHeightmapUpdate={handleHeightmapUpdate}
+        />
         <OrbitControls
           enablePan
           minDistance={45}

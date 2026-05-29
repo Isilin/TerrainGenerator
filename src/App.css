@@ -79,6 +79,35 @@
   font-weight: 600;
 }
 
+.heightmap-overlay {
+  position: absolute;
+  top: 250px;
+  right: 18px;
+  z-index: 11;
+  width: 160px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(11, 19, 43, 0.16);
+}
+
+.heightmap-overlay h2 {
+  margin: 0 0 8px;
+  font-size: 0.86rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.heightmap-overlay canvas {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  image-rendering: pixelated;
+  border-radius: 8px;
+  border: 1px solid rgba(16, 42, 67, 0.24);
+  display: block;
+}
+
 @media (max-width: 760px) {
   .hud {
     top: 12px;
@@ -92,6 +121,14 @@
     bottom: 12px;
     right: 12px;
     width: min(260px, calc(100vw - 24px));
+    border-radius: 12px;
+  }
+
+  .heightmap-overlay {
+    top: auto;
+    bottom: 208px;
+    right: 12px;
+    width: 140px;
     border-radius: 12px;
   }
 }
