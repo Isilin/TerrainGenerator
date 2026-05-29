@@ -5,4 +5,29 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: process.env.GITHUB_ACTIONS ? '/TerrainGenerator/' : '/',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) {
+            return undefined
+          }
+
+          if (id.includes('@react-three') || id.includes('three')) {
+            return 'vendor-three'
+          }
+
+          if (/node_modules[\\/](react|react-dom|scheduler|react-reconciler)/.test(id)) {
+            return 'vendor-react'
+          }
+
+          if (id.includes('leva') || id.includes('zustand')) {
+            return 'vendor-ui'
+          }
+
+          return 'vendor-misc'
+        },
+      },
+    },
+  },
 })
