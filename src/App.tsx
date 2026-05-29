@@ -3,8 +3,23 @@ import { OrbitControls } from '@react-three/drei'
 import { Leva, useControls } from 'leva'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { PostProcessSettings } from './lib/filters'
-import type { NoiseAlgorithm } from './lib/noise'
 import { buildVisibleChunks } from './lib/chunks'
+import {
+  LEGACY_CURVE_OPTIONS,
+  LEGACY_EASING_OPTIONS,
+  LEGACY_HEIGHTMAP_OPTIONS,
+  LEGACY_SCATTERING_OPTIONS,
+  LEGACY_SMOOTHING_OPTIONS,
+  LEGACY_TEXTURE_OPTIONS,
+  mapHeightmapToNoiseAlgorithm,
+  mapSmoothingToPostProcess,
+  type LegacyCurveOption,
+  type LegacyEasingOption,
+  type LegacyHeightmapOption,
+  type LegacyScatteringOption,
+  type LegacySmoothingOption,
+  type LegacyTextureOption,
+} from './lib/legacy'
 import { LruCache } from './lib/lru'
 import {
   createChunkGeometryFromHeights,
@@ -51,11 +66,13 @@ function TerrainChunk({
   chunkZ,
   heights,
   settings,
+  textureMode,
 }: {
   chunkX: number
   chunkZ: number
   heights: Float32Array | undefined
   settings: TerrainChunkSettings
+  textureMode: LegacyTextureOption
 }) {
   const geometry = useMemo(() => {
     if (heights === undefined) {
@@ -76,8 +93,8 @@ function TerrainChunk({
       castShadow
     >
       <meshStandardMaterial
-        color="#97a97c"
-        roughness={0.92}
+        color={textureMode === 'Grayscale' ? '#a0a4ab' : '#97a97c'}
+        roughness={textureMode === 'Grayscale' ? 0.96 : 0.92}
         metalness={0.05}
         wireframe={settings.wireframe}
       />
@@ -89,10 +106,12 @@ function InfiniteTerrain({
   settings,
   onPerfUpdate,
   onHeightmapUpdate,
+  textureMode,
 }: {
   settings: TerrainChunkSettings
   onPerfUpdate: (stats: PerfStats) => void
   onHeightmapUpdate: (preview: HeightmapPreviewData | null) => void
+  textureMode: LegacyTextureOption
 }) {
   const [centerChunk, setCenterChunk] = useState({ x: 0, z: 0 })
   const [chunkHeights, setChunkHeights] = useState<Record<string, Float32Array>>({})
@@ -273,6 +292,7 @@ function InfiniteTerrain({
           chunkZ={chunk.z}
           heights={chunkHeights[chunk.id]}
           settings={settings}
+          textureMode={textureMode}
         />
       ))}
     </group>
@@ -287,11 +307,31 @@ function TerrainScene({
   onHeightmapUpdate: (preview: HeightmapPreviewData | null) => void
 }) {
   const controls = useControls('Generator', {
-    seed: 'terrain-v2',
-    noiseAlgorithm: {
-      options: ['simplex', 'value', 'cellular'],
-      value: 'simplex',
+    easing: {
+      options: LEGACY_EASING_OPTIONS as unknown as string[],
+      value: 'Linear',
     },
+    heightmap: {
+      options: LEGACY_HEIGHTMAP_OPTIONS as unknown as string[],
+      value: 'PerlinDiamond',
+    },
+    smoothing: {
+      options: LEGACY_SMOOTHING_OPTIONS as unknown as string[],
+      value: 'None',
+    },
+    texture: {
+      options: LEGACY_TEXTURE_OPTIONS as unknown as string[],
+      value: 'Blended',
+    },
+    scattering: {
+      options: LEGACY_SCATTERING_OPTIONS as unknown as string[],
+      value: 'PerlinAltitude',
+    },
+    curve: {
+      options: LEGACY_CURVE_OPTIONS as unknown as string[],
+      value: 'EaseInOut',
+    },
+    seed: 'terrain-v2',
     chunkSize: { value: 140, min: 64, max: 280, step: 1 },
     chunkSegments: { value: 96, min: 16, max: 192, step: 1 },
     viewRadius: { value: 2, min: 1, max: 4, step: 1 },
@@ -311,26 +351,23 @@ function TerrainScene({
     wireframe: false,
   })
 
-  const postProcess = useMemo<PostProcessSettings>(() => {
-    if (controls.postProcess === 'mean') {
-      return { mode: 'mean', weight: controls.meanWeight }
-    }
-    if (controls.postProcess === 'median') {
-      return { mode: 'median' }
-    }
-    if (controls.postProcess === 'conservative') {
-      return {
-        mode: 'conservative',
-        multiplier: controls.conservativeMultiplier,
-      }
-    }
-    return { mode: 'none' }
-  }, [controls.postProcess, controls.meanWeight, controls.conservativeMultiplier])
+  const postProcess = useMemo<PostProcessSettings>(
+    () => mapSmoothingToPostProcess(controls.smoothing as LegacySmoothingOption),
+    [controls.smoothing],
+  )
 
   const settings = useMemo(
     () => ({
+      easing: controls.easing as LegacyEasingOption,
       seed: controls.seed,
-      noiseAlgorithm: controls.noiseAlgorithm as NoiseAlgorithm,
+      heightmap: controls.heightmap as LegacyHeightmapOption,
+      noiseAlgorithm: mapHeightmapToNoiseAlgorithm(
+        controls.heightmap as LegacyHeightmapOption,
+      ),
+      smoothing: controls.smoothing as LegacySmoothingOption,
+      texture: controls.texture as LegacyTextureOption,
+      scattering: controls.scattering as LegacyScatteringOption,
+      curve: controls.curve as LegacyCurveOption,
       chunkSize: controls.chunkSize,
       chunkSegments: controls.chunkSegments,
       viewRadius: controls.viewRadius,
@@ -350,8 +387,14 @@ function TerrainScene({
   const terrainKey = useMemo(
     () =>
       JSON.stringify({
+        easing: settings.easing,
         seed: settings.seed,
+        heightmap: settings.heightmap,
         noiseAlgorithm: settings.noiseAlgorithm,
+        smoothing: settings.smoothing,
+        texture: settings.texture,
+        scattering: settings.scattering,
+        curve: settings.curve,
         chunkSize: settings.chunkSize,
         chunkSegments: settings.chunkSegments,
         amplitude: settings.amplitude,
@@ -373,6 +416,7 @@ function TerrainScene({
         settings={settings}
         onPerfUpdate={onPerfUpdate}
         onHeightmapUpdate={onHeightmapUpdate}
+        textureMode={settings.texture}
       />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.25, 0]} receiveShadow>
         <planeGeometry args={[2800, 2800, 1, 1]} />

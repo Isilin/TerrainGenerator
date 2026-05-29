@@ -122,6 +122,82 @@ export const smoothConservative = (
   return result
 }
 
+const buildGaussianKernel = (sigma: number, kernelSize: number) => {
+  const size = Math.max(3, kernelSize % 2 === 0 ? kernelSize + 1 : kernelSize)
+  const radius = Math.floor(size * 0.5)
+  const kernel = new Float32Array(size)
+  const variance = Math.max(1e-6, sigma * sigma)
+
+  let sum = 0
+  for (let i = -radius; i <= radius; i += 1) {
+    const index = i + radius
+    const value = Math.exp(-(i * i) / (2 * variance))
+    kernel[index] = value
+    sum += value
+  }
+
+  for (let i = 0; i < kernel.length; i += 1) {
+    kernel[i] /= sum
+  }
+
+  return kernel
+}
+
+const blurHorizontal = (source: Float32Array, options: HeightFieldOptions, kernel: Float32Array) => {
+  const radius = Math.floor(kernel.length * 0.5)
+  const result = new Float32Array(source.length)
+
+  for (let y = 0; y < options.height; y += 1) {
+    for (let x = 0; x < options.width; x += 1) {
+      let sum = 0
+      for (let k = -radius; k <= radius; k += 1) {
+        const sx = Math.max(0, Math.min(options.width - 1, x + k))
+        sum += source[toIndex(sx, y, options.width)] * kernel[k + radius]
+      }
+      result[toIndex(x, y, options.width)] = sum
+    }
+  }
+
+  return result
+}
+
+const blurVertical = (source: Float32Array, options: HeightFieldOptions, kernel: Float32Array) => {
+  const radius = Math.floor(kernel.length * 0.5)
+  const result = new Float32Array(source.length)
+
+  for (let y = 0; y < options.height; y += 1) {
+    for (let x = 0; x < options.width; x += 1) {
+      let sum = 0
+      for (let k = -radius; k <= radius; k += 1) {
+        const sy = Math.max(0, Math.min(options.height - 1, y + k))
+        sum += source[toIndex(x, sy, options.width)] * kernel[k + radius]
+      }
+      result[toIndex(x, y, options.width)] = sum
+    }
+  }
+
+  return result
+}
+
+export const smoothGaussian = (
+  source: Float32Array,
+  options: HeightFieldOptions,
+  sigma: number,
+  kernelSize: number,
+) => {
+  const kernel = buildGaussianKernel(sigma, kernelSize)
+  const horizontal = blurHorizontal(source, options, kernel)
+  return blurVertical(horizontal, options, kernel)
+}
+
+export const smoothGaussianBox = (source: Float32Array, options: HeightFieldOptions) => {
+  let output = source
+  for (let i = 0; i < 3; i += 1) {
+    output = smoothMean(output, options, 0)
+  }
+  return output
+}
+
 export const clampHeights = (
   source: Float32Array,
   minHeight: number,
@@ -159,6 +235,8 @@ export type PostProcessSettings =
   | { mode: 'mean'; weight: number }
   | { mode: 'median' }
   | { mode: 'conservative'; multiplier: number }
+  | { mode: 'gaussian'; sigma: number; kernelSize: number }
+  | { mode: 'gaussianBox' }
 
 export const applyPostProcess = (
   source: Float32Array,
@@ -175,6 +253,14 @@ export const applyPostProcess = (
 
   if (settings.mode === 'median') {
     return smoothMedian(source, options)
+  }
+
+  if (settings.mode === 'gaussian') {
+    return smoothGaussian(source, options, settings.sigma, settings.kernelSize)
+  }
+
+  if (settings.mode === 'gaussianBox') {
+    return smoothGaussianBox(source, options)
   }
 
   return smoothConservative(source, options, settings.multiplier)

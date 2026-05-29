@@ -3,6 +3,8 @@ import {
   applyPostProcess,
   clampHeights,
   smoothConservative,
+  smoothGaussian,
+  smoothGaussianBox,
   smoothMean,
   smoothMedian,
 } from './filters'
@@ -67,5 +69,28 @@ describe('filters', () => {
 
     expect(toArray(none)).toEqual(toArray(heights))
     expect(mean[4]).toBeLessThan(heights[4])
+  })
+
+  it('gaussian smoothing softens spikes', () => {
+    const heights = new Float32Array([
+      0, 0, 0,
+      0, 9, 0,
+      0, 0, 0,
+    ])
+
+    const smoothed = smoothGaussian(heights, options, 1, 7)
+    expect(smoothed[4]).toBeLessThan(heights[4])
+    expect(smoothed[4]).toBeGreaterThan(0)
+  })
+
+  it('gaussian box smoothing softens spikes', () => {
+    const heights = new Float32Array([
+      0, 0, 0,
+      0, 9, 0,
+      0, 0, 0,
+    ])
+
+    const smoothed = smoothGaussianBox(heights, options)
+    expect(smoothed[4]).toBeLessThan(heights[4])
   })
 })
