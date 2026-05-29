@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   base: process.env.GITHUB_ACTIONS ? '/TerrainGenerator/' : '/',
   build: {
+    chunkSizeWarningLimit: 900,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -13,8 +14,12 @@ export default defineConfig({
             return undefined
           }
 
-          if (id.includes('@react-three') || id.includes('three')) {
-            return 'vendor-three'
+          if (/node_modules[\\/]three[\\/]/.test(id)) {
+            return 'vendor-three-core'
+          }
+
+          if (id.includes('@react-three/fiber')) {
+            return 'vendor-r3f'
           }
 
           if (/node_modules[\\/](react|react-dom|scheduler|react-reconciler)/.test(id)) {
