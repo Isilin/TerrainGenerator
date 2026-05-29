@@ -3,7 +3,7 @@
 Refonte moderne d'un generateur procedural de terrain pour le web.
 
 Le projet historique (AngularJS/Gulp/Bower/Express) a ete retire du runtime actif.
-La version maintenue est maintenant dans `modern/` avec:
+La version maintenue est maintenant a la racine du repo avec:
 
 - React + TypeScript + Vite
 - Three.js via react-three-fiber
@@ -22,7 +22,6 @@ Prerequis:
 Installation:
 
 ```bash
-cd modern
 npm install
 ```
 
@@ -44,9 +43,7 @@ Tests:
 npm run test
 ```
 
-## Scripts racine
-
-Le `package.json` racine expose des raccourcis qui deleguent vers `modern/`:
+## Scripts
 
 - `npm run dev`
 - `npm run build`

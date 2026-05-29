@@ -1,4 +1,4 @@
-name: Deploy Modern App to GitHub Pages
+name: Deploy App to GitHub Pages
 
 on:
   push:
@@ -26,31 +26,27 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: modern/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
       - name: Install dependencies
-        working-directory: modern
         run: npm ci
 
       - name: Run lint
-        working-directory: modern
         run: npm run lint
 
       - name: Run tests
-        working-directory: modern
         run: npm run test
 
       - name: Run build
-        working-directory: modern
         run: npm run build
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: modern/dist
+          path: dist
 
   deploy:
     environment:

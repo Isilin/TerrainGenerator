@@ -1,9 +1,9 @@
 {
     "name": "terraingenerator",
-    "version": "2.0.0",
+    "private": true,
+    "version": "2.1.0",
     "description": "Modern procedural terrain generator (React + TypeScript + Three.js).",
     "license": "GPL-3.0",
-    "private": true,
     "type": "module",
     "author": {
         "name": "Pierre Casati",
@@ -22,10 +22,37 @@
         "node": ">=20"
     },
     "scripts": {
-        "dev": "npm --prefix modern run dev",
-        "build": "npm --prefix modern run build",
-        "lint": "npm --prefix modern run lint",
-        "test": "npm --prefix modern run test",
-        "preview": "npm --prefix modern run preview"
+        "dev": "vite",
+        "build": "tsc -b && vite build",
+        "lint": "eslint .",
+        "test": "vitest run",
+        "test:watch": "vitest",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@react-three/drei": "^10.7.7",
+        "@react-three/fiber": "^9.6.1",
+        "leva": "^0.10.1",
+        "react": "^19.2.6",
+        "react-dom": "^19.2.6",
+        "simplex-noise": "^4.0.3",
+        "three": "^0.184.0",
+        "zustand": "^5.0.13"
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "@types/node": "^24.12.3",
+        "@types/react": "^19.2.14",
+        "@types/react-dom": "^19.2.3",
+        "@types/three": "^0.184.1",
+        "@vitejs/plugin-react": "^6.0.1",
+        "eslint": "^10.3.0",
+        "eslint-plugin-react-hooks": "^7.1.1",
+        "eslint-plugin-react-refresh": "^0.5.2",
+        "globals": "^17.6.0",
+        "typescript": "~6.0.2",
+        "typescript-eslint": "^8.59.2",
+        "vite": "^8.0.12",
+        "vitest": "^4.1.7"
     }
 }
