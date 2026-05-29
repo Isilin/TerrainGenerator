@@ -24,6 +24,7 @@ import { LruCache } from './lib/lru'
 import {
   createChunkGeometryFromHeights,
   createChunkId,
+  createWaterGeometryFromHeights,
   type TerrainColorMode,
   type TerrainChunkSettings,
   type TerrainGenerationSettings,
@@ -61,6 +62,48 @@ const initialPerfStats: PerfStats = {
   inFlightRequests: 0,
   cacheSize: 0,
 }
+
+const WATER_VERTEX_SHADER = `
+  attribute float depthFactor;
+  varying float vDepth;
+  varying vec3 vWorldPos;
+  varying vec3 vWorldNormal;
+
+  void main() {
+    vDepth = depthFactor;
+    vec4 worldPos = modelMatrix * vec4(position, 1.0);
+    vWorldPos = worldPos.xyz;
+    vWorldNormal = normalize(mat3(modelMatrix) * normal);
+    gl_Position = projectionMatrix * viewMatrix * worldPos;
+  }
+`
+
+const WATER_FRAGMENT_SHADER = `
+  uniform vec3 waterColor;
+  uniform float baseOpacity;
+  uniform float depthOpacityBoost;
+  uniform float reflectionStrength;
+  uniform vec3 lightDirection;
+
+  varying float vDepth;
+  varying vec3 vWorldPos;
+  varying vec3 vWorldNormal;
+
+  void main() {
+    vec3 normal = normalize(vWorldNormal);
+    vec3 viewDir = normalize(cameraPosition - vWorldPos);
+    vec3 lightDir = normalize(lightDirection);
+
+    float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 3.0);
+    float specular = pow(max(dot(reflect(-lightDir, normal), viewDir), 0.0), 44.0);
+    float alpha = clamp(baseOpacity + vDepth * depthOpacityBoost, 0.03, 0.96);
+
+    vec3 reflectedLight = vec3((fresnel + specular * 0.7) * reflectionStrength);
+    vec3 finalColor = waterColor + reflectedLight;
+
+    gl_FragColor = vec4(finalColor, alpha);
+  }
+`
 
 function TerrainChunk({
   chunkX,
@@ -106,16 +149,80 @@ function TerrainChunk({
   )
 }
 
+function WaterChunk({
+  chunkX,
+  chunkZ,
+  heights,
+  settings,
+  baseOpacity,
+  depthOpacityBoost,
+  reflectionStrength,
+}: {
+  chunkX: number
+  chunkZ: number
+  heights: Float32Array | undefined
+  settings: TerrainChunkSettings
+  baseOpacity: number
+  depthOpacityBoost: number
+  reflectionStrength: number
+}) {
+  const geometry = useMemo(() => {
+    if (heights === undefined) {
+      return null
+    }
+    return createWaterGeometryFromHeights(settings, heights)
+  }, [heights, settings])
+
+  const uniforms = useMemo(
+    () => ({
+      waterColor: { value: [0.29, 0.62, 0.86] },
+      baseOpacity: { value: baseOpacity },
+      depthOpacityBoost: { value: depthOpacityBoost },
+      reflectionStrength: { value: reflectionStrength },
+      lightDirection: { value: [0.52, 0.8, 0.32] },
+    }),
+    [baseOpacity, depthOpacityBoost, reflectionStrength],
+  )
+
+  if (geometry === null) {
+    return null
+  }
+
+  return (
+    <mesh
+      geometry={geometry}
+      position={[chunkX * settings.chunkSize, 0, chunkZ * settings.chunkSize]}
+      renderOrder={2}
+    >
+      <shaderMaterial
+        vertexShader={WATER_VERTEX_SHADER}
+        fragmentShader={WATER_FRAGMENT_SHADER}
+        uniforms={uniforms}
+        transparent
+        depthWrite={false}
+      />
+    </mesh>
+  )
+}
+
 function InfiniteTerrain({
   settings,
   onPerfUpdate,
   onHeightmapUpdate,
   textureMode,
+  showWater,
+  waterOpacity,
+  waterDepthOpacityBoost,
+  waterReflection,
 }: {
   settings: TerrainChunkSettings
   onPerfUpdate: (stats: PerfStats) => void
   onHeightmapUpdate: (preview: HeightmapPreviewData | null) => void
   textureMode: LegacyTextureOption
+  showWater: boolean
+  waterOpacity: number
+  waterDepthOpacityBoost: number
+  waterReflection: number
 }) {
   const [centerChunk, setCenterChunk] = useState({ x: 0, z: 0 })
   const [chunkHeights, setChunkHeights] = useState<Record<string, Float32Array>>({})
@@ -305,6 +412,20 @@ function InfiniteTerrain({
           textureMode={textureMode}
         />
       ))}
+      {showWater
+        ? chunks.map((chunk) => (
+            <WaterChunk
+              key={`water-${chunk.id}`}
+              chunkX={chunk.x}
+              chunkZ={chunk.z}
+              heights={chunkHeights[chunk.id]}
+              settings={settings}
+              baseOpacity={waterOpacity}
+              depthOpacityBoost={waterDepthOpacityBoost}
+              reflectionStrength={waterReflection}
+            />
+          ))
+        : null}
     </group>
   )
 }
@@ -314,11 +435,15 @@ function TerrainScene({
   onHeightmapUpdate,
   showWater,
   waterOpacity,
+  waterDepthOpacityBoost,
+  waterReflection,
 }: {
   onPerfUpdate: (stats: PerfStats) => void
   onHeightmapUpdate: (preview: HeightmapPreviewData | null) => void
   showWater: boolean
   waterOpacity: number
+  waterDepthOpacityBoost: number
+  waterReflection: number
 }) {
   const controls = useControls('Generator', {
     easing: {
@@ -425,20 +550,11 @@ function TerrainScene({
         onPerfUpdate={onPerfUpdate}
         onHeightmapUpdate={onHeightmapUpdate}
         textureMode={settings.texture}
+        showWater={showWater}
+        waterOpacity={waterOpacity}
+        waterDepthOpacityBoost={waterDepthOpacityBoost}
+        waterReflection={waterReflection}
       />
-      {showWater ? (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-          <planeGeometry args={[3200, 3200, 1, 1]} />
-          <meshStandardMaterial
-            color="#4ea8de"
-            transparent
-            opacity={waterOpacity}
-            roughness={0.24}
-            metalness={0.05}
-            depthWrite={false}
-          />
-        </mesh>
-      ) : null}
     </group>
   )
 }
@@ -553,6 +669,8 @@ function App() {
     showHeightmap: true,
     showWater: true,
     waterOpacity: { value: 0.26, min: 0.05, max: 0.8, step: 0.01 },
+    waterDepthOpacityBoost: { value: 0.56, min: 0, max: 1.2, step: 0.01 },
+    waterReflection: { value: 0.26, min: 0, max: 1.1, step: 0.01 },
   })
 
   const handlePerfUpdate = useCallback((stats: PerfStats) => {
@@ -591,6 +709,8 @@ function App() {
           onHeightmapUpdate={handleHeightmapUpdate}
           showWater={displayControls.showWater}
           waterOpacity={displayControls.waterOpacity}
+          waterDepthOpacityBoost={displayControls.waterDepthOpacityBoost}
+          waterReflection={displayControls.waterReflection}
         />
         <OrbitControls
           enablePan

@@ -218,6 +218,43 @@ export const createChunkGeometryFromHeights = (
   return geometry
 }
 
+export const createWaterGeometryFromHeights = (
+  settings: TerrainGenerationSettings,
+  heights: Float32Array,
+  options?: {
+    waterLevel?: number
+    surfaceLift?: number
+    maxDepthForOpacity?: number
+  },
+) => {
+  const waterLevel = options?.waterLevel ?? 0
+  const surfaceLift = options?.surfaceLift ?? 0.08
+  const maxDepthForOpacity = options?.maxDepthForOpacity ?? Math.max(1, settings.amplitude)
+
+  const geometry = new PlaneGeometry(
+    settings.chunkSize,
+    settings.chunkSize,
+    settings.chunkSegments,
+    settings.chunkSegments,
+  )
+
+  const position = geometry.getAttribute('position') as BufferAttribute
+  const depthFactor = new Float32Array(position.count)
+
+  for (let i = 0; i < position.count; i += 1) {
+    const depth = Math.max(0, waterLevel - heights[i])
+    depthFactor[i] = Math.max(0, Math.min(1, depth / maxDepthForOpacity))
+    position.setZ(i, waterLevel + surfaceLift)
+  }
+
+  geometry.setAttribute('depthFactor', new Float32BufferAttribute(depthFactor, 1))
+
+  position.needsUpdate = true
+  geometry.rotateX(-Math.PI / 2)
+  geometry.computeVertexNormals()
+  return geometry
+}
+
 export const createChunkGeometry = (
   chunkX: number,
   chunkZ: number,
