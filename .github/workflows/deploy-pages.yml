@@ -35,6 +35,14 @@ jobs:
         working-directory: modern
         run: npm ci
 
+      - name: Run lint
+        working-directory: modern
+        run: npm run lint
+
+      - name: Run tests
+        working-directory: modern
+        run: npm run test
+
       - name: Run build
         working-directory: modern
         run: npm run build

@@ -1,0 +1,33 @@
+import { describe, expect, it } from 'vitest'
+import { createSeededNoise2D } from './noise'
+import { sampleHeightAtWorld } from './terrain'
+
+const samplingSettings = {
+  amplitude: 24,
+  frequency: 0.012,
+  octaves: 5,
+  persistence: 0.5,
+  lacunarity: 2,
+}
+
+describe('terrain sampling', () => {
+  it('returns deterministic values for a given seed', () => {
+    const noiseA = createSeededNoise2D('seed-a')
+    const noiseB = createSeededNoise2D('seed-a')
+
+    const heightA = sampleHeightAtWorld(123.5, -77.25, noiseA, samplingSettings)
+    const heightB = sampleHeightAtWorld(123.5, -77.25, noiseB, samplingSettings)
+
+    expect(heightA).toBeCloseTo(heightB, 10)
+  })
+
+  it('changes output when seed changes', () => {
+    const noiseA = createSeededNoise2D('seed-a')
+    const noiseB = createSeededNoise2D('seed-b')
+
+    const heightA = sampleHeightAtWorld(33.2, 190.1, noiseA, samplingSettings)
+    const heightB = sampleHeightAtWorld(33.2, 190.1, noiseB, samplingSettings)
+
+    expect(heightA).not.toBeCloseTo(heightB, 8)
+  })
+})
